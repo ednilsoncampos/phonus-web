@@ -165,53 +165,53 @@
 
 ---
 
-## Etapa 4 — Categorias
+## Etapa 4 — Categorias ✅
 
 > Implementar antes de Produtos, pois Produtos depende de Categorias de Produto.
 
 ### 4.1 Categorias de Produto (`/categorias/produto`)
-- [ ] Criar `CategoriaProdutoService` — `listar()`, `criar()`, `editar()`
-- [ ] Lista com nome e status ativo
-- [ ] Criar/editar inline ou via dialog
-- [ ] Toggle ativo/inativo
+- [x] Criar `CategoriaProdutoService` — `listar()`, `criar()`, `editar()`
+- [x] Lista com nome e status ativo
+- [x] Criar/editar inline ou via dialog
+- [x] Toggle ativo/inativo
 
 ### 4.2 Categorias de Lançamento (`/categorias/lancamento`)
-- [ ] Criar `CategoriaLancamentoService` — `listar()`, `criar()`, `editar()`
-- [ ] Lista com nome, tipo (ENTRADA / SAIDA / AMBOS) e status
-- [ ] Criar/editar inline ou via dialog
-- [ ] Toggle ativo/inativo
+- [x] Criar `CategoriaLancamentoService` — `listar()`, `criar()`, `editar()`
+- [x] Lista com nome, tipo (ENTRADA / SAIDA / AMBOS) e status
+- [x] Criar/editar inline ou via dialog
+- [x] Toggle ativo/inativo
 
 ---
 
-## Etapa 5 — Cadastro de Produtos
+## Etapa 5 — Cadastro de Produtos ✅
 
 ### 5.1 ProdutoService
-- [ ] Criar `ProdutoService`
-- [ ] `listar(params)` — `GET /produtos?page&size&categoriaId&ativos&abaixoDoMinimo`
-- [ ] `buscar(id)` — `GET /produtos/{id}`
-- [ ] `criar(body)` — `POST /produtos`
-- [ ] `atualizar(id, body)` — `PUT /produtos/{id}`
-- [ ] `desativar(id)` — `PATCH /produtos/{id}/desativar`
+- [x] Criar `ProdutoService`
+- [x] `listar(params)` — `GET /produtos?page&size&categoriaId&ativos&abaixoDoMinimo`
+- [x] `buscar(id)` — `GET /produtos/{id}`
+- [x] `criar(body)` — `POST /produtos`
+- [x] `atualizar(id, body)` — `PUT /produtos/{id}`
+- [x] `desativar(id)` — `PATCH /produtos/{id}/desativar`
 
 ### 5.2 Lista de Produtos (`/produtos`)
-- [ ] Tabela com: nome, categoria, preço de venda, estoque, status
-- [ ] `CurrencyBrlPipe` nos preços
-- [ ] Badge "Abaixo do mínimo" quando `abaixoDoMinimo = true`
-- [ ] Filtros: categoria, ativos (toggle), abaixo do mínimo (toggle)
-- [ ] Paginação com `MatPaginator` (`PageResponse<Produto>`, `size=20`)
-- [ ] Botão "Novo produto"
+- [x] Tabela com: nome, categoria, preço de venda, estoque, status
+- [x] `CurrencyBrlPipe` nos preços
+- [x] Badge "Abaixo do mínimo" quando `abaixoDoMinimo = true`
+- [x] Filtros: categoria, ativos (toggle), abaixo do mínimo (toggle)
+- [x] Paginação com `MatPaginator` (`PageResponse<Produto>`, `size=20`)
+- [x] Botão "Novo produto"
 
 ### 5.3 Formulário de Produto (`/produtos/novo` e `/produtos/:id/editar`)
-- [ ] Campos: nome, descrição, categoria, preço de venda, preço de custo, estoque mínimo, unidade de medida, código de barras, NCM, CEST
-- [ ] `categoriaId` — select populado de `CategoriaProdutoService`
-- [ ] `unidadeMedida` — select com enum (`UN`, `KG`, `L`, `M`, `M2`, `CX`, `PCT`)
-- [ ] Preços com máscara em Reais (convertendo para centavos no submit)
-- [ ] Validações: nome required, preço de venda required, estoque mínimo required
+- [x] Campos: nome, descrição, categoria, preço de venda, preço de custo, estoque mínimo, unidade de medida, código de barras, NCM, CEST
+- [x] `categoriaId` — select populado de `CategoriaProdutoService`
+- [x] `unidadeMedida` — select com enum (`UN`, `KG`, `L`, `M`, `M2`, `CX`, `PCT`)
+- [x] Preços com máscara em Reais (convertendo para centavos no submit)
+- [x] Validações: nome required, preço de venda required, estoque mínimo required
 
 ### 5.4 Detalhe do Produto (`/produtos/:id`)
-- [ ] Exibir todos os campos do produto
-- [ ] Botões: "Editar", "Desativar"
-- [ ] Atalho para histórico de estoque do produto
+- [x] Exibir todos os campos do produto
+- [x] Botões: "Editar", "Desativar"
+- [x] Atalho para histórico de estoque do produto
 
 ---
 
