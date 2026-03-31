@@ -215,45 +215,45 @@
 
 ---
 
-## Etapa 6 — Controle de Estoque
+## Etapa 6 — Controle de Estoque ✅
 
 ### 6.1 EstoqueService
-- [ ] Criar `EstoqueService`
-- [ ] `listarMovimentacoes(params)` — `GET /estoque/movimentacoes?page&size&produtoId&dataInicio&dataFim&origem`
-- [ ] `listarPorProduto(id, params)` — `GET /estoque/movimentacoes/produto/{id}?page&size`
-- [ ] `ajustar(produtoId, body)` — `POST /estoque/ajuste?produtoId={id}`
+- [x] Criar `EstoqueService`
+- [x] `listarMovimentacoes(params)` — `GET /estoque/movimentacoes?page&size&produtoId&dataInicio&dataFim&origem`
+- [x] `listarPorProduto(id, params)` — `GET /estoque/movimentacoes/produto/{id}?page&size`
+- [x] `ajustar(produtoId, body)` — `POST /estoque/ajuste?produtoId={id}`
 
 ### 6.2 Histórico Geral (`/estoque`)
-- [ ] Tabela com: produto, tipo, quantidade, origem, data, observação
-- [ ] Filtros: produto (autocomplete), período (data início/fim), origem
-- [ ] Paginação (`PageResponse<MovimentacaoEstoque>`, `size=20`)
-- [ ] Botão "Ajustar estoque"
+- [x] Tabela com: produto, tipo, quantidade, origem, data, observação
+- [x] Filtros: produto (autocomplete), período (data início/fim), origem
+- [x] Paginação (`PageResponse<MovimentacaoEstoque>`, `size=20`)
+- [x] Botão "Ajustar estoque"
 
 ### 6.3 Ajuste de Estoque (dialog)
-- [ ] `AjusteEstoqueDialogComponent`
-- [ ] Campos: tipo (`AJUSTE_POSITIVO` / `AJUSTE_NEGATIVO`), quantidade, observação
-- [ ] Produto pré-preenchido quando chamado via detalhe do produto
+- [x] `AjusteEstoqueDialogComponent`
+- [x] Campos: tipo (`AJUSTE_POSITIVO` / `AJUSTE_NEGATIVO`), quantidade, observação
+- [x] Produto pré-preenchido quando chamado via detalhe do produto
 
 ---
 
-## Etapa 7 — Clientes
+## Etapa 7 — Clientes ✅
 
 ### 7.1 ClienteService
-- [ ] Criar `ClienteService`
-- [ ] `listar(params)` — `GET /clientes?page&size&ativos`
-- [ ] `criar(body)` — `POST /clientes`
-- [ ] `atualizar(id, body)` — `PUT /clientes/{id}`
+- [x] Criar `ClienteService`
+- [x] `listar(params)` — `GET /clientes?page&size&ativos`
+- [x] `criar(body)` — `POST /clientes`
+- [x] `atualizar(id, body)` — `PUT /clientes/{id}`
 
 ### 7.2 Lista de Clientes (`/clientes`)
-- [ ] Tabela com: nome, documento, e-mail, telefone, status
-- [ ] Paginação (`PageResponse<Cliente>`, `size=20`)
-- [ ] Filtro por ativos
-- [ ] Botão "Novo cliente"
+- [x] Tabela com: nome, documento, e-mail, telefone, status
+- [x] Paginação (`PageResponse<Cliente>`, `size=20`)
+- [x] Filtro por ativos
+- [x] Botão "Novo cliente"
 
 ### 7.3 Formulário de Cliente
-- [ ] Campos: nome (required), documento, e-mail, telefone
-- [ ] Usado tanto para criar quanto para editar (dialog ou página)
-- [ ] Toggle ativo/inativo no modo edição
+- [x] Campos: nome (required), documento, e-mail, telefone
+- [x] Usado tanto para criar quanto para editar (dialog ou página)
+- [x] Toggle ativo/inativo no modo edição
 
 ---
 
