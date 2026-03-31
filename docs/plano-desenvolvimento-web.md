@@ -257,44 +257,44 @@
 
 ---
 
-## Etapa 8 — Fornecedores
+## Etapa 8 — Fornecedores ✅
 
 ### 8.1 FornecedorService
-- [ ] Criar `FornecedorService`
-- [ ] `listar(params)` — `GET /fornecedores?page&size&ativos`
-- [ ] `criar(body)` — `POST /fornecedores`
-- [ ] `atualizar(id, body)` — `PUT /fornecedores/{id}`
+- [x] Criar `FornecedorService`
+- [x] `listar(params)` — `GET /fornecedores?page&size&ativos`
+- [x] `criar(body)` — `POST /fornecedores`
+- [x] `atualizar(id, body)` — `PUT /fornecedores/{id}`
 
 ### 8.2 Lista de Fornecedores (`/fornecedores`)
-- [ ] Tabela com: nome, documento, e-mail, telefone, status
-- [ ] Paginação (`PageResponse<Fornecedor>`, `size=20`)
-- [ ] Filtro por ativos
-- [ ] Botão "Novo fornecedor"
+- [x] Tabela com: nome, documento, e-mail, telefone, status
+- [x] Paginação (`PageResponse<Fornecedor>`, `size=20`)
+- [x] Filtro por ativos
+- [x] Botão "Novo fornecedor"
 
 ### 8.3 Formulário de Fornecedor
-- [ ] Campos: nome (required), documento, e-mail, telefone
-- [ ] Toggle ativo/inativo no modo edição
+- [x] Campos: nome (required), documento, e-mail, telefone
+- [x] Toggle ativo/inativo no modo edição
 
 ---
 
-## Etapa 9 — Termos de Uso *(ROOT)*
+## Etapa 9 — Termos de Uso *(ROOT)* ✅
 
 ### 9.1 TermosService
-- [ ] Criar `TermosService`
-- [ ] `listarVersoes()` — `GET /termos/admin`
-- [ ] `criarVersao(body)` — `POST /termos/admin`
-- [ ] `buscarAtual()` — `GET /termos/atual`
+- [x] Criar `TermosService`
+- [x] `listarVersoes()` — `GET /termos/admin`
+- [x] `criarVersao(body)` — `POST /termos/admin`
+- [x] `buscarAtual()` — `GET /termos/atual`
 
 ### 9.2 Lista de Versões (`/termos`)
-- [ ] Tabela: versão, título, data, status ativo
-- [ ] Badge "Ativo" na versão corrente
-- [ ] Botão "Nova versão"
-- [ ] Link "Preview" → abre modal com `GET /termos/atual`
+- [x] Tabela: versão, título, data, status ativo
+- [x] Badge "Ativo" na versão corrente
+- [x] Botão "Nova versão"
+- [x] Link "Preview" → abre modal com `GET /termos/atual`
 
 ### 9.3 Formulário Nova Versão
-- [ ] Campos: versão (max 20), título (max 255), conteúdo (textarea), declaração de aceite (textarea)
-- [ ] Aviso: criação desativa versão anterior automaticamente
-- [ ] Tratar 409 (versão já existe)
+- [x] Campos: versão (max 20), título (max 255), conteúdo (textarea), declaração de aceite (textarea)
+- [x] Aviso: criação desativa versão anterior automaticamente
+- [x] Tratar 409 (versão já existe)
 
 ---
 
