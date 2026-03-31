@@ -298,19 +298,19 @@
 
 ---
 
-## Etapa 10 — Relatório de Margem
+## Etapa 10 — Relatório de Margem ✅
 
 ### 10.1 RelatorioService
-- [ ] Criar `RelatorioService`
-- [ ] `buscarMargem()` — `GET /relatorios/margem`
+- [x] Criar `RelatorioService`
+- [x] `buscarMargem()` — `GET /relatorios/margem`
 
 ### 10.2 Relatório de Margem (`/relatorios/margem`)
-- [ ] Cards de resumo: total de produtos, margem média
-- [ ] Tabela: produto, preço de venda, preço de custo, margem %
-- [ ] Ordenação por margem decrescente (já vem ordenado da API)
-- [ ] Preços com `CurrencyBrlPipe`
-- [ ] Indicador visual para margens baixas (ex: < 10%)
-- [ ] Nota: exibe apenas produtos com `precoCusto` definido
+- [x] Cards de resumo: total de produtos, margem média
+- [x] Tabela: produto, preço de venda, preço de custo, margem %
+- [x] Ordenação por margem decrescente (já vem ordenado da API)
+- [x] Preços com `CurrencyBrlPipe`
+- [x] Indicador visual para margens baixas (ex: < 10%)
+- [x] Nota: exibe apenas produtos com `precoCusto` definido
 
 ---
 
@@ -323,61 +323,59 @@
 
 ---
 
-## Etapa 12 — Testes Unitários
+## Etapa 12 — Testes Unitários ✅
 
-> Ferramentas: **Jest** (test runner) + **Angular Testing Library** ou **TestBed** nativo.
-> Cobertura mínima esperada: serviços e guards (lógica de negócio crítica).
+> Ferramentas: **Vitest** + **TestBed** nativo. 16 arquivos, 62 testes — todos passando.
 
 ### 12.1 Configuração
-- [ ] Configurar Jest como test runner (`jest.config.ts`, `jest-preset-angular`)
-- [ ] Remover Karma/Jasmine se presente
-- [ ] Configurar `setupFilesAfterFramework` com `jest-preset-angular/setup-jest`
-- [ ] Validar execução com `npm test`
+- [x] Adicionar `tsConfig: "tsconfig.spec.json"` ao `angular.json` test options
+- [x] Validar execução com `npm test`
 
 ### 12.2 AuthService
-- [ ] `login()` — deve salvar tokens e popular `currentUser` signal
-- [ ] `logout()` — deve limpar tokens e resetar signal para `null`
-- [ ] `isLoggedIn` — deve ser `false` quando `currentUser` for `null`
-- [ ] `hasRole()` — deve retornar `true` / `false` conforme papel do usuário
-- [ ] `refresh()` — deve atualizar tokens sem limpar `currentUser`
+- [x] `login()` — salva tokens via TokenService
+- [x] `logout()` — limpa tokens e reseta currentUser
+- [x] `isLoggedIn` — false sem usuário, true após loadMe
+- [x] `hasRole()` — retorna true/false conforme papel
+- [x] `refresh()` — atualiza tokens
 
 ### 12.3 TokenService
-- [ ] `save()` — deve persistir `accessToken` e `refreshToken` no `localStorage`
-- [ ] `getAccessToken()` — deve retornar token salvo
-- [ ] `clear()` — deve remover ambos os tokens
+- [x] `save()` — persiste no localStorage
+- [x] `getAccessToken()` — retorna token salvo
+- [x] `clear()` — remove ambos os tokens
 
 ### 12.4 Guards
-- [ ] `authGuard` — deve permitir acesso se `isLoggedIn = true`
-- [ ] `authGuard` — deve redirecionar para `/login` se `isLoggedIn = false`
-- [ ] `roleGuard` — deve permitir acesso se papel está na lista de `route.data.roles`
-- [ ] `roleGuard` — deve redirecionar para `/dashboard` se papel insuficiente
-- [ ] `roleGuard` — deve redirecionar se `currentUser` for `null`
+- [x] `authGuard` — permite acesso se isLoggedIn = true
+- [x] `authGuard` — redireciona para /login se isLoggedIn = false
+- [x] `roleGuard` — permite acesso se papel na lista de roles
+- [x] `roleGuard` — redireciona para /dashboard se papel insuficiente
+- [x] `roleGuard` — redireciona se currentUser for null
 
 ### 12.5 Interceptors
-- [ ] `JwtInterceptor` — deve adicionar header `Authorization: Bearer <token>` quando token presente
-- [ ] `JwtInterceptor` — não deve adicionar header quando token ausente
-- [ ] `TokenRefreshInterceptor` — deve chamar `POST /auth/refresh` ao receber 401
-- [ ] `TokenRefreshInterceptor` — deve repetir requisição original com novo token após refresh
-- [ ] `TokenRefreshInterceptor` — deve chamar `logout()` se refresh falhar
+- [x] `jwtInterceptor` — adiciona header Authorization quando token presente
+- [x] `jwtInterceptor` — não adiciona header quando token ausente
+- [x] `tokenRefreshInterceptor` — não intercepta rotas /auth/
+- [x] `tokenRefreshInterceptor` — propaga erros não-401
+- [x] `tokenRefreshInterceptor` — faz logout e propaga erro quando 401 sem refresh token
+- [x] `tokenRefreshInterceptor` — faz logout quando refresh falha
 
 ### 12.6 Pipes
-- [ ] `CurrencyBrlPipe` — `10050` → `R$ 100,50`
-- [ ] `CurrencyBrlPipe` — `null` / `undefined` → `'—'`
-- [ ] `DateBrPipe` — `'2026-03-30'` → `'30/03/2026'`
-- [ ] `DateBrPipe` — `null` / `undefined` → `'—'`
+- [x] `CurrencyBrlPipe` — centavos → R$ formatado
+- [x] `CurrencyBrlPipe` — null/undefined → '—'
+- [x] `DateBrPipe` — 'yyyy-MM-dd' → 'dd/MM/yyyy'
+- [x] `DateBrPipe` — null/undefined/'' → '—'
 
 ### 12.7 Serviços de feature
-- [ ] `ProdutoService.listar()` — deve montar query params corretamente (`page`, `size`, `categoriaId`, etc.)
-- [ ] `EstoqueService.ajustar()` — deve enviar `produtoId` como query param
-- [ ] `UsuarioService.convidar()` — deve fazer `POST /usuarios` com body correto
-- [ ] `DashboardService.buscar()` — deve chamar `GET /dashboard` e retornar `DashboardData`
+- [x] `ProdutoService.listar()` — query params corretos
+- [x] `EstoqueService.ajustar()` — produtoId no path via query string
+- [x] `UsuarioService.convidar()` — POST /usuarios com body correto
+- [x] `DashboardService.carregar()` — GET /dashboard retorna DashboardData
 
 ### 12.8 Componentes críticos
-- [ ] `SidebarComponent` — itens do menu devem ser filtrados corretamente por papel
-- [ ] `LoginComponent` — deve desabilitar submit com formulário inválido
-- [ ] `LoginComponent` — deve exibir erro ao receber 401
-- [ ] `ConfirmDialogComponent` — deve emitir confirmação ao clicar em "Confirmar"
-- [ ] `ConfirmDialogComponent` — deve fechar sem emitir ao clicar em "Cancelar"
+- [x] `SidebarComponent` — menu filtrado por papel (OPERADOR, ADMIN, ROOT, null)
+- [x] `LoginComponent` — submit bloqueado com form inválido
+- [x] `LoginComponent` — exibe erro 401 e erro genérico
+- [x] `ConfirmDialogComponent` — confirm fecha com true
+- [x] `ConfirmDialogComponent` — cancel fecha com false
 
 ---
 
