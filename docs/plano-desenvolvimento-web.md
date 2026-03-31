@@ -14,23 +14,23 @@
 
 ---
 
-## Etapa 0 — Configuração do Projeto
+## Etapa 0 — Configuração do Projeto ✅
 
 ### 0.1 Estrutura inicial
-- [ ] Verificar versão Angular (`ng version` → 21.2.5)
-- [ ] Configurar `tsconfig.json` com `strict: true`
-- [ ] Criar estrutura de pastas: `core/`, `features/`, `shared/`, `layout/`
-- [ ] Criar `environments/environment.ts` (dev — `http://localhost:8080/api/v1`)
-- [ ] Criar `environments/environment.prod.ts` (lê de `process.env['NG_APP_API_URL']`)
+- [x] Verificar versão Angular (`ng version` → 21.2.5)
+- [x] Configurar `tsconfig.json` com `strict: true`
+- [x] Criar estrutura de pastas: `core/`, `features/`, `shared/`, `layout/`
+- [x] Criar `environments/environment.ts` (dev — `http://localhost:8080/api/v1`)
+- [x] Criar `environments/environment.prod.ts` (lê de `process.env['NG_APP_API_URL']`)
 
 ### 0.2 Tema Angular Material
-- [ ] Criar `src/styles/_variables.scss` com variáveis CSS Phonus
-- [ ] Criar `src/styles/_material-theme.scss` com paleta Phonus (`#16B364`)
-- [ ] Importar tema em `styles.scss`
+- [x] Criar `src/styles/_variables.scss` com variáveis CSS Phonus
+- [x] Criar `src/styles/_material-theme.scss` com paleta Phonus (`#16B364`)
+- [x] Importar tema em `styles.scss`
 - [ ] Validar cores no browser (primary, error, background)
 
 ### 0.3 Deploy
-- [ ] Criar `vercel.json` com redirecionamento SPA
+- [x] Criar `vercel.json` com redirecionamento SPA
 - [ ] Commitar projeto no GitHub
 - [ ] Conectar repositório no Vercel
 - [ ] Configurar variável `NG_APP_API_URL` no Vercel (Production e Preview)
@@ -38,124 +38,124 @@
 
 ---
 
-## Etapa 1 — Autenticação e Shell
+## Etapa 1 — Autenticação e Shell ✅
 
 > Base de todo o painel. Nada mais pode ser implementado sem esta etapa.
 
 ### 1.1 Camada de tokens
-- [ ] Criar `TokenService` — `getAccessToken()`, `getRefreshToken()`, `save()`, `clear()`
-- [ ] Armazenamento em `localStorage`
+- [x] Criar `TokenService` — `getAccessToken()`, `getRefreshToken()`, `save()`, `clear()`
+- [x] Armazenamento em `localStorage`
 
 ### 1.2 Interceptors
-- [ ] Criar `JwtInterceptor` — injeta `Authorization: Bearer <token>` em toda requisição
-- [ ] Criar `TokenRefreshInterceptor` — intercepta 401 → `POST /auth/refresh` → retry
-- [ ] Tratar falha no refresh → logout → `/login`
-- [ ] Registrar interceptors em `app.config.ts`
+- [x] Criar `JwtInterceptor` — injeta `Authorization: Bearer <token>` em toda requisição
+- [x] Criar `TokenRefreshInterceptor` — intercepta 401 → `POST /auth/refresh` → retry
+- [x] Tratar falha no refresh → logout → `/login`
+- [x] Registrar interceptors em `app.config.ts`
 
 ### 1.3 AuthService
-- [ ] Criar `AuthService` com `signal<Usuario | null>`
-- [ ] Implementar `login()` — `POST /auth/login` → salva tokens → `loadMe()`
-- [ ] Implementar `loadMe()` — `GET /auth/me` → popula signal
-- [ ] Implementar `refresh()` — `POST /auth/refresh` → salva novos tokens
-- [ ] Implementar `logout()` — limpa tokens + signal → navega para `/login`
-- [ ] Computed: `isLoggedIn`, `papel`, `hasRole()`
+- [x] Criar `AuthService` com `signal<Usuario | null>`
+- [x] Implementar `login()` — `POST /auth/login` → salva tokens → `loadMe()`
+- [x] Implementar `loadMe()` — `GET /auth/me` → popula signal
+- [x] Implementar `refresh()` — `POST /auth/refresh` → salva novos tokens
+- [x] Implementar `logout()` — limpa tokens + signal → navega para `/login`
+- [x] Computed: `isLoggedIn`, `papel`, `hasRole()`
 
 ### 1.4 Guards
-- [ ] Criar `authGuard` — redireciona para `/login` se não autenticado
-- [ ] Criar `roleGuard` — redireciona para `/dashboard` se papel insuficiente
+- [x] Criar `authGuard` — redireciona para `/login` se não autenticado
+- [x] Criar `roleGuard` — redireciona para `/dashboard` se papel insuficiente
 
 ### 1.5 ApiService
-- [ ] Criar `ApiService` — wrapper `HttpClient` com `baseUrl` do environment
-- [ ] Métodos: `get()`, `post()`, `put()`, `patch()`, `delete()`
+- [x] Criar `ApiService` — wrapper `HttpClient` com `baseUrl` do environment
+- [x] Métodos: `get()`, `post()`, `put()`, `patch()`, `delete()`
 
 ### 1.6 Tela de Login
-- [ ] Criar `LoginComponent` (`/login`)
-- [ ] Formulário Reactive: `email` + `senha`
-- [ ] Validações: required, formato de e-mail
-- [ ] Tratar erro 401 — exibir mensagem
-- [ ] Redirecionar para `/dashboard` após login bem-sucedido
-- [ ] Loading state durante requisição
+- [x] Criar `LoginComponent` (`/login`)
+- [x] Formulário Reactive: `email` + `senha`
+- [x] Validações: required, formato de e-mail
+- [x] Tratar erro 401 — exibir mensagem
+- [x] Redirecionar para `/dashboard` após login bem-sucedido
+- [x] Loading state durante requisição
 
 ### 1.7 Tela Esqueceu a Senha
-- [ ] Criar `ForgotPasswordComponent` (`/esqueceu-senha`)
-- [ ] `POST /auth/esqueceu-senha` com `{ email }`
-- [ ] Exibir mensagem de retorno da API
+- [x] Criar `ForgotPasswordComponent` (`/esqueceu-senha`)
+- [x] `POST /auth/esqueceu-senha` com `{ email }`
+- [x] Exibir mensagem de retorno da API
 
 ### 1.8 Shell (layout principal)
-- [ ] Criar `ShellComponent` — topbar + sidebar + `<router-outlet>`
-- [ ] Criar `TopbarComponent` — nome do usuário + botão Sair
-- [ ] Criar `SidebarComponent` — links filtrados por `papel`
-- [ ] Sidebar colapsável com `BreakpointObserver` (CDK)
-- [ ] Itens do menu visíveis por papel:
-  - [ ] Dashboard — todos
-  - [ ] Usuários — ROOT, ADMIN
-  - [ ] Produtos — ROOT, ADMIN
-  - [ ] Estoque — ROOT, ADMIN
-  - [ ] Categorias (submenu) — ROOT, ADMIN
-  - [ ] Clientes — ROOT, ADMIN
-  - [ ] Fornecedores — ROOT, ADMIN
-  - [ ] Termos — ROOT
-  - [ ] Relatórios — ROOT, ADMIN
+- [x] Criar `ShellComponent` — topbar + sidebar + `<router-outlet>`
+- [x] Criar `TopbarComponent` — nome do usuário + botão Sair
+- [x] Criar `SidebarComponent` — links filtrados por `papel`
+- [x] Sidebar colapsável com `BreakpointObserver` (CDK)
+- [x] Itens do menu visíveis por papel:
+  - [x] Dashboard — todos
+  - [x] Usuários — ROOT, ADMIN
+  - [x] Produtos — ROOT, ADMIN
+  - [x] Estoque — ROOT, ADMIN
+  - [x] Categorias (submenu) — ROOT, ADMIN
+  - [x] Clientes — ROOT, ADMIN
+  - [x] Fornecedores — ROOT, ADMIN
+  - [x] Termos — ROOT
+  - [x] Relatórios — ROOT, ADMIN
 
 ### 1.9 Roteamento base
-- [ ] Configurar `app.routes.ts` com rotas públicas (`/login`, `/esqueceu-senha`)
-- [ ] Configurar rota raiz com `ShellComponent` + `authGuard`
-- [ ] Configurar lazy loading para todas as features
-- [ ] Rota `**` → redireciona para `/dashboard`
+- [x] Configurar `app.routes.ts` com rotas públicas (`/login`, `/esqueceu-senha`)
+- [x] Configurar rota raiz com `ShellComponent` + `authGuard`
+- [x] Configurar lazy loading para todas as features
+- [x] Rota `**` → redireciona para `/dashboard`
 
 ### 1.10 Pipes utilitários
-- [ ] Criar `CurrencyBrlPipe` — centavos → R$ 1.234,56
-- [ ] Criar `DateBrPipe` — `yyyy-MM-dd` → `dd/MM/yyyy`
+- [x] Criar `CurrencyBrlPipe` — centavos → R$ 1.234,56
+- [x] Criar `DateBrPipe` — `yyyy-MM-dd` → `dd/MM/yyyy`
 
 ### 1.11 Componentes shared
-- [ ] Criar `ConfirmDialogComponent` — reutilizável para ações destrutivas
-- [ ] Criar `LoadingSpinnerComponent`
-- [ ] Criar `EmptyStateComponent`
-- [ ] Criar `PageHeaderComponent` — título + breadcrumb
+- [x] Criar `ConfirmDialogComponent` — reutilizável para ações destrutivas
+- [x] Criar `LoadingSpinnerComponent`
+- [x] Criar `EmptyStateComponent`
+- [x] Criar `PageHeaderComponent` — título + breadcrumb
 
 ---
 
-## Etapa 2 — Dashboard
+## Etapa 2 — Dashboard ✅
 
 ### 2.1 DashboardService
-- [ ] Criar `DashboardService` — `GET /dashboard`
-- [ ] Interface `DashboardData`
+- [x] Criar `DashboardService` — `GET /dashboard`
+- [x] Interface `DashboardData`
 
 ### 2.2 DashboardComponent
-- [ ] Cards KPI: Saldo de Caixa, A Receber, A Pagar, Produtos críticos, Contas vencidas
-- [ ] Valores monetários com `CurrencyBrlPipe`
-- [ ] Card "Produtos abaixo do mínimo" → navega para `/produtos?abaixoDoMinimo=true`
-- [ ] Card "Contas vencidas" → navega para `/contas/receber` (referência futura)
-- [ ] Atalhos rápidos por papel (ROOT/ADMIN): "Novo produto", "Ajustar estoque"
-- [ ] Atalho "Convidar usuário" para ROOT/ADMIN
-- [ ] Loading state e tratamento de erro
+- [x] Cards KPI: Saldo de Caixa, A Receber, A Pagar, Produtos críticos, Contas vencidas
+- [x] Valores monetários com `CurrencyBrlPipe`
+- [x] Card "Produtos abaixo do mínimo" → navega para `/produtos?abaixoDoMinimo=true`
+- [x] Card "Contas vencidas" → navega para `/contas/receber` (referência futura)
+- [x] Atalhos rápidos por papel (ROOT/ADMIN): "Novo produto", "Ajustar estoque"
+- [x] Atalho "Convidar usuário" para ROOT/ADMIN
+- [x] Loading state e tratamento de erro
 
 ---
 
-## Etapa 3 — Gestão de Usuários
+## Etapa 3 — Gestão de Usuários ✅
 
 ### 3.1 UsuarioService
-- [ ] Criar `UsuarioService`
-- [ ] `listar()` — `GET /usuarios`
-- [ ] `buscar(id)` — `GET /usuarios/{id}`
-- [ ] `convidar(body)` — `POST /usuarios`
-- [ ] `alterarPapel(id, papel)` — `PATCH /usuarios/{id}/papel`
-- [ ] `desativar(id)` — `DELETE /usuarios/{id}`
-- [ ] `buscarEntitlement(usuarioId)` — `GET /usuarios/{usuarioId}/entitlement`
+- [x] Criar `UsuarioService`
+- [x] `listar()` — `GET /usuarios`
+- [x] `buscar(id)` — `GET /usuarios/{id}`
+- [x] `convidar(body)` — `POST /usuarios`
+- [x] `alterarPapel(id, papel)` — `PATCH /usuarios/{id}/papel`
+- [x] `desativar(id)` — `DELETE /usuarios/{id}`
+- [x] `buscarEntitlement(usuarioId)` — `GET /usuarios/{usuarioId}/entitlement`
 
 ### 3.2 Lista de Usuários (`/usuarios`)
-- [ ] Tabela com: nome, e-mail, papel, status ativo/inativo
-- [ ] Badge de papel colorido por nível
-- [ ] Botão "Convidar usuário" (ROOT/ADMIN)
-- [ ] Ação "Desativar" com `ConfirmDialogComponent` (não pode desativar SUPER_ROOT)
+- [x] Tabela com: nome, e-mail, papel, status ativo/inativo
+- [x] Badge de papel colorido por nível
+- [x] Botão "Convidar usuário" (ROOT/ADMIN)
+- [x] Ação "Desativar" com `ConfirmDialogComponent` (não pode desativar SUPER_ROOT)
 
 ### 3.3 Convidar Usuário (dialog)
-- [ ] `ConvidarUsuarioDialogComponent`
-- [ ] Campos: nome, e-mail, papel
-- [ ] Papel disponível por quem convida:
-  - [ ] ROOT → ADMIN ou OPERADOR
-  - [ ] ADMIN → apenas OPERADOR
-- [ ] Tratamento de erro (e-mail duplicado, etc.)
+- [x] `ConvidarUsuarioDialogComponent`
+- [x] Campos: nome, e-mail, papel
+- [x] Papel disponível por quem convida:
+  - [x] ROOT → ADMIN ou OPERADOR
+  - [x] ADMIN → apenas OPERADOR
+- [x] Tratamento de erro (e-mail duplicado, etc.)
 
 ### 3.4 Detalhe do Usuário (`/usuarios/:id`)
 - [ ] Exibir dados do usuário
