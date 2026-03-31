@@ -1,14 +1,5 @@
-Leia os arquivos da pasta docs
-Eles vao servir de auxilio para criaçao do documento principal deste projeto.
-Me ajude a criar um documento de requisitos/arquitetura baseado no arquivo principal plano-implementacao-web.md
-e no arquivo requisitos-tecnicos.md. O arquivo requisitos-tecnicos.md é apenas uma sugestão.
-Já o plano-implementacao-web.md foi elabarado baseado no mobile e no backend.
+Leia o arquivo docs\plano-desenvolvimento-web.md para iniciar o desenvolvimento.
+Leia os arquivs docs\arquitetura-web-angular-vfinal.md e docs\plano-implementacao-web.md para ter um contexto.
+Leia os outros arquivos da pasta docs para uma visao gerao.
 
-O nome do arquivo final pode ser arquitetura-web-angular-vfinal.md.
-O arquivo swagger-phonus-api-v1.yaml é o contrato entre web e backend, ele é a fonte da verdade para o web.
-O plano-implementacao-web.md contém muitas decisões ja tomadas, mas nada foi implementado ainda.
-
-Me ajude a criar a documentação para em seguida criarmos um plano de desenvolvimento.
-A versão web não precisa ter lançamentos por voz.
-
-Valide comigo o entendimento
+Valide comigo o entendimento para iniciar o desenvolvimento em etapas.
