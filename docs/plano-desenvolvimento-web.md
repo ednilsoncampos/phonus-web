@@ -379,27 +379,38 @@
 
 ---
 
-## Etapa 13 — Qualidade e Acessibilidade
+## Etapa 13 — Qualidade e Acessibilidade ✅
 
-### 12.1 Acessibilidade (WCAG AA)
-- [ ] Todos os formulários com `aria-label` ou `<label>` associado
-- [ ] Foco gerenciado ao abrir/fechar dialogs
-- [ ] Contraste de cores validado (mínimo 4.5:1 para texto normal)
-- [ ] Navegação por teclado em tabelas e menus
-- [ ] Rodar AXE (extensão Chrome) em todas as páginas
-- [ ] Corrigir todas as violações AXE
+### 13.1 Acessibilidade (WCAG AA)
+- [x] Todos os formulários com `aria-label` ou `<label>` associado (Angular Material gerencia via `mat-label`)
+- [x] Foco gerenciado ao abrir/fechar dialogs (Angular Material CDK nativo)
+- [x] Contraste de cores validado — `--phonus-text` (#101828) sobre branco passa 4.5:1
+- [x] Navegação por teclado em tabelas e menus — Angular Material nativo
+- [x] `lang="pt-BR"` adicionado ao `index.html`
+- [x] Skip link "Pular para o conteúdo principal" no `ShellComponent`
+- [x] `id="main-content"` e `tabindex="-1"` no `<main>` do shell
+- [ ] Rodar AXE (extensão Chrome) em todas as páginas — validação manual pós-deploy
+- [ ] Corrigir violações AXE remanescentes — dependente de execução no browser
 
-### 12.2 Tratamento de erros global
-- [ ] Erros HTTP 400 — exibir mensagem do campo inválido
-- [ ] Erros HTTP 403 — redirecionar ou exibir "sem permissão"
-- [ ] Erros HTTP 404 — exibir página "não encontrado"
-- [ ] Erros HTTP 500 — mensagem genérica amigável
-- [ ] Loading states em todas as operações assíncronas
+### 13.2 Tratamento de erros global
+- [x] Criar `ErrorNotificationService` — wrapper de `MatSnackBar` com estilo de erro
+- [x] Criar `HttpErrorInterceptor` — trata 400, 403, 404, 500+ com snackbar e mensagens da API
+- [x] Registrar `httpErrorInterceptor` em `app.config.ts` (após tokenRefreshInterceptor)
+- [x] Erros HTTP 400 — snackbar com `error.error?.message` ou mensagem genérica
+- [x] Erros HTTP 403 — snackbar "Você não tem permissão para realizar esta ação."
+- [x] Erros HTTP 404 — snackbar "Recurso não encontrado." (GETs pontuais)
+- [x] Erros HTTP 500+ — snackbar "Erro interno no servidor. Tente novamente mais tarde."
+- [x] Criar `NotFoundComponent` (`/404`) — exibido para rotas desconhecidas (`**`)
+- [x] Criar `ForbiddenComponent` (`/403`) — página de acesso negado
+- [x] Rota `**` agora exibe `NotFoundComponent` em vez de redirecionar para `/dashboard`
+- [x] Loading states em todas as operações assíncronas — já implementado nos componentes
 
-### 12.3 Responsividade
-- [ ] Layout funcional em telas ≥ 768px (tablet)
-- [ ] Sidebar colapsa automaticamente em telas menores
-- [ ] Tabelas com scroll horizontal em telas pequenas
+### 13.3 Responsividade
+- [x] Layout funcional em telas ≥ 768px — confirmado via `BreakpointObserver`
+- [x] Sidebar colapsa automaticamente em telas menores (`Breakpoints.XSmall`, `Breakpoints.Small`)
+- [x] Shell: `margin-left: 0` em mobile para sidebar colapsada
+- [x] Tabelas com scroll horizontal — `overflow-x: auto` em todos os `table-wrap` (7 componentes)
+- [x] Formulários: `.form-row` colapsa para `1fr` em ≤ 768px via `styles.scss` global
 
 ---
 

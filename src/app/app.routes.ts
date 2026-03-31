@@ -150,5 +150,25 @@ export const routes: Routes = [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: 'dashboard' },
+  {
+    path: '403',
+    loadComponent: () =>
+      import('./features/errors/forbidden/forbidden.component').then(
+        (m) => m.ForbiddenComponent,
+      ),
+  },
+  {
+    path: '404',
+    loadComponent: () =>
+      import('./features/errors/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
+  },
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/errors/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent,
+      ),
+  },
 ];

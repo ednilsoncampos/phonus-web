@@ -85,7 +85,7 @@ const ORIGENS: { value: OrigemMovimentacao; label: string }[] = [
     .table-wrap {
       border: 1px solid var(--phonus-border);
       border-radius: 12px;
-      overflow: hidden;
+      overflow-x: auto;
     }
     table { width: 100%; }
     th.mat-header-cell {
