@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/auth/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
@@ -33,8 +34,8 @@ export class LoginComponent {
   protected readonly hidePassword = signal(true);
 
   protected readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    senha: ['', Validators.required],
+    email: [environment.devCredentials?.email ?? '', [Validators.required, Validators.email]],
+    senha: [environment.devCredentials?.senha ?? '', Validators.required],
   });
 
   protected togglePasswordVisibility(event: MouseEvent): void {
