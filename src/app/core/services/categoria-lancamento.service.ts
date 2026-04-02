@@ -11,14 +11,14 @@ export class CategoriaLancamentoService {
   private readonly api = inject(ApiService);
 
   listar() {
-    return this.api.get<CategoriaLancamento[]>('/categorias/lancamento');
+    return this.api.get<CategoriaLancamento[]>('/categorias-lancamento');
   }
 
   criar(body: CriarCategoriaLancamentoRequest) {
-    return this.api.post<CategoriaLancamento>('/categorias/lancamento', body);
+    return this.api.post<CategoriaLancamento>('/categorias-lancamento', body);
   }
 
   editar(id: string, body: AtualizarCategoriaLancamentoRequest) {
-    return this.api.put<CategoriaLancamento>(`/categorias/lancamento/${id}`, body);
+    return this.api.put<CategoriaLancamento>(`/categorias-lancamento/${id}`, body);
   }
 }

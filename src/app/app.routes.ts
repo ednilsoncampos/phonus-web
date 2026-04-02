@@ -139,6 +139,24 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'lancamentos',
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
+        loadComponent: () =>
+          import('./features/lancamentos/lancamentos-list/lancamentos-list.component').then(
+            (m) => m.LancamentosListComponent,
+          ),
+      },
+      {
+        path: 'lancamentos/novo',
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
+        loadComponent: () =>
+          import('./features/lancamentos/lancamento-form/lancamento-form.component').then(
+            (m) => m.LancamentoFormComponent,
+          ),
+      },
+      {
         path: 'relatorios/margem',
         canActivate: [roleGuard],
         data: { roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },

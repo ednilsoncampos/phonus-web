@@ -11,14 +11,14 @@ export class CategoriaProdutoService {
   private readonly api = inject(ApiService);
 
   listar() {
-    return this.api.get<CategoriaProduto[]>('/categorias/produto');
+    return this.api.get<CategoriaProduto[]>('/categorias-produto');
   }
 
   criar(body: CriarCategoriaProdutoRequest) {
-    return this.api.post<CategoriaProduto>('/categorias/produto', body);
+    return this.api.post<CategoriaProduto>('/categorias-produto', body);
   }
 
   editar(id: string, body: AtualizarCategoriaProdutoRequest) {
-    return this.api.put<CategoriaProduto>(`/categorias/produto/${id}`, body);
+    return this.api.put<CategoriaProduto>(`/categorias-produto/${id}`, body);
   }
 }
