@@ -5,18 +5,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
   selector: 'app-loading-spinner',
   imports: [MatProgressSpinnerModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="spinner-wrapper" role="status" aria-label="Carregando">
-      <mat-spinner diameter="48" />
-    </div>
-  `,
-  styles: `
-    .spinner-wrapper {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 48px;
-    }
-  `,
+  templateUrl: './loading-spinner.component.html',
+  styleUrl: './loading-spinner.component.scss',
 })
 export class LoadingSpinnerComponent {}

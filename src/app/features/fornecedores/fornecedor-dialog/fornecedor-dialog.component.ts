@@ -25,62 +25,8 @@ export interface FornecedorDialogData {
     MatProgressSpinnerModule,
     MatSlideToggleModule,
   ],
-  styles: `
-    .dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 400px; }
-    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
-    .error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }
-  `,
-  template: `
-    <h2 mat-dialog-title>{{ editando ? 'Editar fornecedor' : 'Novo fornecedor' }}</h2>
-
-    <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
-
-        <mat-form-field appearance="outline">
-          <mat-label>Nome *</mat-label>
-          <input matInput formControlName="nome" autocomplete="off" />
-          @if (form.controls.nome.invalid && form.controls.nome.touched) {
-            <mat-error>Nome é obrigatório</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Documento (CPF/CNPJ)</mat-label>
-          <input matInput formControlName="documento" autocomplete="off" />
-        </mat-form-field>
-
-        <div class="form-row">
-          <mat-form-field appearance="outline">
-            <mat-label>E-mail</mat-label>
-            <input matInput formControlName="email" type="email" autocomplete="off" />
-            @if (form.controls.email.hasError('email') && form.controls.email.touched) {
-              <mat-error>E-mail inválido</mat-error>
-            }
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Telefone</mat-label>
-            <input matInput formControlName="telefone" autocomplete="off" />
-          </mat-form-field>
-        </div>
-
-        @if (editando) {
-          <mat-slide-toggle formControlName="ativo">Ativo</mat-slide-toggle>
-        }
-
-        @if (erro()) {
-          <p class="error-msg" role="alert">{{ erro() }}</p>
-        }
-      </form>
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      <button mat-button [disabled]="salvando()" (click)="cancelar()">Cancelar</button>
-      <button mat-flat-button color="primary" [disabled]="salvando()" (click)="salvar()">
-        @if (salvando()) { <mat-spinner diameter="20" /> } @else { Salvar }
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './fornecedor-dialog.component.html',
+  styleUrl: './fornecedor-dialog.component.scss',
 })
 export class FornecedorDialogComponent {
   private readonly fb = inject(NonNullableFormBuilder);

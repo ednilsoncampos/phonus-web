@@ -1,0 +1,11 @@
+<a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
+<app-topbar (menuToggle)="toggleSidebar()" />
+<app-sidebar [collapsed]="sidebarCollapsed()" />
+<main
+  class="shell-content"
+  [class.shell-content--collapsed]="sidebarCollapsed()"
+  id="main-content"
+  tabindex="-1"
+>
+  <router-outlet />
+</main>

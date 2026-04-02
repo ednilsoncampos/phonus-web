@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>{{ editando ? 'Editar categoria' : 'Nova categoria de lançamento' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="dialog-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Nome</mat-label>
+      <input matInput formControlName="nome" autocomplete="off" />
+      @if (form.controls.nome.invalid && form.controls.nome.touched) {
+        <mat-error>Nome é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Tipo</mat-label>
+      <mat-select formControlName="tipo">
+        @for (op of tipoOptions; track op.value) {
+          <mat-option [value]="op.value">{{ op.label }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.tipo.invalid && form.controls.tipo.touched) {
+        <mat-error>Tipo é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    @if (editando) {
+      <mat-slide-toggle formControlName="ativo">Ativo</mat-slide-toggle>
+    }
+
+    @if (erro()) {
+      <p class="error-msg" role="alert">{{ erro() }}</p>
+    }
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button [disabled]="salvando()" (click)="cancelar()">Cancelar</button>
+  <button mat-flat-button color="primary" [disabled]="salvando()" (click)="salvar()">
+    @if (salvando()) { <mat-spinner diameter="20" /> } @else { Salvar }
+  </button>
+</mat-dialog-actions>

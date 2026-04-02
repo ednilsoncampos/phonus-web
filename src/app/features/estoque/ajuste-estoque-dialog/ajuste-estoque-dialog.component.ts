@@ -27,77 +27,8 @@ export interface AjusteEstoqueDialogData {
     MatSelectModule,
     MatProgressSpinnerModule,
   ],
-  styles: `
-    .dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 380px; }
-    .error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }
-    .produto-info {
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--phonus-text);
-      padding: 8px 0 4px;
-    }
-  `,
-  template: `
-    <h2 mat-dialog-title>Ajustar estoque</h2>
-
-    <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
-
-        @if (data.produto) {
-          <p class="produto-info">{{ data.produto.nome }}</p>
-        } @else {
-          <mat-form-field appearance="outline">
-            <mat-label>Produto *</mat-label>
-            <mat-select formControlName="produtoId">
-              @for (p of data.produtos ?? []; track p.id) {
-                <mat-option [value]="p.id">{{ p.nome }}</mat-option>
-              }
-            </mat-select>
-            @if (form.controls.produtoId.invalid && form.controls.produtoId.touched) {
-              <mat-error>Produto é obrigatório</mat-error>
-            }
-          </mat-form-field>
-        }
-
-        <mat-form-field appearance="outline">
-          <mat-label>Tipo de ajuste *</mat-label>
-          <mat-select formControlName="tipo">
-            <mat-option value="AJUSTE_POSITIVO">Entrada (adicionar ao estoque)</mat-option>
-            <mat-option value="AJUSTE_NEGATIVO">Saída (remover do estoque)</mat-option>
-          </mat-select>
-          @if (form.controls.tipo.invalid && form.controls.tipo.touched) {
-            <mat-error>Tipo é obrigatório</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Quantidade *</mat-label>
-          <input matInput type="number" min="1" step="1" formControlName="quantidade" />
-          @if (form.controls.quantidade.hasError('required') && form.controls.quantidade.touched) {
-            <mat-error>Quantidade é obrigatória</mat-error>
-          } @else if (form.controls.quantidade.hasError('min') && form.controls.quantidade.touched) {
-            <mat-error>Deve ser maior que zero</mat-error>
-          }
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Observação</mat-label>
-          <textarea matInput formControlName="observacao" rows="2"></textarea>
-        </mat-form-field>
-
-        @if (erro()) {
-          <p class="error-msg" role="alert">{{ erro() }}</p>
-        }
-      </form>
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      <button mat-button [disabled]="salvando()" (click)="cancelar()">Cancelar</button>
-      <button mat-flat-button color="primary" [disabled]="salvando()" (click)="salvar()">
-        @if (salvando()) { <mat-spinner diameter="20" /> } @else { Confirmar }
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './ajuste-estoque-dialog.component.html',
+  styleUrl: './ajuste-estoque-dialog.component.scss',
 })
 export class AjusteEstoqueDialogComponent {
   private readonly fb = inject(NonNullableFormBuilder);

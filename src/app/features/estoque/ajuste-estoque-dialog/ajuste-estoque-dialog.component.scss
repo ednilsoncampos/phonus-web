@@ -1,0 +1,8 @@
+.dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 380px; }
+.error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }
+.produto-info {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--phonus-text);
+  padding: 8px 0 4px;
+}

@@ -1,0 +1,32 @@
+<mat-toolbar class="topbar">
+  <button
+    mat-icon-button
+    class="topbar__menu-btn"
+    aria-label="Alternar menu lateral"
+    (click)="menuToggle.emit()"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="topbar__brand">Phonus</span>
+
+  <span class="topbar__spacer"></span>
+
+  <button
+    mat-button
+    [matMenuTriggerFor]="userMenu"
+    class="topbar__user-btn"
+    aria-label="Menu do usuário"
+  >
+    <mat-icon aria-hidden="true">account_circle</mat-icon>
+    <span class="topbar__username">{{ auth.currentUser()?.nome }}</span>
+    <mat-icon aria-hidden="true">arrow_drop_down</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="auth.logout()">
+      <mat-icon aria-hidden="true">logout</mat-icon>
+      Sair
+    </button>
+  </mat-menu>
+</mat-toolbar>

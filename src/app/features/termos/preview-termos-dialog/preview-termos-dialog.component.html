@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Preview — Termos de Uso em vigor</h2>
+
+<mat-dialog-content style="min-width: 560px">
+  @if (carregando()) {
+    <div class="state-center" role="status">
+      <mat-spinner diameter="40" />
+      <span>Carregando termos...</span>
+    </div>
+  } @else if (erro()) {
+    <div class="state-center" role="alert">
+      <span>{{ erro() }}</span>
+    </div>
+  } @else if (termos()) {
+    <div class="preview-meta">
+      <span>Versão: <strong>{{ termos()!.versao }}</strong></span>
+      <span>Publicado em: <strong>{{ termos()!.createdAt?.substring(0, 10) | dateBr }}</strong></span>
+    </div>
+    <h3 style="margin: 0 0 12px; font-size: 16px;">{{ termos()!.titulo }}</h3>
+    <div class="preview-content" role="document" [attr.aria-label]="termos()!.titulo">
+      {{ termos()!.conteudo }}
+    </div>
+    <p class="declaracao">{{ termos()!.declaracaoAceite }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="fechar()">Fechar</button>
+</mat-dialog-actions>

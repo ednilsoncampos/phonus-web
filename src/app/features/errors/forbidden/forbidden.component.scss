@@ -1,0 +1,27 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  color: var(--phonus-text);
+}
+.code {
+  font-size: 96px;
+  font-weight: 700;
+  color: var(--phonus-error);
+  line-height: 1;
+}
+h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+p {
+  color: var(--phonus-text-secondary);
+  margin: 0;
+}
+.actions { display: flex; gap: 12px; margin-top: 8px; }

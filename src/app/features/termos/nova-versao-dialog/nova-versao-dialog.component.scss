@@ -1,0 +1,14 @@
+.dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 560px; }
+.aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #c2410c;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }

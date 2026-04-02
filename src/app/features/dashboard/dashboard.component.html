@@ -1,0 +1,66 @@
+<div class="dashboard">
+  <app-page-header title="Dashboard" [subtitle]="saudacao()" />
+
+  @if (carregando()) {
+    <div class="state-center" role="status" aria-label="Carregando dados do dashboard">
+      <mat-spinner diameter="48" />
+      <span>Carregando...</span>
+    </div>
+  } @else if (erro()) {
+    <div class="state-center" role="alert">
+      <mat-icon aria-hidden="true">error_outline</mat-icon>
+      <span>{{ erro() }}</span>
+      <button mat-stroked-button (click)="carregar()">Tentar novamente</button>
+    </div>
+  } @else {
+    <!-- KPIs -->
+    <div class="kpi-grid" role="list" aria-label="Indicadores do negócio">
+      @for (card of kpiCards(); track card.label) {
+        <mat-card
+          class="kpi-card"
+          [class.kpi-card--link]="!!card.route"
+          role="listitem"
+          [attr.tabindex]="card.route ? 0 : null"
+          [attr.aria-label]="card.label + ': ' + card.value"
+          (click)="navegar(card)"
+          (keydown.enter)="navegar(card)"
+          (keydown.space)="navegar(card)"
+        >
+          <div class="kpi-card__inner">
+            <div class="kpi-icon" [class]="'kpi-icon--' + card.color" aria-hidden="true">
+              <mat-icon>{{ card.icon }}</mat-icon>
+            </div>
+            <div class="kpi-info">
+              <div class="kpi-label">{{ card.label }}</div>
+              <div
+                class="kpi-value"
+                [class.kpi-value--alert]="card.color === 'red' || card.color === 'orange'"
+              >
+                {{ card.value }}
+              </div>
+            </div>
+          </div>
+        </mat-card>
+      }
+    </div>
+
+    <!-- Atalhos rápidos -->
+    @if (podeVerAtalhos()) {
+      <p class="section-title">Atalhos rápidos</p>
+      <div class="shortcuts">
+        <button mat-stroked-button color="primary" (click)="ir(['/produtos'], { acao: 'novo' })">
+          <mat-icon>add</mat-icon>
+          Novo produto
+        </button>
+        <button mat-stroked-button color="primary" (click)="ir(['/estoque'])">
+          <mat-icon>inventory</mat-icon>
+          Ajustar estoque
+        </button>
+        <button mat-stroked-button color="primary" (click)="ir(['/usuarios'], { acao: 'convidar' })">
+          <mat-icon>person_add</mat-icon>
+          Convidar usuário
+        </button>
+      </div>
+    }
+  }
+</div>

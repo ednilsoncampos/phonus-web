@@ -36,66 +36,8 @@ const NAV_ITEMS: NavItem[] = [
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive, MatIconModule, MatListModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <nav class="sidebar" [class.sidebar--collapsed]="collapsed()" aria-label="Menu principal">
-      <mat-nav-list>
-        @for (item of visibleItems(); track item.route) {
-          <a
-            mat-list-item
-            [routerLink]="item.route"
-            routerLinkActive="active"
-            [attr.aria-label]="item.label"
-          >
-            <mat-icon matListItemIcon aria-hidden="true">{{ item.icon }}</mat-icon>
-            @if (!collapsed()) {
-              <span matListItemTitle>{{ item.label }}</span>
-            }
-          </a>
-        }
-      </mat-nav-list>
-    </nav>
-  `,
-  styles: `
-    .sidebar {
-      position: fixed;
-      top: 64px;
-      left: 0;
-      bottom: 0;
-      width: 220px;
-      background: var(--phonus-surface);
-      border-right: 1px solid var(--phonus-border);
-      overflow-y: auto;
-      overflow-x: hidden;
-      transition: width 0.2s ease;
-      z-index: 99;
-    }
-    .sidebar--collapsed {
-      width: 64px;
-    }
-    mat-nav-list {
-      padding-top: 8px;
-    }
-    a[mat-list-item] {
-      border-radius: 8px;
-      margin: 2px 8px;
-      color: var(--phonus-text-secondary);
-      transition: background 0.15s, color 0.15s;
-
-      &.active {
-        background: var(--phonus-primary-light);
-        color: var(--phonus-primary-dark);
-
-        mat-icon {
-          color: var(--phonus-primary);
-        }
-      }
-
-      &:hover:not(.active) {
-        background: var(--phonus-background);
-        color: var(--phonus-text);
-      }
-    }
-  `,
+  templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
   private readonly auth = inject(AuthService);

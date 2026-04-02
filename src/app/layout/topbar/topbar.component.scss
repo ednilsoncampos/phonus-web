@@ -1,0 +1,38 @@
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--phonus-surface);
+  border-bottom: 1px solid var(--phonus-border);
+  height: 64px;
+  padding: 0 16px;
+  color: var(--phonus-text);
+}
+.topbar__menu-btn {
+  margin-right: 8px;
+}
+.topbar__brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--phonus-primary);
+  letter-spacing: -0.5px;
+}
+.topbar__spacer {
+  flex: 1;
+}
+.topbar__user-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--phonus-text);
+}
+.topbar__username {
+  font-size: 14px;
+  font-weight: 500;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

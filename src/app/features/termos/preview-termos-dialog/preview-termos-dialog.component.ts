@@ -10,75 +10,8 @@ import { DateBrPipe } from '../../../shared/pipes/date-br.pipe';
   selector: 'app-preview-termos-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatDialogModule, MatButtonModule, MatProgressSpinnerModule, DateBrPipe],
-  styles: `
-    .state-center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      min-height: 200px;
-      color: var(--phonus-text-secondary);
-    }
-    .preview-meta {
-      display: flex;
-      gap: 16px;
-      font-size: 13px;
-      color: var(--phonus-text-secondary);
-      margin-bottom: 16px;
-    }
-    .preview-content {
-      white-space: pre-wrap;
-      font-size: 14px;
-      line-height: 1.7;
-      color: var(--phonus-text);
-      max-height: 400px;
-      overflow-y: auto;
-      border: 1px solid var(--phonus-border);
-      border-radius: 8px;
-      padding: 16px;
-      background: var(--phonus-background);
-    }
-    .declaracao {
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      background: var(--phonus-primary-light);
-      color: var(--phonus-primary-dark);
-      font-size: 13px;
-      font-style: italic;
-    }
-  `,
-  template: `
-    <h2 mat-dialog-title>Preview — Termos de Uso em vigor</h2>
-
-    <mat-dialog-content style="min-width: 560px">
-      @if (carregando()) {
-        <div class="state-center" role="status">
-          <mat-spinner diameter="40" />
-          <span>Carregando termos...</span>
-        </div>
-      } @else if (erro()) {
-        <div class="state-center" role="alert">
-          <span>{{ erro() }}</span>
-        </div>
-      } @else if (termos()) {
-        <div class="preview-meta">
-          <span>Versão: <strong>{{ termos()!.versao }}</strong></span>
-          <span>Publicado em: <strong>{{ termos()!.createdAt?.substring(0, 10) | dateBr }}</strong></span>
-        </div>
-        <h3 style="margin: 0 0 12px; font-size: 16px;">{{ termos()!.titulo }}</h3>
-        <div class="preview-content" role="document" [attr.aria-label]="termos()!.titulo">
-          {{ termos()!.conteudo }}
-        </div>
-        <p class="declaracao">{{ termos()!.declaracaoAceite }}</p>
-      }
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      <button mat-flat-button color="primary" (click)="fechar()">Fechar</button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './preview-termos-dialog.component.html',
+  styleUrl: './preview-termos-dialog.component.scss',
 })
 export class PreviewTermosDialogComponent implements OnInit {
   private readonly service = inject(TermosService);

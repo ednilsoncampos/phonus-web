@@ -1,0 +1,123 @@
+<app-page-header title="Produtos">
+  <button mat-flat-button color="primary" (click)="novo()">
+    <mat-icon>add</mat-icon>
+    Novo produto
+  </button>
+</app-page-header>
+
+<!-- Filtros -->
+<div class="filters">
+  <mat-select
+    class="filter-categoria"
+    [(ngModel)]="categoriaId"
+    (ngModelChange)="onFiltroChange()"
+    placeholder="Todas as categorias"
+    aria-label="Filtrar por categoria"
+  >
+    <mat-option value="">Todas as categorias</mat-option>
+    @for (cat of categorias(); track cat.id) {
+      <mat-option [value]="cat.id">{{ cat.nome }}</mat-option>
+    }
+  </mat-select>
+
+  <mat-slide-toggle
+    [checked]="apenasAtivos()"
+    (change)="setApenasAtivos($event.checked)"
+  >
+    Somente ativos
+  </mat-slide-toggle>
+
+  <mat-slide-toggle
+    [checked]="abaixoDoMinimo()"
+    (change)="setAbaixoDoMinimo($event.checked)"
+  >
+    Abaixo do mínimo
+  </mat-slide-toggle>
+</div>
+
+@if (carregando()) {
+  <div class="state-center" role="status" aria-label="Carregando produtos">
+    <mat-spinner diameter="48" />
+    <span>Carregando...</span>
+  </div>
+} @else if (erro()) {
+  <div class="state-center" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <span>{{ erro() }}</span>
+    <button mat-stroked-button (click)="carregarProdutos()">Tentar novamente</button>
+  </div>
+} @else if (produtos().length === 0) {
+  <div class="state-center">
+    <mat-icon aria-hidden="true">inventory_2</mat-icon>
+    <span>Nenhum produto encontrado.</span>
+  </div>
+} @else {
+  <div class="table-wrap">
+    <table mat-table [dataSource]="produtos()" aria-label="Lista de produtos">
+
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let p">{{ p.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="categoria">
+        <th mat-header-cell *matHeaderCellDef>Categoria</th>
+        <td mat-cell *matCellDef="let p">{{ nomeCategoria(p.categoriaId) }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="precoVenda">
+        <th mat-header-cell *matHeaderCellDef class="col-preco">Preço de venda</th>
+        <td mat-cell *matCellDef="let p" class="col-preco">
+          {{ p.precoVenda | currencyBrl }}
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="estoque">
+        <th mat-header-cell *matHeaderCellDef class="col-estoque">Estoque</th>
+        <td mat-cell *matCellDef="let p" class="col-estoque">
+          <div class="estoque-cell">
+            <span>{{ p.quantidadeEstoque }} {{ p.unidadeMedida }}</span>
+            @if (p.abaixoDoMinimo) {
+              <span class="badge-minimo" title="Abaixo do estoque mínimo">Min</span>
+            }
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="col-status">Status</th>
+        <td mat-cell *matCellDef="let p" class="col-status">
+          <span [class]="p.ativo ? 'status-ativo' : 'status-inativo'">
+            {{ p.ativo ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef class="col-acoes"></th>
+        <td mat-cell *matCellDef="let p" class="col-acoes">
+          <button
+            mat-icon-button
+            matTooltip="Ver detalhes"
+            [attr.aria-label]="'Ver detalhes de ' + p.nome"
+            (click)="verDetalhe(p.id)"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="totalElements()"
+    [pageSize]="pageSize"
+    [pageIndex]="page()"
+    [pageSizeOptions]="[20]"
+    (page)="onPage($event)"
+    aria-label="Paginação de produtos"
+  />
+}

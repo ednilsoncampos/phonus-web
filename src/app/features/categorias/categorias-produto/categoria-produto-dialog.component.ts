@@ -25,40 +25,8 @@ export interface CategoriaProdutoDialogData {
     MatProgressSpinnerModule,
     MatSlideToggleModule,
   ],
-  styles: `
-    .dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 340px; }
-    .error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }
-  `,
-  template: `
-    <h2 mat-dialog-title>{{ editando ? 'Editar categoria' : 'Nova categoria de produto' }}</h2>
-
-    <mat-dialog-content>
-      <form [formGroup]="form" class="dialog-form">
-        <mat-form-field appearance="outline">
-          <mat-label>Nome</mat-label>
-          <input matInput formControlName="nome" autocomplete="off" />
-          @if (form.controls.nome.invalid && form.controls.nome.touched) {
-            <mat-error>Nome é obrigatório</mat-error>
-          }
-        </mat-form-field>
-
-        @if (editando) {
-          <mat-slide-toggle formControlName="ativo">Ativo</mat-slide-toggle>
-        }
-
-        @if (erro()) {
-          <p class="error-msg" role="alert">{{ erro() }}</p>
-        }
-      </form>
-    </mat-dialog-content>
-
-    <mat-dialog-actions align="end">
-      <button mat-button [disabled]="salvando()" (click)="cancelar()">Cancelar</button>
-      <button mat-flat-button color="primary" [disabled]="salvando()" (click)="salvar()">
-        @if (salvando()) { <mat-spinner diameter="20" /> } @else { Salvar }
-      </button>
-    </mat-dialog-actions>
-  `,
+  templateUrl: './categoria-produto-dialog.component.html',
+  styleUrl: './categoria-produto-dialog.component.scss',
 })
 export class CategoriaProdutoDialogComponent {
   private readonly fb = inject(NonNullableFormBuilder);

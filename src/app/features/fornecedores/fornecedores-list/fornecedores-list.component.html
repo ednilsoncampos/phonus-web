@@ -1,0 +1,93 @@
+<app-page-header title="Fornecedores">
+  <button mat-flat-button color="primary" (click)="abrirDialog()">
+    <mat-icon>add</mat-icon>
+    Novo fornecedor
+  </button>
+</app-page-header>
+
+<div class="filters">
+  <mat-slide-toggle
+    [checked]="apenasAtivos()"
+    (change)="setApenasAtivos($event.checked)"
+  >
+    Somente ativos
+  </mat-slide-toggle>
+</div>
+
+@if (carregando()) {
+  <div class="state-center" role="status" aria-label="Carregando fornecedores">
+    <mat-spinner diameter="48" />
+    <span>Carregando...</span>
+  </div>
+} @else if (erro()) {
+  <div class="state-center" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <span>{{ erro() }}</span>
+    <button mat-stroked-button (click)="carregar()">Tentar novamente</button>
+  </div>
+} @else if (fornecedores().length === 0) {
+  <div class="state-center">
+    <mat-icon aria-hidden="true">local_shipping</mat-icon>
+    <span>Nenhum fornecedor encontrado.</span>
+  </div>
+} @else {
+  <div class="table-wrap">
+    <table mat-table [dataSource]="fornecedores()" aria-label="Lista de fornecedores">
+
+      <ng-container matColumnDef="nome">
+        <th mat-header-cell *matHeaderCellDef>Nome</th>
+        <td mat-cell *matCellDef="let f">{{ f.nome }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="documento">
+        <th mat-header-cell *matHeaderCellDef class="col-doc">Documento</th>
+        <td mat-cell *matCellDef="let f" class="col-doc">{{ f.documento || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="email">
+        <th mat-header-cell *matHeaderCellDef>E-mail</th>
+        <td mat-cell *matCellDef="let f">{{ f.email || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="telefone">
+        <th mat-header-cell *matHeaderCellDef>Telefone</th>
+        <td mat-cell *matCellDef="let f">{{ f.telefone || '—' }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef class="col-status">Status</th>
+        <td mat-cell *matCellDef="let f" class="col-status">
+          <span [class]="f.ativo ? 'status-ativo' : 'status-inativo'">
+            {{ f.ativo ? 'Ativo' : 'Inativo' }}
+          </span>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="acoes">
+        <th mat-header-cell *matHeaderCellDef class="col-acoes"></th>
+        <td mat-cell *matCellDef="let f" class="col-acoes">
+          <button
+            mat-icon-button
+            matTooltip="Editar"
+            [attr.aria-label]="'Editar ' + f.nome"
+            (click)="abrirDialog(f)"
+          >
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="colunas"></tr>
+      <tr mat-row *matRowDef="let row; columns: colunas;"></tr>
+    </table>
+  </div>
+
+  <mat-paginator
+    [length]="totalElements()"
+    [pageSize]="pageSize"
+    [pageIndex]="page()"
+    [pageSizeOptions]="[20]"
+    (page)="onPage($event)"
+    aria-label="Paginação de fornecedores"
+  />
+}
