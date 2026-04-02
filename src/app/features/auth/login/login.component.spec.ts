@@ -29,6 +29,8 @@ describe('LoginComponent', () => {
     const fixture = TestBed.createComponent(LoginComponent);
     fixture.detectChanges();
 
+    // Limpa o pre-preenchimento de devCredentials para tornar o form inválido
+    (fixture.componentInstance as any).form.setValue({ email: '', senha: '' });
     (fixture.componentInstance as any).submit();
 
     expect(loginSpy).not.toHaveBeenCalled();
