@@ -1,0 +1,268 @@
+// =============================================================
+// Phonus — Padrões visuais compartilhados
+// Usado em todas as telas. Não duplicar nos componentes.
+// =============================================================
+
+// ----- Estado central (loading / erro / vazio) ---------------
+
+.state-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 200px;
+  color: var(--phonus-text-secondary);
+  text-align: center;
+
+  mat-icon {
+    font-size: 40px;
+    width: 40px;
+    height: 40px;
+    opacity: 0.4;
+  }
+}
+
+// ----- Filtros -----------------------------------------------
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+// ----- Tabelas -----------------------------------------------
+
+.table-wrap {
+  border-radius: 14px;
+  overflow-x: auto;
+  box-shadow: var(--phonus-shadow-sm);
+  border: 1px solid var(--phonus-border);
+}
+
+table { width: 100%; }
+
+th.mat-header-cell {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--phonus-text-secondary);
+  background: var(--phonus-background);
+  border-bottom: 1px solid var(--phonus-border);
+}
+
+td.mat-cell {
+  color: var(--phonus-text);
+  font-size: 14px;
+}
+
+tr.mat-row {
+  transition: background 0.12s;
+
+  &:hover {
+    background: var(--phonus-background);
+  }
+
+  &:last-child td {
+    border-bottom: none;
+  }
+}
+
+// ----- Detalhe de registro ----------------------------------
+
+.detail-card {
+  background: var(--phonus-surface);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 720px;
+  margin: 0 auto;
+  box-shadow: var(--phonus-shadow-sm);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 32px;
+}
+
+.detail-full { grid-column: 1 / -1; }
+
+.detail-field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--phonus-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.detail-field span {
+  font-size: 15px;
+  color: var(--phonus-text);
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--phonus-border);
+  margin: 20px 0;
+}
+
+.actions-top {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+// ----- Formulários -------------------------------------------
+
+.form-card {
+  background: var(--phonus-surface);
+  border-radius: 16px;
+  padding: 28px;
+  max-width: 720px;
+  margin: 0 auto;
+  box-shadow: var(--phonus-shadow-sm);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.form-full { grid-column: 1 / -1; }
+
+.section-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--phonus-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 20px 0 8px;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.error-banner {
+  color: var(--phonus-error);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+// ----- Badges ------------------------------------------------
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.badge--green  { background: var(--phonus-primary-light); color: var(--phonus-primary-dark); }
+.badge--red    { background: #fee2e2; color: #991b1b; }
+.badge--blue   { background: #dbeafe; color: #1d4ed8; }
+.badge--orange { background: #ffedd5; color: #c2410c; }
+.badge--purple { background: #ede9fe; color: #6d28d9; }
+.badge--yellow { background: #fef9c3; color: #854d0e; }
+
+// badges semânticos (lançamentos)
+.badge-entrada  { @extend .badge; @extend .badge--green; }
+.badge-saida    { @extend .badge; @extend .badge--red; }
+.badge-pago     { @extend .badge; @extend .badge--green; }
+.badge-pendente { @extend .badge; @extend .badge--yellow; }
+
+// badge de status ativo (termos)
+.badge-ativo   { @extend .badge; @extend .badge--green; }
+.badge-inativo { font-size: 13px; color: var(--phonus-text-secondary); }
+
+// ----- Status inline (sem badge) ----------------------------
+
+.status-ativo   { color: var(--phonus-primary); font-weight: 600; }
+.status-inativo { color: var(--phonus-text-secondary); }
+
+// ----- KPI grid (dashboard + relatórios) --------------------
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+  margin-bottom: 36px;
+}
+
+.kpi-card {
+  cursor: default;
+  border-radius: 16px;
+  border: none;
+  box-shadow: var(--phonus-shadow-sm);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+
+  &.kpi-card--link {
+    cursor: pointer;
+
+    &:hover {
+      box-shadow: var(--phonus-shadow-md);
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.kpi-card__inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 20px;
+}
+
+.kpi-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon { font-size: 24px; width: 24px; height: 24px; }
+}
+
+.kpi-icon--green  { background: var(--phonus-primary-light); color: var(--phonus-primary); }
+.kpi-icon--blue   { background: #dbeafe; color: #1d4ed8; }
+.kpi-icon--red    { background: #fee2e2; color: #b91c1c; }
+.kpi-icon--orange { background: #ffedd5; color: #c2410c; }
+.kpi-icon--purple { background: #ede9fe; color: #6d28d9; }
+
+.kpi-info { min-width: 0; }
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--phonus-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 4px;
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--phonus-text);
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+
+  &.kpi-value--alert { color: var(--phonus-error); }
+}

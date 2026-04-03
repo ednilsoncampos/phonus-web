@@ -1,30 +1,4 @@
-.filters { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
-
-.state-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 200px;
-  color: var(--phonus-text-secondary);
-}
-.table-wrap {
-  border: 1px solid var(--phonus-border);
-  border-radius: 12px;
-  overflow-x: auto;
-}
-table { width: 100%; }
-th.mat-header-cell {
-  font-weight: 600;
-  color: var(--phonus-text-secondary);
-  font-size: 13px;
-  background: var(--phonus-background);
-}
-td.mat-cell { color: var(--phonus-text); }
-tr.mat-row:last-child td { border-bottom: none; }
+// Estilos específicos de colunas — padrões globais em _patterns.scss
 .col-doc    { width: 160px; }
-.col-status { width: 90px;  }
+.col-status { width: 90px; }
 .col-acoes  { width: 80px; text-align: right; }
-.status-ativo   { color: var(--phonus-primary); font-weight: 600; }
-.status-inativo { color: var(--phonus-text-secondary); }

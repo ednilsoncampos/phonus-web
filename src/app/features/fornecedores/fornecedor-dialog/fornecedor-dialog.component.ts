@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
+import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
 
 export interface FornecedorDialogData {
   fornecedor?: Fornecedor;
@@ -24,6 +25,7 @@ export interface FornecedorDialogData {
     MatInputModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
+    PhoneMaskDirective,
   ],
   templateUrl: './fornecedor-dialog.component.html',
   styleUrl: './fornecedor-dialog.component.scss',

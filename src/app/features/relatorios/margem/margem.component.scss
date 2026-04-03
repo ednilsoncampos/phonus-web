@@ -1,51 +1,4 @@
-.state-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 200px;
-  color: var(--phonus-text-secondary);
-}
-
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-bottom: 28px;
-}
-.kpi-card {
-  background: var(--phonus-surface);
-  border: 1px solid var(--phonus-border);
-  border-radius: 12px;
-  padding: 20px;
-}
-.kpi-label {
-  font-size: 13px;
-  color: var(--phonus-text-secondary);
-  margin-bottom: 4px;
-}
-.kpi-value {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--phonus-text);
-}
-
-.table-wrap {
-  border: 1px solid var(--phonus-border);
-  border-radius: 12px;
-  overflow-x: auto;
-}
-table { width: 100%; }
-th.mat-header-cell {
-  font-weight: 600;
-  color: var(--phonus-text-secondary);
-  font-size: 13px;
-  background: var(--phonus-background);
-}
-td.mat-cell { color: var(--phonus-text); }
-tr.mat-row:last-child td { border-bottom: none; }
-
+// kpi-grid, kpi-card, kpi-label, kpi-value, table-wrap, state-center: em _patterns.scss
 .col-preco  { width: 140px; text-align: right; }
 .col-margem { width: 120px; text-align: right; }
 
@@ -55,5 +8,5 @@ tr.mat-row:last-child td { border-bottom: none; }
   justify-content: flex-end;
   gap: 6px;
 }
-.margem-ok   { color: var(--phonus-primary); font-weight: 600; }
-.margem-low  { color: var(--phonus-error);   font-weight: 600; }
+.margem-ok  { color: var(--phonus-primary); font-weight: 600; }
+.margem-low { color: var(--phonus-error);   font-weight: 600; }

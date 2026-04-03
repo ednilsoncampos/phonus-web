@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ClienteService } from '../../../core/services/cliente.service';
 import { Cliente } from '../../../core/models/cliente.model';
+import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
 
 export interface ClienteDialogData {
   cliente?: Cliente;
@@ -24,6 +25,7 @@ export interface ClienteDialogData {
     MatInputModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
+    PhoneMaskDirective,
   ],
   templateUrl: './cliente-dialog.component.html',
   styleUrl: './cliente-dialog.component.scss',

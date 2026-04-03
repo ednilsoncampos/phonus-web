@@ -1,79 +1,42 @@
+// KPI grid, kpi-card, state-center, shortcuts: em _patterns.scss
 .dashboard { padding: 0; }
 
-.kpi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-.kpi-card {
-  cursor: default;
-  border-radius: 12px;
-  border: 1px solid var(--phonus-border);
-}
-.kpi-card--link { cursor: pointer; }
-.kpi-card--link:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
-
-.kpi-card__inner {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-}
-
-.kpi-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.kpi-icon mat-icon { font-size: 24px; width: 24px; height: 24px; }
-
-.kpi-icon--green  { background: var(--phonus-primary-light); color: var(--phonus-primary-dark); }
-.kpi-icon--blue   { background: #dbeafe; color: #1d4ed8; }
-.kpi-icon--red    { background: #fee2e2; color: #b91c1c; }
-.kpi-icon--orange { background: #ffedd5; color: #c2410c; }
-.kpi-icon--purple { background: #ede9fe; color: #6d28d9; }
-
-.kpi-info { min-width: 0; }
-.kpi-label {
-  font-size: 13px;
-  color: var(--phonus-text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.kpi-value {
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--phonus-text);
-  line-height: 1.3;
-}
-.kpi-value--alert { color: var(--phonus-error); }
-
 .section-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--phonus-text);
-  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  color: var(--phonus-text-secondary);
+  margin: 0 0 14px;
 }
 
 .shortcuts {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-}
+  gap: 10px;
 
-.state-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 200px;
-  color: var(--phonus-text-secondary);
+  button[mat-stroked-button] {
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0 18px;
+    height: 40px;
+    letter-spacing: 0;
+    border-color: var(--phonus-border);
+    color: var(--phonus-text);
+    transition: background 0.15s, border-color 0.15s;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      margin-right: 6px;
+      color: var(--phonus-primary);
+    }
+
+    &:hover {
+      background: var(--phonus-primary-light);
+      border-color: var(--phonus-primary);
+    }
+  }
 }

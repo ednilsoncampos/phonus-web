@@ -21,11 +21,32 @@ a[mat-list-item] {
   border-radius: 8px;
   margin: 2px 8px;
   color: var(--phonus-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
   transition: background 0.15s, color 0.15s;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 3px;
+    height: 60%;
+    background: var(--phonus-primary);
+    border-radius: 0 3px 3px 0;
+    transition: transform 0.15s ease;
+  }
 
   &.active {
     background: var(--phonus-primary-light);
-    color: var(--phonus-primary-dark);
+    color: var(--phonus-text);
+    font-weight: 600;
+
+    &::before {
+      transform: translateY(-50%) scaleY(1);
+    }
 
     mat-icon {
       color: var(--phonus-primary);

@@ -1,5 +1,8 @@
 @use 'styles/material-theme';
 @use 'styles/variables';
+@use 'styles/patterns';
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 html {
   height: 100%;
@@ -9,9 +12,14 @@ body {
   color-scheme: light;
   background-color: var(--phonus-background);
   color: var(--phonus-text);
-  font-family: Roboto, sans-serif;
+  font-family: 'Inter', sans-serif;
   margin: 0;
   height: 100%;
+}
+
+/* Dialogs: padding-top para evitar clipagem do floating label no primeiro campo */
+.mat-mdc-dialog-content {
+  padding-top: 12px !important;
 }
 
 /* Snackbar de erro global */

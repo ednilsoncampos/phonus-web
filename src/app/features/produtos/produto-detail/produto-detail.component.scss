@@ -1,48 +1,4 @@
-.state-center {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 200px;
-  color: var(--phonus-text-secondary);
-}
-.detail-card {
-  background: var(--phonus-surface);
-  border: 1px solid var(--phonus-border);
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 720px;
-}
-.detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px 32px;
-}
-.detail-full { grid-column: 1 / -1; }
-.detail-field label {
-  display: block;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--phonus-text-secondary);
-  text-transform: uppercase;
-  letter-spacing: .5px;
-  margin-bottom: 4px;
-}
-.detail-field span {
-  font-size: 15px;
-  color: var(--phonus-text);
-}
-.section-divider {
-  border: none;
-  border-top: 1px solid var(--phonus-border);
-  margin: 20px 0;
-}
-.actions-top {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 24px;
-}
+// detail-card, detail-grid, detail-field, section-divider, actions-top: em _patterns.scss
 .badge-minimo {
   display: inline-flex;
   align-items: center;
@@ -52,7 +8,5 @@
   font-size: 12px;
   font-weight: 600;
   background: #fee2e2;
-  color: #b91c1c;
+  color: #991b1b;
 }
-.status-ativo   { color: var(--phonus-primary); font-weight: 600; }
-.status-inativo { color: var(--phonus-text-secondary); }

@@ -1,19 +1,25 @@
 .page-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--phonus-border);
 }
 .page-header__title {
   margin: 0;
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 28px;
+  font-weight: 800;
   color: var(--phonus-text);
+  letter-spacing: -0.7px;
+  line-height: 1.15;
 }
 .page-header__subtitle {
-  margin: 4px 0 0;
+  margin: 5px 0 0;
   font-size: 14px;
+  font-weight: 400;
   color: var(--phonus-text-secondary);
+  letter-spacing: 0;
 }
 .page-header__actions {
   display: flex;

@@ -6,18 +6,20 @@
   z-index: 100;
   background: var(--phonus-surface);
   border-bottom: 1px solid var(--phonus-border);
+  box-shadow: var(--phonus-shadow-sm);
   height: 64px;
   padding: 0 16px;
   color: var(--phonus-text);
 }
 .topbar__menu-btn {
   margin-right: 8px;
+  color: var(--phonus-text-secondary);
 }
 .topbar__brand {
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--phonus-primary);
-  letter-spacing: -0.5px;
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--phonus-text);
+  letter-spacing: -0.7px;
 }
 .topbar__spacer {
   flex: 1;
@@ -26,11 +28,19 @@
   display: flex;
   align-items: center;
   gap: 4px;
-  color: var(--phonus-text);
+  color: var(--phonus-text-secondary);
+  border-radius: 8px;
+  padding: 4px 8px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--phonus-background);
+    color: var(--phonus-text);
+  }
 }
 .topbar__username {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   max-width: 160px;
   overflow: hidden;
   text-overflow: ellipsis;
