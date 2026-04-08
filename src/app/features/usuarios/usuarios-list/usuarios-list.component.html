@@ -61,6 +61,17 @@
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef class="col-acoes"></th>
         <td mat-cell *matCellDef="let u" class="col-acoes">
+          @if (!u.ativo) {
+            <button
+              mat-icon-button
+              matTooltip="Reenviar convite por e-mail"
+              [attr.aria-label]="'Reenviar convite para ' + u.nome"
+              [disabled]="reenviandoPara() === u.id"
+              (click)="reenviarConvite(u)"
+            >
+              <mat-icon>forward_to_inbox</mat-icon>
+            </button>
+          }
           @if (podeDesativar(u)) {
             <button
               mat-icon-button

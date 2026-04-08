@@ -23,10 +23,27 @@ body {
 }
 
 /* Snackbar de erro global */
-.snack-error {
-  --mdc-snackbar-container-color: #b91c1c;
-  --mdc-snackbar-supporting-text-color: #fff;
-  --mat-snack-bar-button-color: #fca5a5;
+.snack-error .mdc-snackbar__surface {
+  background-color: #b91c1c !important;
+  color: #fff !important;
+}
+.snack-error .mdc-snackbar__label {
+  color: #fff !important;
+}
+.snack-error .mat-mdc-snack-bar-action {
+  color: #fca5a5 !important;
+}
+
+/* Snackbar de sucesso global */
+.snack-success .mdc-snackbar__surface {
+  background-color: #166534 !important;
+  color: #fff !important;
+}
+.snack-success .mdc-snackbar__label {
+  color: #fff !important;
+}
+.snack-success .mat-mdc-snack-bar-action {
+  color: #bbf7d0 !important;
 }
 
 /* Scroll horizontal em tabelas em telas pequenas */

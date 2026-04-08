@@ -1,2 +1,10 @@
 // Estilos específicos — padrões globais (form-card, form-row, section-label, actions, error-banner) em _patterns.scss
 .price-prefix { color: var(--phonus-text-secondary); margin-right: 4px; }
+
+.field-with-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  mat-form-field { flex: 1; }
+}

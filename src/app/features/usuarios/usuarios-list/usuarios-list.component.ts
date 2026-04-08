@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthService } from '../../../core/auth/auth.service';
@@ -47,11 +48,13 @@ export class UsuariosListComponent implements OnInit {
   private readonly usuarioService = inject(UsuarioService);
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly colunas = ['nome', 'email', 'papel', 'status', 'acoes'];
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
   readonly usuarios = signal<Usuario[]>([]);
+  readonly reenviandoPara = signal<string | null>(null);
 
   readonly podeConvidar = computed(() =>
     this.authService.hasRole('SUPER_ROOT', 'ROOT', 'ADMIN'),
@@ -106,6 +109,29 @@ export class UsuariosListComponent implements OnInit {
       if (novoUsuario) {
         this.usuarios.update((lista) => [...lista, novoUsuario]);
       }
+    });
+  }
+
+  reenviarConvite(usuario: Usuario): void {
+    this.reenviandoPara.set(usuario.id);
+
+    this.authService.reenviarAtivacao(usuario.email).subscribe({
+      next: () => {
+        this.reenviandoPara.set(null);
+        this.snackBar.open(
+          `Convite reenviado para ${usuario.email}! Peça ao usuário para verificar o e-mail e a pasta de spam.`,
+          'Fechar',
+          { duration: 8000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-success'] },
+        );
+      },
+      error: () => {
+        this.reenviandoPara.set(null);
+        this.snackBar.open(
+          'Não foi possível reenviar o convite. Tente novamente.',
+          'Fechar',
+          { duration: 7000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-error'] },
+        );
+      },
     });
   }
 

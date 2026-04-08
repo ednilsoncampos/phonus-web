@@ -546,8 +546,8 @@
                             }
                         }
                     },
-                    "409": {
-                        "description": "Já existe uma versão com este número",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -566,8 +566,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "409": {
+                        "description": "Já existe uma versão com este número",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -603,16 +603,6 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "404": {
                         "description": "Usuário ou termo de uso não encontrado",
                         "content": {
@@ -635,6 +625,16 @@
                     },
                     "204": {
                         "description": "Aceite registrado com sucesso"
+                    },
+                    "400": {
+                        "description": "Dados inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -886,12 +886,12 @@
                             }
                         }
                     },
-                    "201": {
-                        "description": "Pagamento registrado com sucesso",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PagamentoResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -906,12 +906,12 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Parcela não encontrada",
+                    "201": {
+                        "description": "Pagamento registrado com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/PagamentoResponse"
                                 }
                             }
                         }
@@ -926,8 +926,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "404": {
+                        "description": "Parcela não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1065,8 +1065,8 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição (campos obrigatórios ausentes, tipo ou forma de pagamento inválidos)",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1075,18 +1075,8 @@
                             }
                         }
                     },
-                    "201": {
-                        "description": "Lançamento criado com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LancamentoResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "400": {
+                        "description": "Dados inválidos na requisição (campos obrigatórios ausentes, tipo ou forma de pagamento inválidos)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1101,6 +1091,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Lançamento criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LancamentoResponse"
                                 }
                             }
                         }
@@ -1132,6 +1132,16 @@
                     "required": true
                 },
                 "responses": {
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Interpretação concluída. Campos nulos indicam que o dado não foi identificado no texto.",
                         "content": {
@@ -1144,16 +1154,6 @@
                     },
                     "400": {
                         "description": "Texto ausente ou inválido",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1568,6 +1568,14 @@
                         "schema": {
                             "type": "string"
                         }
+                    },
+                    {
+                        "name": "e",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 ],
                 "responses": {
@@ -1602,6 +1610,9 @@
                                         "type": "string"
                                     },
                                     "confirmaSenha": {
+                                        "type": "string"
+                                    },
+                                    "e": {
                                         "type": "string"
                                     }
                                 },
@@ -1647,16 +1658,6 @@
                     "required": true
                 },
                 "responses": {
-                    "409": {
-                        "description": "E-mail já cadastrado no sistema",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "400": {
                         "description": "Dados inválidos na requisição (campos obrigatórios ausentes ou formato incorreto)",
                         "content": {
@@ -1673,6 +1674,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "E-mail já cadastrado no sistema",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1699,6 +1710,16 @@
                     "required": true
                 },
                 "responses": {
+                    "401": {
+                        "description": "Refresh token inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Tokens renovados com sucesso",
                         "content": {
@@ -1711,16 +1732,6 @@
                     },
                     "400": {
                         "description": "Refresh token ausente ou campo inválido",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Refresh token inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1838,12 +1849,12 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos",
+                    "200": {
+                        "description": "E-mail de recuperação enviado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/EsqueceuSenhaResponse"
                                 }
                             }
                         }
@@ -1858,12 +1869,12 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "E-mail de recuperação enviado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/EsqueceuSenhaResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1890,8 +1901,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Plano não encontrado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -1910,8 +1921,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Dados inválidos",
+                    "404": {
+                        "description": "Plano não encontrado",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2049,6 +2060,16 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "403": {
                         "description": "A parcela pertence a outro usuário",
                         "content": {
@@ -2069,16 +2090,6 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Parcela não encontrada",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "422": {
                         "description": "Parcela já foi paga anteriormente",
                         "content": {
@@ -2089,8 +2100,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "404": {
+                        "description": "Parcela não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2174,22 +2185,22 @@
                 "description": "Retorna a versão ativa dos termos de uso e política de privacidade. Endpoint público, não requer autenticação.",
                 "operationId": "obterAtual",
                 "responses": {
-                    "404": {
-                        "description": "Nenhum termo de uso ativo cadastrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Termos retornados com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TermosAceiteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Nenhum termo de uso ativo cadastrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2230,26 +2241,6 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Relatório gerado com sucesso (lista pode ser vazia)",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/RelatorioPagamentosResponse"
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Parâmetros de data inválidos",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
@@ -2266,6 +2257,26 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parâmetros de data inválidos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Relatório gerado com sucesso (lista pode ser vazia)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RelatorioPagamentosResponse"
                                 }
                             }
                         }
@@ -2351,16 +2362,6 @@
                     }
                 ],
                 "responses": {
-                    "400": {
-                        "description": "Parâmetros de data inválidos ou tipo inválido",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
@@ -2371,8 +2372,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuário autenticado não encontrado",
+                    "400": {
+                        "description": "Parâmetros de data inválidos ou tipo inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2387,6 +2388,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/RelatorioLancamentosResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário autenticado não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2572,6 +2583,16 @@
                     }
                 ],
                 "responses": {
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "403": {
                         "description": "Lançamento pertence a outro usuário",
                         "content": {
@@ -2584,16 +2605,6 @@
                     },
                     "404": {
                         "description": "Lançamento não encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2999,22 +3010,22 @@
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Saldo retornado com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CaixaResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Saldo retornado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CaixaResponse"
                                 }
                             }
                         }

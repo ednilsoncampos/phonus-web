@@ -37,6 +37,10 @@ export class AuthService {
     );
   }
 
+  reenviarAtivacao(email: string) {
+    return this.api.post<void>('/auth/reenviar-ativacao', { email });
+  }
+
   refresh(refreshToken: string) {
     return this.api
       .post<AuthResponse>('/auth/refresh', { refreshToken })

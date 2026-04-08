@@ -21,9 +21,9 @@ interface NavItem {
 const NAV_ITEMS: NavItem[] = [
   { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: null },
   { label: 'Usuários', icon: 'group', route: '/usuarios', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
+  { label: 'Cat. Produto', icon: 'category', route: '/categorias/produto', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
   { label: 'Produtos', icon: 'inventory_2', route: '/produtos', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
   { label: 'Estoque', icon: 'warehouse', route: '/estoque', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Cat. Produto', icon: 'category', route: '/categorias/produto', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
   { label: 'Cat. Lançamento', icon: 'label', route: '/categorias/lancamento', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
   { label: 'Lançamentos', icon: 'receipt_long', route: '/lancamentos', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
   { label: 'Clientes', icon: 'people', route: '/clientes', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },

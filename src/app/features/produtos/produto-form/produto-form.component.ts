@@ -8,15 +8,21 @@ import {
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ProdutoService } from '../../../core/services/produto.service';
 import { CategoriaProdutoService } from '../../../core/services/categoria-produto.service';
 import { CriarProdutoRequest, UnidadeMedida } from '../../../core/models/produto.model';
 import { CategoriaProduto } from '../../../core/models/categoria-produto.model';
+import {
+  CategoriaProdutoDialogComponent,
+  CategoriaProdutoDialogData,
+} from '../../categorias/categorias-produto/categoria-produto-dialog.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
 const UNIDADES: { value: UnidadeMedida; label: string }[] = [
@@ -40,6 +46,7 @@ const UNIDADES: { value: UnidadeMedida; label: string }[] = [
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
     MatProgressSpinnerModule,
   ],
   templateUrl: './produto-form.component.html',
@@ -51,6 +58,7 @@ export class ProdutoFormComponent implements OnInit {
   private readonly categoriaService = inject(CategoriaProdutoService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(MatDialog);
 
   readonly unidades = UNIDADES;
   readonly carregando = signal(false);
@@ -64,11 +72,11 @@ export class ProdutoFormComponent implements OnInit {
   readonly form = this.fb.group({
     nome:          ['', Validators.required],
     descricao:     [''],
-    categoriaId:   [''],
+    categoriaId:   ['', Validators.required],
     unidadeMedida: ['UN' as UnidadeMedida, Validators.required],
     precoVenda:    [null as number | null, [Validators.required, Validators.min(0.01)]],
-    precoCusto:    [null as number | null],
-    estoqueMinimo: [0, [Validators.required, Validators.min(0)]],
+    precoCusto:    [null as number | null, [Validators.required, Validators.min(0.01)]],
+    estoqueMinimo: [null as unknown as number, [Validators.required, Validators.min(1)]],
     codigoBarras:  [''],
     ncm:           [''],
     cest:          [''],
@@ -120,7 +128,7 @@ export class ProdutoFormComponent implements OnInit {
       categoriaId:   raw.categoriaId || undefined,
       unidadeMedida: raw.unidadeMedida,
       precoVenda:    Math.round((raw.precoVenda ?? 0) * 100),
-      precoCusto:    raw.precoCusto != null ? Math.round(raw.precoCusto * 100) : undefined,
+      precoCusto:    Math.round((raw.precoCusto ?? 0) * 100),
       estoqueMinimo: raw.estoqueMinimo,
       codigoBarras:  raw.codigoBarras || undefined,
       ncm:           raw.ncm || undefined,
@@ -140,6 +148,20 @@ export class ProdutoFormComponent implements OnInit {
         this.salvando.set(false);
         this.erro.set(err?.error?.message ?? 'Erro ao salvar o produto.');
       },
+    });
+  }
+
+  abrirCriarCategoria(): void {
+    const ref = this.dialog.open<
+      CategoriaProdutoDialogComponent,
+      CategoriaProdutoDialogData,
+      CategoriaProduto | undefined
+    >(CategoriaProdutoDialogComponent, { data: {}, width: '400px' });
+
+    ref.afterClosed().subscribe((nova) => {
+      if (!nova) return;
+      this.categorias.update((lista) => [...lista, nova]);
+      this.form.controls.categoriaId.setValue(nova.id);
     });
   }
 

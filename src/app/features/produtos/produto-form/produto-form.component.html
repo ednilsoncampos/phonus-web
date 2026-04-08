@@ -23,15 +23,28 @@
           <textarea matInput formControlName="descricao" rows="2"></textarea>
         </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Categoria</mat-label>
-          <mat-select formControlName="categoriaId">
-            <mat-option value="">Sem categoria</mat-option>
-            @for (cat of categorias(); track cat.id) {
-              <mat-option [value]="cat.id">{{ cat.nome }}</mat-option>
+        <div class="field-with-action">
+          <mat-form-field appearance="outline">
+            <mat-label>Categoria *</mat-label>
+            <mat-select formControlName="categoriaId">
+              @for (cat of categorias(); track cat.id) {
+                <mat-option [value]="cat.id">{{ cat.nome }}</mat-option>
+              }
+            </mat-select>
+            @if (form.controls.categoriaId.invalid && form.controls.categoriaId.touched) {
+              <mat-error>Categoria é obrigatória</mat-error>
             }
-          </mat-select>
-        </mat-form-field>
+          </mat-form-field>
+          <button
+            mat-icon-button
+            type="button"
+            matTooltip="Nova categoria"
+            aria-label="Criar nova categoria de produto"
+            (click)="abrirCriarCategoria()"
+          >
+            <mat-icon>add_circle_outline</mat-icon>
+          </button>
+        </div>
 
         <mat-form-field appearance="outline">
           <mat-label>Unidade de medida *</mat-label>
@@ -43,8 +56,8 @@
         </mat-form-field>
       </div>
 
-      <p class="section-label">Preços</p>
-      <div class="form-row">
+      <p class="section-label">Preços e Estoque</p>
+      <div class="form-row-3">
         <mat-form-field appearance="outline">
           <mat-label>Preço de venda *</mat-label>
           <span matTextPrefix class="price-prefix">R$&nbsp;</span>
@@ -57,25 +70,29 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Preço de custo</mat-label>
+          <mat-label>Preço de custo *</mat-label>
           <span matTextPrefix class="price-prefix">R$&nbsp;</span>
           <input matInput type="number" min="0" step="0.01" formControlName="precoCusto" />
+          @if (form.controls.precoCusto.hasError('required') && form.controls.precoCusto.touched) {
+            <mat-error>Preço de custo é obrigatório</mat-error>
+          } @else if (form.controls.precoCusto.hasError('min') && form.controls.precoCusto.touched) {
+            <mat-error>Deve ser maior que zero</mat-error>
+          }
         </mat-form-field>
-      </div>
 
-      <p class="section-label">Estoque</p>
-      <div class="form-row">
         <mat-form-field appearance="outline">
           <mat-label>Estoque mínimo *</mat-label>
           <input matInput type="number" min="0" formControlName="estoqueMinimo" />
-          @if (form.controls.estoqueMinimo.invalid && form.controls.estoqueMinimo.touched) {
+          @if (form.controls.estoqueMinimo.hasError('required') && form.controls.estoqueMinimo.touched) {
             <mat-error>Estoque mínimo é obrigatório</mat-error>
+          } @else if (form.controls.estoqueMinimo.hasError('min') && form.controls.estoqueMinimo.touched) {
+            <mat-error>Deve ser maior que zero</mat-error>
           }
         </mat-form-field>
       </div>
 
       <p class="section-label">Dados fiscais (opcional)</p>
-      <div class="form-row">
+      <div class="form-row-3">
         <mat-form-field appearance="outline">
           <mat-label>Código de barras</mat-label>
           <input matInput formControlName="codigoBarras" autocomplete="off" />
