@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ClienteService } from '../../../core/services/cliente.service';
 import { Cliente } from '../../../core/models/cliente.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PhonePipe } from '../../../shared/pipes/phone.pipe';
 import {
   ClienteDialogComponent,
   ClienteDialogData,
@@ -26,6 +27,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PageHeaderComponent,
+    PhonePipe,
     MatTableModule,
     MatButtonModule,
     MatIconModule,

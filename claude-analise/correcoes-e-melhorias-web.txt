@@ -1,5 +1,4 @@
-Leia o arquivo docs\plano-desenvolvimento-web.md para iniciar o desenvolvimento.
-Leia os arquivs docs\arquitetura-web-angular-vfinal.md e docs\plano-implementacao-web.md para ter um contexto.
-Leia os outros arquivos da pasta docs para uma visao gerao.
-
-Valide comigo o entendimento para iniciar o desenvolvimento em etapas.
+Na tela de lançamentos coloque a linha referente a pagamento abaixo dos itens.
+O que significa o label Vínculos? O termo (opcional) pode ser removido.
+Tem como criar um scroll para os itens, manter dois produtos na tela conforme print claude-analise\dois-produtos-tela.png
+e ao clicar em Adicionar item, renderizar no topo e nao no fim?

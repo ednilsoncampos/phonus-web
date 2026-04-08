@@ -48,7 +48,7 @@ export class ProdutosListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  readonly colunas = ['nome', 'categoria', 'precoVenda', 'estoque', 'status', 'acoes'];
+  readonly colunas = ['nome', 'categoria', 'precoVenda', 'precoCusto', 'estoque', 'status', 'acoes'];
   readonly pageSize = 20;
 
   readonly carregando = signal(false);

@@ -21,6 +21,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { LancamentoService } from '../../../core/services/lancamento.service';
 import { CategoriaLancamentoService } from '../../../core/services/categoria-lancamento.service';
 import { ClienteService } from '../../../core/services/cliente.service';
@@ -32,6 +33,7 @@ import { Cliente } from '../../../core/models/cliente.model';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
 import { Produto } from '../../../core/models/produto.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
+import { DateFieldComponent } from '../../../shared/components/date-field/date-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
 const FORMAS_PAGAMENTO: { value: FormaPagamento; label: string }[] = [
@@ -52,12 +54,14 @@ const FORMAS_PRAZO: FormaPagamento[] = ['CREDITO', 'CHEQUE', 'PROMISSORIA'];
     ReactiveFormsModule,
     PageHeaderComponent,
     CurrencyBrlPipe,
+    DateFieldComponent,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
   ],
   templateUrl: './lancamento-form.component.html',
   styleUrl: './lancamento-form.component.scss',
@@ -75,7 +79,7 @@ export class LancamentoFormComponent implements OnInit {
 
   readonly form = this.fb.group({
     tipo:               ['SAIDA' as TipoLancamento, Validators.required],
-    descricao:          ['', Validators.required],
+    descricao:          [''],
     valorTotal:         [null as number | null, [Validators.required, Validators.min(0.01)]],
     formaPagamento:     ['PIX' as FormaPagamento, Validators.required],
     dataLancamento:     ['', Validators.required],
@@ -96,10 +100,15 @@ export class LancamentoFormComponent implements OnInit {
   });
 
   readonly isPrazo = computed(() => FORMAS_PRAZO.includes(this.fpSignal()));
+  readonly mostrarCliente = computed(() => this.tipoSignal() === 'ENTRADA');
+  readonly mostrarFornecedor = computed(() => this.tipoSignal() === 'SAIDA');
+
+  readonly passo = signal(1);
 
   readonly carregando = signal(false);
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
+  readonly erroItens = signal<string | null>(null);
 
   readonly todasCategorias = signal<CategoriaLancamento[]>([]);
   readonly clientes = signal<Cliente[]>([]);
@@ -121,6 +130,14 @@ export class LancamentoFormComponent implements OnInit {
     const d = String(hoje.getDate()).padStart(2, '0');
     this.form.controls.dataLancamento.setValue(`${y}-${m}-${d}`);
 
+    this.form.controls.tipo.valueChanges.subscribe((tipo) => {
+      if (tipo === 'ENTRADA') {
+        this.form.controls.fornecedorId.setValue('');
+      } else {
+        this.form.controls.clienteId.setValue('');
+      }
+    });
+
     this.carregando.set(true);
     let pendentes = 4;
 
@@ -133,27 +150,60 @@ export class LancamentoFormComponent implements OnInit {
     this.clienteService.listar({ size: 200, ativos: true }).subscribe({ next: (r) => { this.clientes.set(r.content); onLoad(); }, error: onLoad });
     this.fornecedorService.listar({ size: 200, ativos: true }).subscribe({ next: (r) => { this.fornecedores.set(r.content); onLoad(); }, error: onLoad });
     this.produtoService.listar({ size: 200, ativos: true }).subscribe({ next: (r) => { this.produtos.set(r.content); onLoad(); }, error: onLoad });
+
+    this.itensArray.valueChanges.subscribe(() => this.calcularTotal());
+
+    this.adicionarItem();
   }
 
   adicionarItem(): void {
-    this.itensArray.push(this.novoItemGroup());
+    this.itensArray.insert(0, this.novoItemGroup());
     this.itemGroups.set([...this.itensArray.controls]);
+    this.calcularTotal();
   }
 
   removerItem(index: number): void {
     this.itensArray.removeAt(index);
     this.itemGroups.set([...this.itensArray.controls]);
+    this.calcularTotal();
   }
 
   precoReferencia(produtoId: string): number {
     return this.produtos().find((p) => p.id === produtoId)?.precoVenda ?? 0;
   }
 
-  salvar(): void {
-    this.form.markAllAsTouched();
-    this.itensArray.controls.forEach((g) => g.markAllAsTouched());
+  avancar(): void {
+    if (this.passo() === 1) {
+      this.itensArray.controls.forEach((g) => g.markAllAsTouched());
+      if (this.itensArray.length === 0) {
+        this.erroItens.set('Adicione pelo menos um produto.');
+        return;
+      }
+      if (this.itensArray.invalid) return;
+      this.erroItens.set(null);
+    } else if (this.passo() === 2) {
+      this.form.controls.tipo.markAsTouched();
+      this.form.controls.dataLancamento.markAsTouched();
+      if (this.form.controls.tipo.invalid || this.form.controls.dataLancamento.invalid) return;
+    }
+    this.passo.update((p) => p + 1);
+  }
 
-    if (this.form.invalid || this.itensArray.invalid) return;
+  voltar(): void {
+    this.passo.update((p) => p - 1);
+  }
+
+  salvar(): void {
+    this.form.controls.formaPagamento.markAsTouched();
+    this.form.controls.valorTotal.markAsTouched();
+    if (this.form.controls.formaPagamento.invalid || this.form.controls.valorTotal.invalid) return;
+
+    const descricao = this.itensArray.controls
+      .map((g) => this.produtos().find((p) => p.id === g.get('produtoId')?.value)?.nome ?? '')
+      .filter((nome) => nome)
+      .join(', ')
+      .substring(0, 300);
+    this.form.controls.descricao.setValue(descricao);
 
     this.salvando.set(true);
     this.erro.set(null);
@@ -192,6 +242,21 @@ export class LancamentoFormComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['/lancamentos']);
+  }
+
+  private calcularTotal(): void {
+    const total = this.itensArray.controls.reduce((sum, g) => {
+      const produtoId = g.get('produtoId')?.value as string;
+      const produto = this.produtos().find((p) => p.id === produtoId);
+      const precoReais = (produto?.precoVenda ?? 0) / 100;
+      const quantidade = (g.get('quantidade')?.value as number) ?? 0;
+      const desconto = (g.get('desconto')?.value as number) ?? 0;
+      return sum + Math.max(0, precoReais * quantidade - desconto);
+    }, 0);
+    this.form.controls.valorTotal.setValue(
+      Math.round(total * 100) / 100,
+      { emitEvent: false },
+    );
   }
 
   private novoItemGroup(): FormGroup {

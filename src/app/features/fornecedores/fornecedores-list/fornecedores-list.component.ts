@@ -16,6 +16,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
+import { PhonePipe } from '../../../shared/pipes/phone.pipe';
 import {
   FornecedorDialogComponent,
   FornecedorDialogData,
@@ -26,6 +27,7 @@ import {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PageHeaderComponent,
+    PhonePipe,
     MatTableModule,
     MatButtonModule,
     MatIconModule,

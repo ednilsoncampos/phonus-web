@@ -1,6 +1,11 @@
 // kpi-grid, kpi-card, kpi-label, kpi-value, table-wrap, state-center: em _patterns.scss
-.col-preco  { width: 140px; text-align: right; }
-.col-margem { width: 120px; text-align: right; }
+.kpi-card {
+  padding: 20px 24px;
+}
+
+.col-categoria { width: 160px; }
+.col-preco     { width: 140px; text-align: right; }
+.col-margem    { width: 120px; text-align: right; }
 
 .margem-cell {
   display: flex;

@@ -25,6 +25,7 @@ import {
 } from '../../../core/models/lancamento.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
 import { DateBrPipe } from '../../../shared/pipes/date-br.pipe';
+import { DateFieldComponent } from '../../../shared/components/date-field/date-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
 const FORMA_LABELS: Record<FormaPagamento, string> = {
@@ -44,6 +45,7 @@ const FORMA_LABELS: Record<FormaPagamento, string> = {
     PageHeaderComponent,
     CurrencyBrlPipe,
     DateBrPipe,
+    DateFieldComponent,
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,

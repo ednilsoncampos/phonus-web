@@ -157,6 +157,15 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'lancamentos/:id',
+        canActivate: [roleGuard],
+        data: { roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
+        loadComponent: () =>
+          import('./features/lancamentos/lancamento-detail/lancamento-detail').then(
+            (m) => m.LancamentoDetail,
+          ),
+      },
+      {
         path: 'relatorios/margem',
         canActivate: [roleGuard],
         data: { roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },

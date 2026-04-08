@@ -18,27 +18,17 @@
     <mat-option value="SAIDA">Saída</mat-option>
   </mat-select>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Data início</mat-label>
-    <input
-      matInput
-      type="date"
-      [(ngModel)]="filtroDataInicio"
-      (ngModelChange)="onFiltroChange()"
-      aria-label="Data início"
-    />
-  </mat-form-field>
+  <app-date-field
+    label="Data início"
+    [(ngModel)]="filtroDataInicio"
+    (ngModelChange)="onFiltroChange()"
+  />
 
-  <mat-form-field appearance="outline">
-    <mat-label>Data fim</mat-label>
-    <input
-      matInput
-      type="date"
-      [(ngModel)]="filtroDataFim"
-      (ngModelChange)="onFiltroChange()"
-      aria-label="Data fim"
-    />
-  </mat-form-field>
+  <app-date-field
+    label="Data fim"
+    [(ngModel)]="filtroDataFim"
+    (ngModelChange)="onFiltroChange()"
+  />
 </div>
 
 @if (carregando()) {

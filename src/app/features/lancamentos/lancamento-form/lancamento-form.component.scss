@@ -1,6 +1,80 @@
 // Estilos específicos — padrões globais (form-card, form-row, section-label, actions, error-banner) em _patterns.scss
 .price-prefix { color: var(--phonus-text-secondary); margin-right: 4px; }
 
+// Wizard
+.wizard-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.wizard-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+
+  &__num {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    background: var(--phonus-border);
+    color: var(--phonus-text-secondary);
+    transition: background 0.2s, color 0.2s;
+
+    mat-icon { font-size: 18px; width: 18px; height: 18px; }
+  }
+
+  &__label {
+    font-size: 11px;
+    color: var(--phonus-text-secondary);
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+
+  &--active {
+    .wizard-step__num {
+      background: var(--phonus-primary, #2e7d32);
+      color: #fff;
+    }
+    .wizard-step__label {
+      color: var(--phonus-primary, #2e7d32);
+      font-weight: 600;
+    }
+  }
+
+  &--done {
+    .wizard-step__num {
+      background: var(--phonus-primary, #2e7d32);
+      color: #fff;
+    }
+    .wizard-step__label { color: var(--phonus-text-secondary); }
+  }
+}
+
+.wizard-divider {
+  flex: 1;
+  height: 2px;
+  background: var(--phonus-border);
+  margin: 0 8px 16px;
+}
+
+// Layout 3 colunas para a linha Tipo | Categoria | Data
+.form-row--vinculos {
+  grid-template-columns: 160px 180px 1fr;
+}
+
+.itens-scroll {
+  max-height: 465px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
 .item-row {
   display: grid;
   grid-template-columns: 1fr 120px 140px auto;
