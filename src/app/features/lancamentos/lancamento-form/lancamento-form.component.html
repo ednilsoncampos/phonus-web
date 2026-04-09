@@ -96,13 +96,13 @@
         <p class="section-label">Dados do lançamento</p>
         <div class="form-row form-row--vinculos">
           <mat-form-field appearance="outline">
-            <mat-label>Tipo *</mat-label>
+            <mat-label>Movimentação Financeira *</mat-label>
             <mat-select
               formControlName="tipo"
-              matTooltip="Entrada = dinheiro recebido · Saída = dinheiro pago"
+              matTooltip="Entrada de Caixa = dinheiro recebido · Saída de Caixa = dinheiro pago"
             >
-              <mat-option value="ENTRADA">Entrada</mat-option>
-              <mat-option value="SAIDA">Saída</mat-option>
+              <mat-option value="ENTRADA_CAIXA">Entrada de Caixa</mat-option>
+              <mat-option value="SAIDA_CAIXA">Saída de Caixa</mat-option>
             </mat-select>
             @if (form.controls.tipo.invalid && form.controls.tipo.touched) {
               <mat-error>Tipo é obrigatório</mat-error>

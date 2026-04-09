@@ -8,7 +8,7 @@ import { PageResponse } from '../models/page-response.model';
 const mockLancamento: LancamentoResponse = {
   id: 'l1',
   usuarioId: 'u1',
-  tipo: 'SAIDA',
+  tipo: 'SAIDA_CAIXA',
   descricao: 'Compra de material',
   valorTotal: 5000,
   formaPagamento: 'PIX',
@@ -47,16 +47,16 @@ describe('LancamentoService', () => {
 
     httpMock.expectOne((r) => r.url.endsWith('/lancamentos')).flush(mockPage);
     expect(result?.content).toHaveLength(1);
-    expect(result?.content[0].tipo).toBe('SAIDA');
+    expect(result?.content[0].tipo).toBe('SAIDA_CAIXA');
   });
 
   it('listar envia filtros de tipo e data', () => {
     service
-      .listar({ tipo: 'ENTRADA', dataInicio: '2026-01-01', dataFim: '2026-01-31' })
+      .listar({ tipo: 'ENTRADA_CAIXA', dataInicio: '2026-01-01', dataFim: '2026-01-31' })
       .subscribe();
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/lancamentos'));
-    expect(req.request.params.get('tipo')).toBe('ENTRADA');
+    expect(req.request.params.get('tipo')).toBe('ENTRADA_CAIXA');
     expect(req.request.params.get('dataInicio')).toBe('2026-01-01');
     expect(req.request.params.get('dataFim')).toBe('2026-01-31');
     req.flush(mockPage);
@@ -74,7 +74,7 @@ describe('LancamentoService', () => {
   it('criar faz POST /lancamentos com valorTotal em centavos', () => {
     service
       .criar({
-        tipo: 'SAIDA',
+        tipo: 'SAIDA_CAIXA',
         descricao: 'Teste',
         valorTotal: 5000,
         formaPagamento: 'PIX',

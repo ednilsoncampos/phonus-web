@@ -374,8 +374,8 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição",
+                    "401": {
+                        "description": "Token ausente ou inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -384,8 +384,8 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Token ausente ou inválido",
+                    "400": {
+                        "description": "Dados inválidos na requisição",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -536,16 +536,6 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
@@ -562,6 +552,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/TermosAceiteResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos na requisição",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -603,8 +603,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Usuário ou termo de uso não encontrado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -623,11 +623,8 @@
                             }
                         }
                     },
-                    "204": {
-                        "description": "Aceite registrado com sucesso"
-                    },
-                    "400": {
-                        "description": "Dados inválidos",
+                    "404": {
+                        "description": "Usuário ou termo de uso não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -635,6 +632,9 @@
                                 }
                             }
                         }
+                    },
+                    "204": {
+                        "description": "Aceite registrado com sucesso"
                     }
                 }
             }
@@ -670,7 +670,7 @@
                     "Produtos"
                 ],
                 "summary": "Listar produtos",
-                "description": "Filtros opcionais: categoria, apenas ativos (padrão true), abaixo do estoque mínimo.",
+                "description": "Filtros opcionais: categoria, apenas ativos (padrão true), abaixo do estoque mínimo, busca por nome (parcial, case-insensitive). Quando busca é informada, abaixoDoMinimo é ignorado.",
                 "operationId": "listar_1",
                 "parameters": [
                     {
@@ -701,6 +701,15 @@
                         "schema": {
                             "type": "boolean",
                             "default": false
+                        }
+                    },
+                    {
+                        "name": "busca",
+                        "in": "query",
+                        "description": "Busca parcial por nome (case-insensitive)",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     {
@@ -876,16 +885,6 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
@@ -906,18 +905,18 @@
                             }
                         }
                     },
-                    "201": {
-                        "description": "Pagamento registrado com sucesso",
+                    "422": {
+                        "description": "Parcela já foi paga anteriormente",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PagamentoResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
                     },
-                    "422": {
-                        "description": "Parcela já foi paga anteriormente",
+                    "400": {
+                        "description": "Dados inválidos na requisição",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -932,6 +931,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Pagamento registrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponse"
                                 }
                             }
                         }
@@ -1142,22 +1151,22 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Interpretação concluída. Campos nulos indicam que o dado não foi identificado no texto.",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/InterpretarLancamentoResponse"
-                                }
-                            }
-                        }
-                    },
                     "400": {
                         "description": "Texto ausente ou inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Interpretação concluída. Campos nulos indicam que o dado não foi identificado no texto.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/InterpretarLancamentoResponse"
                                 }
                             }
                         }
@@ -1176,7 +1185,7 @@
                     "Fornecedores"
                 ],
                 "summary": "Listar fornecedores",
-                "description": "Por padrão retorna apenas fornecedores ativos. Use ?ativos=false para incluir inativos.",
+                "description": "Por padrão retorna apenas fornecedores ativos. Use ?ativos=false para incluir inativos. Use ?busca=texto para filtrar por nome (busca parcial, case-insensitive).",
                 "operationId": "listar_3",
                 "parameters": [
                     {
@@ -1186,6 +1195,14 @@
                         "schema": {
                             "type": "boolean",
                             "default": true
+                        }
+                    },
+                    {
+                        "name": "busca",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     {
@@ -1317,7 +1334,7 @@
                     "Clientes"
                 ],
                 "summary": "Listar clientes",
-                "description": "Por padrão retorna apenas clientes ativos. Use ?ativos=false para incluir inativos.",
+                "description": "Por padrão retorna apenas clientes ativos. Use ?ativos=false para incluir inativos. Use ?busca=texto para filtrar por nome (busca parcial, case-insensitive).",
                 "operationId": "listar_4",
                 "parameters": [
                     {
@@ -1327,6 +1344,14 @@
                         "schema": {
                             "type": "boolean",
                             "default": true
+                        }
+                    },
+                    {
+                        "name": "busca",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
                         }
                     },
                     {
@@ -1658,6 +1683,16 @@
                     "required": true
                 },
                 "responses": {
+                    "409": {
+                        "description": "E-mail já cadastrado no sistema",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "400": {
                         "description": "Dados inválidos na requisição (campos obrigatórios ausentes ou formato incorreto)",
                         "content": {
@@ -1674,16 +1709,6 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UsuarioResponse"
-                                }
-                            }
-                        }
-                    },
-                    "409": {
-                        "description": "E-mail já cadastrado no sistema",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1720,22 +1745,22 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Tokens renovados com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
-                                }
-                            }
-                        }
-                    },
                     "400": {
                         "description": "Refresh token ausente ou campo inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Tokens renovados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/AuthResponse"
                                 }
                             }
                         }
@@ -1797,22 +1822,22 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Autenticação bem-sucedida",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/AuthResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos na requisição",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1882,6 +1907,93 @@
                 }
             }
         },
+        "/auth/ativar": {
+            "get": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Ativar conta via link do e-mail",
+                "description": "Se o usuário foi convidado, exibe formulário para definição de senha. Caso contrário, ativa diretamente.",
+                "operationId": "ativarConta",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "e",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Conta ativada ou formulário/erro exibido em HTML",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Autenticação"
+                ],
+                "summary": "Definir senha e ativar conta (usuário convidado)",
+                "operationId": "definirSenhaEAtivar",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "token": {
+                                        "type": "string"
+                                    },
+                                    "novaSenha": {
+                                        "type": "string"
+                                    },
+                                    "confirmaSenha": {
+                                        "type": "string"
+                                    },
+                                    "e": {
+                                        "type": "string"
+                                    }
+                                },
+                                "required": [
+                                    "confirmaSenha",
+                                    "novaSenha",
+                                    "token"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "text/html": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/assinaturas/validar": {
             "post": {
                 "tags": [
@@ -1901,8 +2013,8 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos",
+                    "404": {
+                        "description": "Plano não encontrado",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -1921,8 +2033,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Plano não encontrado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2050,16 +2162,6 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente, inválido ou expirado",
                         "content": {
@@ -2080,22 +2182,32 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Parcela baixada com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/PagamentoResponse"
-                                }
-                            }
-                        }
-                    },
                     "422": {
                         "description": "Parcela já foi paga anteriormente",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Dados inválidos na requisição",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Parcela baixada com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponse"
                                 }
                             }
                         }
@@ -2138,6 +2250,16 @@
                     }
                 ],
                 "responses": {
+                    "403": {
+                        "description": "Acesso negado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Entitlement retornado",
                         "content": {
@@ -2150,16 +2272,6 @@
                     },
                     "404": {
                         "description": "Usuário não encontrado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Acesso negado",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2251,12 +2363,12 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuário autenticado não encontrado",
+                    "200": {
+                        "description": "Relatório gerado com sucesso (lista pode ser vazia)",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/RelatorioPagamentosResponse"
                                 }
                             }
                         }
@@ -2271,12 +2383,12 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Relatório gerado com sucesso (lista pode ser vazia)",
+                    "404": {
+                        "description": "Usuário autenticado não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/RelatorioPagamentosResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -2362,8 +2474,8 @@
                     }
                 ],
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "400": {
+                        "description": "Parâmetros de data inválidos ou tipo inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2372,8 +2484,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Parâmetros de data inválidos ou tipo inválido",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2603,22 +2715,22 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Lançamento não encontrado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Lançamento encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/LancamentoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Lançamento não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -3047,22 +3159,22 @@
                 "description": "Retorna os dados do usuário correspondente ao access token informado.",
                 "operationId": "me",
                 "responses": {
-                    "200": {
-                        "description": "Dados do usuário retornados com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UsuarioResponse"
-                                }
-                            }
-                        }
-                    },
                     "401": {
                         "description": "Token ausente ou inválido",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Dados do usuário retornados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
                                 }
                             }
                         }
@@ -3083,38 +3195,6 @@
                         "bearerAuth": []
                     }
                 ]
-            }
-        },
-        "/auth/ativar": {
-            "get": {
-                "tags": [
-                    "Autenticação"
-                ],
-                "summary": "Ativar conta via link do e-mail",
-                "description": "Valida o token de ativação e ativa a conta do usuário. Retorna página HTML com o resultado.",
-                "operationId": "ativarConta",
-                "parameters": [
-                    {
-                        "name": "token",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Conta ativada ou erro exibido em HTML",
-                        "content": {
-                            "text/html": {
-                                "schema": {
-                                    "type": "string"
-                                }
-                            }
-                        }
-                    }
-                }
             }
         },
         "/usuarios/{id}": {
@@ -3928,7 +4008,7 @@
                     },
                     "itens": {
                         "type": "array",
-                        "description": "Itens de produto vinculados ao lançamento (opcional). Para SAIDA: deduz estoque com origem VENDA. Para ENTRADA: adiciona estoque com origem COMPRA.",
+                        "description": "Itens de produto vinculados ao lançamento (opcional). Para ENTRADA (venda): deduz estoque com origem VENDA. Para SAIDA (compra): adiciona estoque com origem COMPRA; valorUnitario em cada item é obrigatório.",
                         "items": {
                             "$ref": "#/components/schemas/LancamentoItemRequest"
                         }
@@ -3959,6 +4039,11 @@
                         "type": "integer",
                         "format": "int64",
                         "minimum": 0
+                    },
+                    "valorUnitario": {
+                        "type": "integer",
+                        "format": "int64",
+                        "minimum": 1
                     }
                 },
                 "required": [
@@ -4590,13 +4675,7 @@
                         "format": "uuid"
                     },
                     "status": {
-                        "type": "string",
-                        "enum": [
-                            "PURCHASED",
-                            "PENDING",
-                            "CANCELED",
-                            "EXPIRED"
-                        ]
+                        "$ref": "#/components/schemas/EnumStatusAssinatura"
                     },
                     "inicioEm": {
                         "type": "string",
@@ -4624,6 +4703,16 @@
                     "renovacaoAutomatica",
                     "status",
                     "usuarioId"
+                ]
+            },
+            "EnumStatusAssinatura": {
+                "type": "string",
+                "description": "Status da assinatura",
+                "enum": [
+                    "PURCHASED",
+                    "PENDING",
+                    "CANCELED",
+                    "EXPIRED"
                 ]
             },
             "AlterarPapelRequest": {
@@ -4679,11 +4768,7 @@
                         "type": "boolean"
                     },
                     "tier": {
-                        "type": "string",
-                        "enum": [
-                            "FREE",
-                            "PREMIUM"
-                        ]
+                        "$ref": "#/components/schemas/EnumTierAssinatura"
                     },
                     "planoAtual": {
                         "$ref": "#/components/schemas/PlanoResumidoResponse"
@@ -4704,6 +4789,22 @@
                     "usuarioId"
                 ]
             },
+            "EnumPeriodoCobranca": {
+                "type": "string",
+                "description": "Período de cobrança da assinatura",
+                "enum": [
+                    "MONTHLY",
+                    "YEARLY"
+                ]
+            },
+            "EnumTierAssinatura": {
+                "type": "string",
+                "description": "Nível da assinatura",
+                "enum": [
+                    "FREE",
+                    "PREMIUM"
+                ]
+            },
             "PlanoResumidoResponse": {
                 "type": "object",
                 "properties": {
@@ -4718,11 +4819,7 @@
                         "type": "string"
                     },
                     "periodoCobranca": {
-                        "type": "string",
-                        "enum": [
-                            "MONTHLY",
-                            "YEARLY"
-                        ]
+                        "$ref": "#/components/schemas/EnumPeriodoCobranca"
                     },
                     "preco": {
                         "type": "integer",

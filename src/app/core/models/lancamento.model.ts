@@ -1,7 +1,21 @@
-export type TipoLancamento = 'ENTRADA' | 'SAIDA';
+export type TipoLancamento = 'ENTRADA_CAIXA' | 'SAIDA_CAIXA';
 export type FormaPagamento = 'PIX' | 'DINHEIRO' | 'DEBITO' | 'CREDITO' | 'CHEQUE' | 'PROMISSORIA';
 export type OrigemLancamento = 'VOZ' | 'TEXTO';
 export type StatusParcela = 'EM_ABERTO' | 'PAGA';
+
+export const TIPO_LANCAMENTO_LABELS: Record<TipoLancamento, string> = {
+  ENTRADA_CAIXA: 'Entrada de Caixa',
+  SAIDA_CAIXA:   'Saída de Caixa',
+};
+
+export const FORMA_PAGAMENTO_LABELS: Record<FormaPagamento, string> = {
+  PIX:         'Pix',
+  DINHEIRO:    'Dinheiro',
+  DEBITO:      'Cartão de Débito',
+  CREDITO:     'Cartão de Crédito',
+  CHEQUE:      'Cheque',
+  PROMISSORIA: 'Promissória',
+};
 
 export interface LancamentoItemRequest {
   produtoId: string;

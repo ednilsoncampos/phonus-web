@@ -14,22 +14,16 @@ import { MatTableModule } from '@angular/material/table';
 import { LancamentoService } from '../../../core/services/lancamento.service';
 import { ProdutoService } from '../../../core/services/produto.service';
 import {
+  FORMA_PAGAMENTO_LABELS,
   FormaPagamento,
   LancamentoResponse,
+  TIPO_LANCAMENTO_LABELS,
 } from '../../../core/models/lancamento.model';
 import { Produto } from '../../../core/models/produto.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
 import { DateBrPipe } from '../../../shared/pipes/date-br.pipe';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
-const FORMA_LABELS: Record<FormaPagamento, string> = {
-  PIX: 'PIX',
-  DINHEIRO: 'Dinheiro',
-  DEBITO: 'Débito',
-  CREDITO: 'Crédito',
-  CHEQUE: 'Cheque',
-  PROMISSORIA: 'Promissória',
-};
 
 @Component({
   selector: 'app-lancamento-detail',
@@ -59,6 +53,7 @@ export class LancamentoDetail implements OnInit {
   readonly lancamento = signal<LancamentoResponse | null>(null);
   private readonly produtos = signal<Produto[]>([]);
 
+  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
   readonly colunasItens = ['produto', 'quantidade', 'valorUnitario', 'desconto', 'subtotal'];
   readonly colunasParcelas = ['numero', 'vencimento', 'valor', 'status'];
 
@@ -97,7 +92,7 @@ export class LancamentoDetail implements OnInit {
   }
 
   formaLabel(forma: FormaPagamento): string {
-    return FORMA_LABELS[forma] ?? forma;
+    return FORMA_PAGAMENTO_LABELS[forma] ?? forma;
   }
 
   voltar(): void {

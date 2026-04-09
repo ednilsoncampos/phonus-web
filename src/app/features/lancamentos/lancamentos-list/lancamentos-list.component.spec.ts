@@ -9,7 +9,7 @@ import { LancamentoResponse, ParcelaResponse } from '../../../core/models/lancam
 const mockLancamento: LancamentoResponse = {
   id: 'l1',
   usuarioId: 'u1',
-  tipo: 'SAIDA',
+  tipo: 'SAIDA_CAIXA',
   descricao: 'Compra de material',
   valorTotal: 5000,
   formaPagamento: 'PIX',

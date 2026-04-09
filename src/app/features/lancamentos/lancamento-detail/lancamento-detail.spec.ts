@@ -42,7 +42,7 @@ const mockParcela: ParcelaResponse = {
 const mockLancamento: LancamentoResponse = {
   id: 'l1',
   usuarioId: 'u1',
-  tipo: 'ENTRADA',
+  tipo: 'ENTRADA_CAIXA',
   descricao: 'Venda teste',
   valorTotal: 4000,
   formaPagamento: 'PIX',

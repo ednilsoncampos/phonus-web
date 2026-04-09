@@ -27,7 +27,7 @@ import { CategoriaLancamentoService } from '../../../core/services/categoria-lan
 import { ClienteService } from '../../../core/services/cliente.service';
 import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { ProdutoService } from '../../../core/services/produto.service';
-import { CriarLancamentoRequest, FormaPagamento, TipoLancamento } from '../../../core/models/lancamento.model';
+import { CriarLancamentoRequest, FORMA_PAGAMENTO_LABELS, FormaPagamento, TIPO_LANCAMENTO_LABELS, TipoLancamento } from '../../../core/models/lancamento.model';
 import { CategoriaLancamento } from '../../../core/models/categoria-lancamento.model';
 import { Cliente } from '../../../core/models/cliente.model';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
@@ -36,14 +36,9 @@ import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
 import { DateFieldComponent } from '../../../shared/components/date-field/date-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
-const FORMAS_PAGAMENTO: { value: FormaPagamento; label: string }[] = [
-  { value: 'PIX',        label: 'PIX'        },
-  { value: 'DINHEIRO',   label: 'Dinheiro'   },
-  { value: 'DEBITO',     label: 'Débito'     },
-  { value: 'CREDITO',    label: 'Crédito'    },
-  { value: 'CHEQUE',     label: 'Cheque'     },
-  { value: 'PROMISSORIA', label: 'Promissória' },
-];
+const FORMAS_PAGAMENTO = Object.entries(FORMA_PAGAMENTO_LABELS).map(
+  ([value, label]) => ({ value: value as FormaPagamento, label }),
+);
 
 const FORMAS_PRAZO: FormaPagamento[] = ['CREDITO', 'CHEQUE', 'PROMISSORIA'];
 
@@ -75,10 +70,11 @@ export class LancamentoFormComponent implements OnInit {
   private readonly produtoService = inject(ProdutoService);
   private readonly router = inject(Router);
 
+  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
   readonly formasPagamento = FORMAS_PAGAMENTO;
 
   readonly form = this.fb.group({
-    tipo:               ['SAIDA' as TipoLancamento, Validators.required],
+    tipo:               ['SAIDA_CAIXA' as TipoLancamento, Validators.required],
     descricao:          [''],
     valorTotal:         [null as number | null, [Validators.required, Validators.min(0.01)]],
     formaPagamento:     ['PIX' as FormaPagamento, Validators.required],
@@ -92,7 +88,7 @@ export class LancamentoFormComponent implements OnInit {
   private readonly itensArray = new FormArray<FormGroup>([]);
 
   private readonly tipoSignal = toSignal(this.form.controls.tipo.valueChanges, {
-    initialValue: 'SAIDA' as TipoLancamento,
+    initialValue: 'SAIDA_CAIXA' as TipoLancamento,
   });
 
   private readonly fpSignal = toSignal(this.form.controls.formaPagamento.valueChanges, {
@@ -100,8 +96,8 @@ export class LancamentoFormComponent implements OnInit {
   });
 
   readonly isPrazo = computed(() => FORMAS_PRAZO.includes(this.fpSignal()));
-  readonly mostrarCliente = computed(() => this.tipoSignal() === 'ENTRADA');
-  readonly mostrarFornecedor = computed(() => this.tipoSignal() === 'SAIDA');
+  readonly mostrarCliente = computed(() => this.tipoSignal() === 'ENTRADA_CAIXA');
+  readonly mostrarFornecedor = computed(() => this.tipoSignal() === 'SAIDA_CAIXA');
 
   readonly passo = signal(1);
 
@@ -117,9 +113,9 @@ export class LancamentoFormComponent implements OnInit {
   readonly itemGroups = signal<FormGroup[]>([]);
 
   readonly categoriasFiltradas = computed(() => {
-    const tipo = this.tipoSignal();
+    const tipoCategoria = this.tipoSignal() === 'ENTRADA_CAIXA' ? 'ENTRADA' : 'SAIDA';
     return this.todasCategorias().filter(
-      (c) => c.ativo && (c.tipo === tipo || c.tipo === 'AMBOS'),
+      (c) => c.ativo && (c.tipo === tipoCategoria || c.tipo === 'AMBOS'),
     );
   });
 
@@ -131,7 +127,7 @@ export class LancamentoFormComponent implements OnInit {
     this.form.controls.dataLancamento.setValue(`${y}-${m}-${d}`);
 
     this.form.controls.tipo.valueChanges.subscribe((tipo) => {
-      if (tipo === 'ENTRADA') {
+      if (tipo === 'ENTRADA_CAIXA') {
         this.form.controls.fornecedorId.setValue('');
       } else {
         this.form.controls.clienteId.setValue('');

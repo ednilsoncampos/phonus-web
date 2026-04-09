@@ -18,9 +18,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { LancamentoService } from '../../../core/services/lancamento.service';
 import {
+  FORMA_PAGAMENTO_LABELS,
   FormaPagamento,
   LancamentoResponse,
   ParcelaResponse,
+  TIPO_LANCAMENTO_LABELS,
   TipoLancamento,
 } from '../../../core/models/lancamento.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
@@ -28,14 +30,6 @@ import { DateBrPipe } from '../../../shared/pipes/date-br.pipe';
 import { DateFieldComponent } from '../../../shared/components/date-field/date-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
-const FORMA_LABELS: Record<FormaPagamento, string> = {
-  PIX: 'PIX',
-  DINHEIRO: 'Dinheiro',
-  DEBITO: 'Débito',
-  CREDITO: 'Crédito',
-  CHEQUE: 'Cheque',
-  PROMISSORIA: 'Promissória',
-};
 
 @Component({
   selector: 'app-lancamentos-list',
@@ -63,6 +57,7 @@ export class LancamentosListComponent implements OnInit {
   private readonly service = inject(LancamentoService);
   private readonly router = inject(Router);
 
+  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
   readonly colunas = ['descricao', 'tipo', 'valorTotal', 'formaPagamento', 'dataLancamento', 'parcelas', 'acoes'];
   readonly pageSize = 20;
 
@@ -124,7 +119,7 @@ export class LancamentosListComponent implements OnInit {
   }
 
   formaLabel(forma: FormaPagamento): string {
-    return FORMA_LABELS[forma] ?? forma;
+    return FORMA_PAGAMENTO_LABELS[forma] ?? forma;
   }
 
   todosPago(parcelas: ParcelaResponse[]): boolean {

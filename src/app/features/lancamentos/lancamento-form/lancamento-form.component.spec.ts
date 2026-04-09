@@ -70,13 +70,13 @@ describe('LancamentoFormComponent', () => {
     const comp = fixture.componentInstance;
 
     comp.todasCategorias.set([
-      { id: '1', nome: 'Salário', tipo: 'ENTRADA', ativo: true },
-      { id: '2', nome: 'Compras', tipo: 'SAIDA', ativo: true },
+      { id: '1', nome: 'Salário', tipo: 'ENTRADA_CAIXA', ativo: true },
+      { id: '2', nome: 'Compras', tipo: 'SAIDA_CAIXA', ativo: true },
       { id: '3', nome: 'Geral', tipo: 'AMBOS', ativo: true },
-      { id: '4', nome: 'Inativo', tipo: 'SAIDA', ativo: false },
+      { id: '4', nome: 'Inativo', tipo: 'SAIDA_CAIXA', ativo: false },
     ]);
 
-    comp.form.controls.tipo.setValue('SAIDA');
+    comp.form.controls.tipo.setValue('SAIDA_CAIXA');
     const filtradas = comp.categoriasFiltradas();
     expect(filtradas).toHaveLength(2);
     expect(filtradas.map((c) => c.id)).toContain('2');
@@ -121,7 +121,7 @@ describe('LancamentoFormComponent', () => {
 
   it('salvar navega para /lancamentos após sucesso', () => {
     vi.spyOn(lancamentoService, 'criar').mockReturnValue(
-      of({ id: 'l1', usuarioId: 'u1', tipo: 'SAIDA', descricao: 'Teste', valorTotal: 100, formaPagamento: 'PIX', origem: 'TEXTO', dataLancamento: '2026-04-01', parcelas: [], itens: [] }),
+      of({ id: 'l1', usuarioId: 'u1', tipo: 'SAIDA_CAIXA', descricao: 'Teste', valorTotal: 100, formaPagamento: 'PIX', origem: 'TEXTO', dataLancamento: '2026-04-01', parcelas: [], itens: [] }),
     );
 
     const fixture = TestBed.createComponent(LancamentoFormComponent);
@@ -129,7 +129,7 @@ describe('LancamentoFormComponent', () => {
     const comp = fixture.componentInstance;
 
     comp.form.setValue({
-      tipo: 'SAIDA',
+      tipo: 'SAIDA_CAIXA',
       descricao: 'Compra teste',
       valorTotal: 100,
       formaPagamento: 'PIX',
@@ -155,7 +155,7 @@ describe('LancamentoFormComponent', () => {
     const comp = fixture.componentInstance;
 
     comp.form.setValue({
-      tipo: 'SAIDA',
+      tipo: 'SAIDA_CAIXA',
       descricao: 'Compra teste',
       valorTotal: 100,
       formaPagamento: 'PIX',

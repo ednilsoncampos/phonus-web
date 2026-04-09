@@ -13,6 +13,7 @@ export class AuthService {
   private readonly router = inject(Router);
 
   private readonly _user = signal<Usuario | null>(null);
+  private refreshTimer?: ReturnType<typeof setTimeout>;
 
   readonly currentUser = this._user.asReadonly();
   readonly isLoggedIn = computed(() => this._user() !== null);
@@ -27,6 +28,7 @@ export class AuthService {
     return this.api.post<AuthResponse>('/auth/login', credentials).pipe(
       tap((res) => {
         this.tokenService.save(res.accessToken, res.refreshToken);
+        this.scheduleRefresh(res.accessToken);
       }),
     );
   }
@@ -47,13 +49,57 @@ export class AuthService {
       .pipe(
         tap((res) => {
           this.tokenService.save(res.accessToken, res.refreshToken);
+          this.scheduleRefresh(res.accessToken);
         }),
       );
   }
 
   logout(): void {
+    this.clearRefreshTimer();
     this.tokenService.clear();
     this._user.set(null);
     this.router.navigate(['/login']);
+  }
+
+  scheduleRefreshFromStorage(): void {
+    const token = this.tokenService.getAccessToken();
+    if (token) {
+      this.scheduleRefresh(token);
+    }
+  }
+
+  private scheduleRefresh(accessToken: string): void {
+    this.clearRefreshTimer();
+
+    let exp: number;
+    try {
+      const payload = JSON.parse(atob(accessToken.split('.')[1]));
+      exp = payload.exp as number;
+    } catch {
+      return;
+    }
+
+    const msUntilExpiry = exp * 1000 - Date.now();
+    // Agenda refresh 30s antes de expirar (ou imediatamente se já expirou/falta menos de 30s)
+    const delay = Math.max(0, msUntilExpiry - 30_000);
+
+    this.refreshTimer = setTimeout(() => {
+      const refreshToken = this.tokenService.getRefreshToken();
+      if (!refreshToken) {
+        this.logout();
+        return;
+      }
+      this.refresh(refreshToken).subscribe({
+        next: () => { /* scheduleRefresh já é chamado no tap do refresh() */ },
+        error: () => this.logout(),
+      });
+    }, delay);
+  }
+
+  private clearRefreshTimer(): void {
+    if (this.refreshTimer !== undefined) {
+      clearTimeout(this.refreshTimer);
+      this.refreshTimer = undefined;
+    }
   }
 }

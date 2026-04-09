@@ -12,7 +12,7 @@
 } @else if (lancamento()) {
   <app-page-header
     [title]="lancamento()!.descricao"
-    [subtitle]="lancamento()!.tipo === 'ENTRADA' ? 'Entrada' : 'Saída'"
+    [subtitle]="tipoLabels[lancamento()!.tipo]"
   >
     <button mat-stroked-button (click)="voltar()">
       <mat-icon>arrow_back</mat-icon>
@@ -24,9 +24,9 @@
 
     <div class="detail-grid">
       <div class="detail-field">
-        <label>Tipo</label>
-        <span [class]="lancamento()!.tipo === 'ENTRADA' ? 'status-ativo' : 'status-inativo'">
-          {{ lancamento()!.tipo === 'ENTRADA' ? 'Entrada' : 'Saída' }}
+        <label>Movimentação Financeira</label>
+        <span [class]="lancamento()!.tipo === 'ENTRADA_CAIXA' ? 'status-ativo' : 'status-inativo'">
+          {{ tipoLabels[lancamento()!.tipo] }}
         </span>
       </div>
 

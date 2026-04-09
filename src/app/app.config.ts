@@ -10,7 +10,7 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_SNACK_BAR_DEFAULT_OPTIONS } from '@angular/material/snack-bar';
-import { catchError, of } from 'rxjs';
+import { catchError, of, tap } from 'rxjs';
 
 import { routes } from './app.routes';
 import { jwtInterceptor } from './core/auth/jwt.interceptor';
@@ -38,7 +38,10 @@ export const appConfig: ApplicationConfig = {
         const tokens = inject(TokenService);
         return () =>
           tokens.getAccessToken()
-            ? auth.loadMe().pipe(catchError(() => of(null)))
+            ? auth.loadMe().pipe(
+                tap(() => auth.scheduleRefreshFromStorage()),
+                catchError(() => of(null)),
+              )
             : of(null);
       },
       multi: true,
