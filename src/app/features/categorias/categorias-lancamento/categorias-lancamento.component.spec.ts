@@ -7,7 +7,7 @@ import { CategoriasLancamentoComponent } from './categorias-lancamento.component
 import { CategoriaLancamentoService } from '../../../core/services/categoria-lancamento.service';
 import { CategoriaLancamento } from '../../../core/models/categoria-lancamento.model';
 
-const mockCat: CategoriaLancamento = { id: 'cat1', nome: 'Salário', tipo: 'ENTRADA', ativo: true };
+const mockCat: CategoriaLancamento = { id: 'cat1', nome: 'Salário', tipo: 'ENTRADA_CAIXA', ativo: true };
 
 describe('CategoriasLancamentoComponent', () => {
   let service: CategoriaLancamentoService;
@@ -23,28 +23,22 @@ describe('CategoriasLancamentoComponent', () => {
     vi.spyOn(service, 'listar').mockReturnValue(of([mockCat]));
   });
 
-  it('tipoLabel retorna o rótulo correto para ENTRADA', () => {
+  it('tipoLabel retorna o rótulo correto para ENTRADA_CAIXA', () => {
     const fixture = TestBed.createComponent(CategoriasLancamentoComponent);
     const comp = fixture.componentInstance;
-    expect(comp.tipoLabel('ENTRADA')).toBe('Entrada');
+    expect(comp.tipoLabel('ENTRADA_CAIXA')).toBe('Entrada de Caixa');
   });
 
-  it('tipoLabel retorna o rótulo correto para SAIDA', () => {
+  it('tipoLabel retorna o rótulo correto para SAIDA_CAIXA', () => {
     const fixture = TestBed.createComponent(CategoriasLancamentoComponent);
     const comp = fixture.componentInstance;
-    expect(comp.tipoLabel('SAIDA')).toBe('Saída');
+    expect(comp.tipoLabel('SAIDA_CAIXA')).toBe('Saída de Caixa');
   });
 
-  it('tipoLabel retorna o rótulo correto para AMBOS', () => {
+  it('tipoCss retorna a classe correta para ENTRADA_CAIXA', () => {
     const fixture = TestBed.createComponent(CategoriasLancamentoComponent);
     const comp = fixture.componentInstance;
-    expect(comp.tipoLabel('AMBOS')).toBe('Ambos');
-  });
-
-  it('tipoCss retorna a classe correta para ENTRADA', () => {
-    const fixture = TestBed.createComponent(CategoriasLancamentoComponent);
-    const comp = fixture.componentInstance;
-    expect(comp.tipoCss('ENTRADA')).toBe('badge badge--green');
+    expect(comp.tipoCss('ENTRADA_CAIXA')).toBe('badge badge--green');
   });
 
   it('carregar preenche categorias após sucesso', () => {

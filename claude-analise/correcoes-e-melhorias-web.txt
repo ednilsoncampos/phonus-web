@@ -1,4 +1,5 @@
-Na tela de lançamentos coloque a linha referente a pagamento abaixo dos itens.
-O que significa o label Vínculos? O termo (opcional) pode ser removido.
-Tem como criar um scroll para os itens, manter dois produtos na tela conforme print claude-analise\dois-produtos-tela.png
-e ao clicar em Adicionar item, renderizar no topo e nao no fim?
+Leia as imagens .png da pasta claude-analise, nao precisa ler da pasta old.
+Elas mostram ajustes de layout.
+Exemplo de layout centralizado claude-analise\alinhado-centro.png.
+Botao filtrar desalinhado e campos alinhado a esquerda claude-analise\botao-filtrar-tela-estoque-desalinhado.png.
+Combobox nao mostra os "traços" do campo claude-analise\tela-lancamentos-campo-data-grande.png e os campos dados ficaram gigantes.

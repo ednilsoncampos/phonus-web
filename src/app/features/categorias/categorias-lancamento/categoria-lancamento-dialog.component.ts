@@ -15,9 +15,8 @@ export interface CategoriaLancamentoDialogData {
 }
 
 const TIPO_OPTIONS: { value: TipoCategoria; label: string }[] = [
-  { value: 'ENTRADA', label: 'Entrada' },
-  { value: 'SAIDA',   label: 'Saída'   },
-  { value: 'AMBOS',   label: 'Ambos'   },
+  { value: 'ENTRADA_CAIXA', label: 'Entrada de Caixa' },
+  { value: 'SAIDA_CAIXA',   label: 'Saída de Caixa'   },
 ];
 
 @Component({
@@ -49,7 +48,7 @@ export class CategoriaLancamentoDialogComponent {
 
   readonly form = this.fb.group({
     nome: [this.data.categoria?.nome ?? '', Validators.required],
-    tipo: [this.data.categoria?.tipo ?? 'ENTRADA' as TipoCategoria, Validators.required],
+    tipo: [this.data.categoria?.tipo ?? 'ENTRADA_CAIXA' as TipoCategoria, Validators.required],
     ativo: [this.data.categoria?.ativo ?? true],
   });
 

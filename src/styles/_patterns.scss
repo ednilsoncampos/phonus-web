@@ -23,6 +23,13 @@
   }
 }
 
+// ----- Centralização de conteúdo ----------------------------
+
+.page-wrap {
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
 // ----- Filtros -----------------------------------------------
 
 .filters {
@@ -31,6 +38,10 @@
   align-items: flex-end;
   gap: 12px;
   margin-bottom: 24px;
+
+  // Alinha botões com a borda visível do mat-form-field outline
+  // (que tem ~22px de espaço de subscript abaixo da borda)
+  button { margin-bottom: 22px; }
 }
 
 // ----- Tabelas -----------------------------------------------

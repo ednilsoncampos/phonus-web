@@ -27,7 +27,6 @@ import {
 } from '../../../core/models/lancamento.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
 import { DateBrPipe } from '../../../shared/pipes/date-br.pipe';
-import { DateFieldComponent } from '../../../shared/components/date-field/date-field.component';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
 
 
@@ -39,7 +38,6 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
     PageHeaderComponent,
     CurrencyBrlPipe,
     DateBrPipe,
-    DateFieldComponent,
     MatFormFieldModule,
     MatInputModule,
     MatTableModule,
@@ -57,7 +55,9 @@ export class LancamentosListComponent implements OnInit {
   private readonly service = inject(LancamentoService);
   private readonly router = inject(Router);
 
-  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
+  tipoLabel(tipo: TipoLancamento): string {
+    return TIPO_LANCAMENTO_LABELS[tipo];
+  }
   readonly colunas = ['descricao', 'tipo', 'valorTotal', 'formaPagamento', 'dataLancamento', 'parcelas', 'acoes'];
   readonly pageSize = 20;
 

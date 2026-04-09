@@ -1,4 +1,4 @@
-export type TipoCategoria = 'ENTRADA' | 'SAIDA' | 'AMBOS';
+export type TipoCategoria = 'ENTRADA_CAIXA' | 'SAIDA_CAIXA';
 
 export interface CategoriaLancamento {
   id: string;

@@ -20,15 +20,13 @@ import {
 } from './categoria-lancamento-dialog.component';
 
 const TIPO_LABEL: Record<TipoCategoria, string> = {
-  ENTRADA: 'Entrada',
-  SAIDA:   'Saída',
-  AMBOS:   'Ambos',
+  ENTRADA_CAIXA: 'Entrada de Caixa',
+  SAIDA_CAIXA:   'Saída de Caixa',
 };
 
 const TIPO_CSS: Record<TipoCategoria, string> = {
-  ENTRADA: 'badge--green',
-  SAIDA:   'badge--red',
-  AMBOS:   'badge--blue',
+  ENTRADA_CAIXA: 'badge--green',
+  SAIDA_CAIXA:   'badge--red',
 };
 
 @Component({

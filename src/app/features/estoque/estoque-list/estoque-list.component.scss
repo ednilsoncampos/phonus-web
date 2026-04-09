@@ -1,7 +1,11 @@
 // Estilos específicos — padrões globais em _patterns.scss
-.filter-produto { min-width: 220px; }
-.filter-origem  { min-width: 180px; }
-.filter-data    { width: 150px; }
+.filters {
+  flex-wrap: nowrap;
+}
+
+.filter-produto { min-width: 220px; flex-shrink: 1; }
+.filter-origem  { min-width: 140px; flex-shrink: 1; }
+.filter-data    { width: 150px; flex-shrink: 0; }
 
 .col-tipo   { width: 100px; }
 .col-qtd    { width: 90px; text-align: right; }

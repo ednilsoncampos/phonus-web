@@ -18,6 +18,7 @@ import {
   FormaPagamento,
   LancamentoResponse,
   TIPO_LANCAMENTO_LABELS,
+  TipoLancamento,
 } from '../../../core/models/lancamento.model';
 import { Produto } from '../../../core/models/produto.model';
 import { CurrencyBrlPipe } from '../../../shared/pipes/currency-brl.pipe';
@@ -53,7 +54,9 @@ export class LancamentoDetail implements OnInit {
   readonly lancamento = signal<LancamentoResponse | null>(null);
   private readonly produtos = signal<Produto[]>([]);
 
-  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
+  tipoLabel(tipo: TipoLancamento): string {
+    return TIPO_LANCAMENTO_LABELS[tipo];
+  }
   readonly colunasItens = ['produto', 'quantidade', 'valorUnitario', 'desconto', 'subtotal'];
   readonly colunasParcelas = ['numero', 'vencimento', 'valor', 'status'];
 

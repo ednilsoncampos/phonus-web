@@ -72,15 +72,13 @@ describe('LancamentoFormComponent', () => {
     comp.todasCategorias.set([
       { id: '1', nome: 'Salário', tipo: 'ENTRADA_CAIXA', ativo: true },
       { id: '2', nome: 'Compras', tipo: 'SAIDA_CAIXA', ativo: true },
-      { id: '3', nome: 'Geral', tipo: 'AMBOS', ativo: true },
-      { id: '4', nome: 'Inativo', tipo: 'SAIDA_CAIXA', ativo: false },
+      { id: '3', nome: 'Inativo', tipo: 'SAIDA_CAIXA', ativo: false },
     ]);
 
     comp.form.controls.tipo.setValue('SAIDA_CAIXA');
     const filtradas = comp.categoriasFiltradas();
-    expect(filtradas).toHaveLength(2);
+    expect(filtradas).toHaveLength(1);
     expect(filtradas.map((c) => c.id)).toContain('2');
-    expect(filtradas.map((c) => c.id)).toContain('3');
   });
 
   it('adicionarItem adiciona um grupo ao array de itens', () => {

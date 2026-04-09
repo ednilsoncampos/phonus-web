@@ -70,7 +70,9 @@ export class LancamentoFormComponent implements OnInit {
   private readonly produtoService = inject(ProdutoService);
   private readonly router = inject(Router);
 
-  readonly tipoLabels = TIPO_LANCAMENTO_LABELS;
+  tipoLabel(tipo: TipoLancamento): string {
+    return TIPO_LANCAMENTO_LABELS[tipo];
+  }
   readonly formasPagamento = FORMAS_PAGAMENTO;
 
   readonly form = this.fb.group({
@@ -113,9 +115,9 @@ export class LancamentoFormComponent implements OnInit {
   readonly itemGroups = signal<FormGroup[]>([]);
 
   readonly categoriasFiltradas = computed(() => {
-    const tipoCategoria = this.tipoSignal() === 'ENTRADA_CAIXA' ? 'ENTRADA' : 'SAIDA';
+    const tipo = this.tipoSignal();
     return this.todasCategorias().filter(
-      (c) => c.ativo && (c.tipo === tipoCategoria || c.tipo === 'AMBOS'),
+      (c) => c.ativo && c.tipo === tipo,
     );
   });
 
