@@ -11,6 +11,7 @@ export interface ListarClientesParams {
   page?: number;
   size?: number;
   ativos?: boolean;
+  busca?: string;
 }
 
 @Injectable({ providedIn: 'root' })

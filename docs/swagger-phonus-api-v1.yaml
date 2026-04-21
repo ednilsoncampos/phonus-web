@@ -374,6 +374,16 @@
                     "required": true
                 },
                 "responses": {
+                    "422": {
+                        "description": "Senha atual incorreta",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "401": {
                         "description": "Token ausente ou inválido",
                         "content": {
@@ -386,16 +396,6 @@
                     },
                     "400": {
                         "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Senha atual incorreta",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -536,8 +536,8 @@
                     "required": true
                 },
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "409": {
+                        "description": "Já existe uma versão com este número",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -546,12 +546,12 @@
                             }
                         }
                     },
-                    "201": {
-                        "description": "Nova versão criada com sucesso",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/TermosAceiteResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -566,12 +566,12 @@
                             }
                         }
                     },
-                    "409": {
-                        "description": "Já existe uma versão com este número",
+                    "201": {
+                        "description": "Nova versão criada com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/TermosAceiteResponse"
                                 }
                             }
                         }
@@ -603,8 +603,8 @@
                     "required": true
                 },
                 "responses": {
-                    "400": {
-                        "description": "Dados inválidos",
+                    "409": {
+                        "description": "Usuário já aceitou esta versão dos termos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -613,8 +613,11 @@
                             }
                         }
                     },
-                    "409": {
-                        "description": "Usuário já aceitou esta versão dos termos",
+                    "204": {
+                        "description": "Aceite registrado com sucesso"
+                    },
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -632,9 +635,6 @@
                                 }
                             }
                         }
-                    },
-                    "204": {
-                        "description": "Aceite registrado com sucesso"
                     }
                 }
             }
@@ -885,16 +885,6 @@
                     "required": true
                 },
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "403": {
                         "description": "A parcela pertence a outro usuário",
                         "content": {
@@ -905,8 +895,18 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Parcela já foi paga anteriormente",
+                    "201": {
+                        "description": "Pagamento registrado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PagamentoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -935,12 +935,12 @@
                             }
                         }
                     },
-                    "201": {
-                        "description": "Pagamento registrado com sucesso",
+                    "422": {
+                        "description": "Parcela já foi paga anteriormente",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PagamentoResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1074,8 +1074,18 @@
                     "required": true
                 },
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "201": {
+                        "description": "Lançamento criado com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LancamentoResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuário autenticado não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1094,22 +1104,12 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuário autenticado não encontrado",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "201": {
-                        "description": "Lançamento criado com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/LancamentoResponse"
                                 }
                             }
                         }
@@ -1683,16 +1683,6 @@
                     "required": true
                 },
                 "responses": {
-                    "409": {
-                        "description": "E-mail já cadastrado no sistema",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "400": {
                         "description": "Dados inválidos na requisição (campos obrigatórios ausentes ou formato incorreto)",
                         "content": {
@@ -1709,6 +1699,16 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/UsuarioResponse"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "E-mail já cadastrado no sistema",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1735,12 +1735,12 @@
                     "required": true
                 },
                 "responses": {
-                    "401": {
-                        "description": "Refresh token inválido ou expirado",
+                    "200": {
+                        "description": "Tokens renovados com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/AuthResponse"
                                 }
                             }
                         }
@@ -1755,12 +1755,12 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Tokens renovados com sucesso",
+                    "401": {
+                        "description": "Refresh token inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/AuthResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -1822,6 +1822,16 @@
                     "required": true
                 },
                 "responses": {
+                    "401": {
+                        "description": "Credenciais inválidas (e-mail não encontrado ou senha incorreta)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "200": {
                         "description": "Autenticação bem-sucedida",
                         "content": {
@@ -1834,16 +1844,6 @@
                     },
                     "400": {
                         "description": "Dados inválidos na requisição",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Credenciais inválidas (e-mail não encontrado ou senha incorreta)",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1884,8 +1884,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "E-mail não encontrado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1894,8 +1894,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Dados inválidos",
+                    "404": {
+                        "description": "E-mail não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2013,8 +2013,8 @@
                     "required": true
                 },
                 "responses": {
-                    "404": {
-                        "description": "Plano não encontrado",
+                    "400": {
+                        "description": "Dados inválidos",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2033,8 +2033,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Dados inválidos",
+                    "404": {
+                        "description": "Plano não encontrado",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2162,12 +2162,12 @@
                     "required": true
                 },
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "200": {
+                        "description": "Parcela baixada com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
+                                    "$ref": "#/components/schemas/PagamentoResponse"
                                 }
                             }
                         }
@@ -2182,8 +2182,8 @@
                             }
                         }
                     },
-                    "422": {
-                        "description": "Parcela já foi paga anteriormente",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2202,18 +2202,18 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Parcela baixada com sucesso",
+                    "404": {
+                        "description": "Parcela não encontrada",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "$ref": "#/components/schemas/PagamentoResponse"
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
                     },
-                    "404": {
-                        "description": "Parcela não encontrada",
+                    "422": {
+                        "description": "Parcela já foi paga anteriormente",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2250,16 +2250,6 @@
                     }
                 ],
                 "responses": {
-                    "403": {
-                        "description": "Acesso negado",
-                        "content": {
-                            "*/*": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Entitlement retornado",
                         "content": {
@@ -2272,6 +2262,16 @@
                     },
                     "404": {
                         "description": "Usuário não encontrado",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Acesso negado",
                         "content": {
                             "*/*": {
                                 "schema": {
@@ -2353,8 +2353,8 @@
                     }
                 ],
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "404": {
+                        "description": "Usuário autenticado não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2373,8 +2373,8 @@
                             }
                         }
                     },
-                    "400": {
-                        "description": "Parâmetros de data inválidos",
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2383,8 +2383,8 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuário autenticado não encontrado",
+                    "400": {
+                        "description": "Parâmetros de data inválidos",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2474,18 +2474,8 @@
                     }
                 ],
                 "responses": {
-                    "400": {
-                        "description": "Parâmetros de data inválidos ou tipo inválido",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
+                    "404": {
+                        "description": "Usuário autenticado não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2504,8 +2494,18 @@
                             }
                         }
                     },
-                    "404": {
-                        "description": "Usuário autenticado não encontrado",
+                    "400": {
+                        "description": "Parâmetros de data inválidos ou tipo inválido",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2695,26 +2695,6 @@
                     }
                 ],
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Lançamento pertence a outro usuário",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Lançamento encontrado",
                         "content": {
@@ -2725,8 +2705,28 @@
                             }
                         }
                     },
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
                     "404": {
                         "description": "Lançamento não encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Lançamento pertence a outro usuário",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3122,22 +3122,22 @@
                     }
                 ],
                 "responses": {
-                    "401": {
-                        "description": "Token ausente, inválido ou expirado",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ErrorResponse"
-                                }
-                            }
-                        }
-                    },
                     "200": {
                         "description": "Saldo retornado com sucesso",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/CaixaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token ausente, inválido ou expirado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponse"
                                 }
                             }
                         }
@@ -3169,22 +3169,22 @@
                             }
                         }
                     },
-                    "200": {
-                        "description": "Dados do usuário retornados com sucesso",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/UsuarioResponse"
-                                }
-                            }
-                        }
-                    },
                     "404": {
                         "description": "Usuário não encontrado",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ErrorResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Dados do usuário retornados com sucesso",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/UsuarioResponse"
                                 }
                             }
                         }
@@ -3586,6 +3586,16 @@
                         "type": "string",
                         "description": "Caminho da requisição que gerou o erro",
                         "example": "/api/v1/lancamentos/42"
+                    },
+                    "details": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object"
+                        },
+                        "description": "Detalhes adicionais contextuais do erro (ex.: id de recurso relacionado)",
+                        "example": {
+                            "idExistente": "a3b2c1d0-0000-0000-0000-000000000000"
+                        }
                     }
                 },
                 "required": [

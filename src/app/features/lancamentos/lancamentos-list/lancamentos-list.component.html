@@ -8,11 +8,7 @@
 <div class="filters">
   <mat-form-field appearance="outline" class="filter-tipo">
     <mat-label>Tipo</mat-label>
-    <mat-select
-      [(ngModel)]="filtroTipo"
-      (ngModelChange)="onFiltroChange()"
-      aria-label="Filtrar por tipo"
-    >
+    <mat-select [(ngModel)]="filtroTipo" aria-label="Filtrar por tipo">
       <mat-option value="">Todos os tipos</mat-option>
       <mat-option value="ENTRADA_CAIXA">Entrada de Caixa</mat-option>
       <mat-option value="SAIDA_CAIXA">Saída de Caixa</mat-option>
@@ -21,13 +17,18 @@
 
   <mat-form-field appearance="outline" class="filter-date">
     <mat-label>Data início</mat-label>
-    <input matInput type="date" [(ngModel)]="filtroDataInicio" (ngModelChange)="onFiltroChange()" />
+    <input matInput type="date" [(ngModel)]="filtroDataInicio" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="filter-date">
     <mat-label>Data fim</mat-label>
-    <input matInput type="date" [(ngModel)]="filtroDataFim" (ngModelChange)="onFiltroChange()" />
+    <input matInput type="date" [(ngModel)]="filtroDataFim" />
   </mat-form-field>
+
+  <button mat-stroked-button (click)="onFiltroChange()">
+    <mat-icon>search</mat-icon>
+    Filtrar
+  </button>
 </div>
 
 @if (carregando()) {

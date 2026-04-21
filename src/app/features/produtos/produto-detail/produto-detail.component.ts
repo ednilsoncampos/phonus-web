@@ -98,7 +98,7 @@ export class ProdutoDetailComponent implements OnInit {
     ref.afterClosed().subscribe((confirmado: boolean) => {
       if (!confirmado) return;
       this.produtoService.desativar(this.produtoId).subscribe({
-        next: (atualizado) => this.produto.set(atualizado),
+        next: () => this.router.navigate(['/produtos']),
       });
     });
   }

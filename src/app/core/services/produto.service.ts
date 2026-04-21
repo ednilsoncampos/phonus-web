@@ -9,6 +9,7 @@ export interface ListarProdutosParams {
   categoriaId?: string;
   ativos?: boolean;
   abaixoDoMinimo?: boolean;
+  busca?: string;
 }
 
 @Injectable({ providedIn: 'root' })

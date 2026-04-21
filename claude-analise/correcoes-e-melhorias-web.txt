@@ -1,5 +1,5 @@
-Leia as imagens .png da pasta claude-analise, nao precisa ler da pasta old.
-Elas mostram ajustes de layout.
-Exemplo de layout centralizado claude-analise\alinhado-centro.png.
-Botao filtrar desalinhado e campos alinhado a esquerda claude-analise\botao-filtrar-tela-estoque-desalinhado.png.
-Combobox nao mostra os "traços" do campo claude-analise\tela-lancamentos-campo-data-grande.png e os campos dados ficaram gigantes.
+Este padrão de pesquisa e campo ativo ficou bom: claude-analise\padrao-campo-ativo.png.
+Agora melhore um pouquinho o alinhamento do botao "Somente ativos", ele pode subir um pouco para ficar exatamente no meio.
+Aplique essa melhoria nas telas que usam o filtro de ativos.
+
+Valide o entendimento

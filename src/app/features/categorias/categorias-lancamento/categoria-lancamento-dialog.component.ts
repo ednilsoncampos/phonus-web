@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -23,6 +24,7 @@ const TIPO_OPTIONS: { value: TipoCategoria; label: string }[] = [
   selector: 'app-categoria-lancamento-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    A11yModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,

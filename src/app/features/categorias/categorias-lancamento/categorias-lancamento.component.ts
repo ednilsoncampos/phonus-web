@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CategoriaLancamentoService } from '../../../core/services/categoria-lancamento.service';
@@ -37,6 +38,7 @@ const TIPO_CSS: Record<TipoCategoria, string> = {
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatSlideToggleModule,
     MatTooltipModule,
     MatProgressSpinnerModule,
   ],
@@ -51,6 +53,7 @@ export class CategoriasLancamentoComponent implements OnInit {
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);
   readonly categorias = signal<CategoriaLancamento[]>([]);
+  readonly apenasAtivas = signal(true);
 
   ngOnInit(): void {
     this.carregar();
@@ -60,7 +63,7 @@ export class CategoriasLancamentoComponent implements OnInit {
     this.carregando.set(true);
     this.erro.set(null);
 
-    this.service.listar().subscribe({
+    this.service.listar(this.apenasAtivas()).subscribe({
       next: (lista) => {
         this.categorias.set(lista);
         this.carregando.set(false);
@@ -70,6 +73,11 @@ export class CategoriasLancamentoComponent implements OnInit {
         this.carregando.set(false);
       },
     });
+  }
+
+  setApenasAtivas(value: boolean): void {
+    this.apenasAtivas.set(value);
+    this.carregar();
   }
 
   tipoLabel(tipo: TipoCategoria): string {
@@ -91,15 +99,7 @@ export class CategoriasLancamentoComponent implements OnInit {
     });
 
     ref.afterClosed().subscribe((resultado) => {
-      if (!resultado) return;
-
-      if (categoria) {
-        this.categorias.update((lista) =>
-          lista.map((c) => (c.id === resultado.id ? resultado : c)),
-        );
-      } else {
-        this.categorias.update((lista) => [...lista, resultado]);
-      }
+      if (resultado) this.carregar();
     });
   }
 }

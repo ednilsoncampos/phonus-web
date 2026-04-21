@@ -21,6 +21,7 @@ export interface LancamentoItemRequest {
   produtoId: string;
   quantidade: number;
   desconto: number;
+  valorUnitario?: number;
 }
 
 export interface LancamentoItemResponse {

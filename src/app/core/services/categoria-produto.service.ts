@@ -10,8 +10,11 @@ import {
 export class CategoriaProdutoService {
   private readonly api = inject(ApiService);
 
-  listar() {
-    return this.api.get<CategoriaProduto[]>('/categorias-produto');
+  listar(ativas?: boolean) {
+    return this.api.get<CategoriaProduto[]>(
+      '/categorias-produto',
+      ativas !== undefined ? { ativas } : undefined,
+    );
   }
 
   criar(body: CriarCategoriaProdutoRequest) {

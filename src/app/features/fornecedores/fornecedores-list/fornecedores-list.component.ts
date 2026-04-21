@@ -1,13 +1,18 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -31,6 +36,8 @@ import {
     MatTableModule,
     MatButtonModule,
     MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatSlideToggleModule,
     MatPaginatorModule,
     MatTooltipModule,
@@ -39,9 +46,11 @@ import {
   templateUrl: './fornecedores-list.component.html',
   styleUrl: './fornecedores-list.component.scss',
 })
-export class FornecedoresListComponent implements OnInit {
+export class FornecedoresListComponent implements OnInit, AfterViewInit {
   private readonly service = inject(FornecedorService);
   private readonly dialog = inject(MatDialog);
+
+  @ViewChild('buscaInput') buscaInput?: ElementRef<HTMLInputElement>;
 
   readonly colunas = ['nome', 'documento', 'email', 'telefone', 'status', 'acoes'];
   readonly pageSize = 20;
@@ -52,9 +61,14 @@ export class FornecedoresListComponent implements OnInit {
   readonly totalElements = signal(0);
   readonly page = signal(0);
   readonly apenasAtivos = signal(true);
+  readonly busca = signal('');
 
   ngOnInit(): void {
     this.carregar();
+  }
+
+  ngAfterViewInit(): void {
+    this.buscaInput?.nativeElement.focus();
   }
 
   carregar(): void {
@@ -62,7 +76,7 @@ export class FornecedoresListComponent implements OnInit {
     this.erro.set(null);
 
     this.service
-      .listar({ page: this.page(), size: this.pageSize, ativos: this.apenasAtivos() || undefined })
+      .listar({ page: this.page(), size: this.pageSize, ativos: this.apenasAtivos(), busca: this.busca() || undefined })
       .subscribe({
         next: (res) => {
           this.fornecedores.set(res.content);
@@ -82,6 +96,12 @@ export class FornecedoresListComponent implements OnInit {
     this.carregar();
   }
 
+  onBusca(event: Event): void {
+    this.busca.set((event.target as HTMLInputElement).value);
+    this.page.set(0);
+    this.carregar();
+  }
+
   onPage(event: PageEvent): void {
     this.page.set(event.pageIndex);
     this.carregar();
@@ -95,14 +115,7 @@ export class FornecedoresListComponent implements OnInit {
     >(FornecedorDialogComponent, { data: { fornecedor }, width: '480px' });
 
     ref.afterClosed().subscribe((resultado) => {
-      if (!resultado) return;
-      if (fornecedor) {
-        this.fornecedores.update((lista) =>
-          lista.map((f) => (f.id === resultado.id ? resultado : f)),
-        );
-      } else {
-        this.fornecedores.update((lista) => [resultado, ...lista]);
-      }
+      if (resultado) this.carregar();
     });
   }
 }

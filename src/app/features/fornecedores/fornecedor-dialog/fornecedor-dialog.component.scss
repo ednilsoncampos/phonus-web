@@ -1,3 +1,12 @@
 // form-row definido em _patterns.scss
-.dialog-form { display: flex; flex-direction: column; gap: 4px; min-width: 400px; }
+.dialog-form { display: flex; flex-direction: column; gap: 4px; width: 100%; }
 .error-msg { color: var(--phonus-error); font-size: 13px; margin-top: 8px; }
+.reativacao-banner {
+  background: var(--phonus-warn-bg, #fff3e0);
+  border: 1px solid var(--phonus-warn, #f57c00);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 8px;
+  p { margin: 0 0 8px; font-size: 14px; }
+}
+.reativacao-actions { display: flex; gap: 8px; justify-content: flex-end; }

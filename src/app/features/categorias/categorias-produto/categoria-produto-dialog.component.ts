@@ -1,3 +1,4 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,6 +18,7 @@ export interface CategoriaProdutoDialogData {
   selector: 'app-categoria-produto-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    A11yModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,

@@ -4,7 +4,7 @@
   <form [formGroup]="form" class="dialog-form">
     <mat-form-field appearance="outline">
       <mat-label>Nome</mat-label>
-      <input matInput formControlName="nome" autocomplete="off" />
+      <input matInput formControlName="nome" autocomplete="off" cdkFocusInitial (keydown.enter)="salvar()" />
       @if (form.controls.nome.invalid && form.controls.nome.touched) {
         <mat-error>Nome é obrigatório</mat-error>
       }

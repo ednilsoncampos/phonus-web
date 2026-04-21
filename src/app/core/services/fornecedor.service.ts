@@ -11,6 +11,7 @@ export interface ListarFornecedoresParams {
   page?: number;
   size?: number;
   ativos?: boolean;
+  busca?: string;
 }
 
 @Injectable({ providedIn: 'root' })

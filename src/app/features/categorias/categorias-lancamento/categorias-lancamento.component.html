@@ -5,6 +5,12 @@
   </button>
 </app-page-header>
 
+<div class="filters">
+  <mat-slide-toggle [checked]="apenasAtivas()" (change)="setApenasAtivas($event.checked)">
+    Somente ativas
+  </mat-slide-toggle>
+</div>
+
 @if (carregando()) {
   <div class="state-center" role="status" aria-label="Carregando categorias">
     <mat-spinner diameter="48" />

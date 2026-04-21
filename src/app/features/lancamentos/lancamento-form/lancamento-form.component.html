@@ -112,7 +112,6 @@
           <mat-form-field appearance="outline">
             <mat-label>Categoria</mat-label>
             <mat-select formControlName="categoriaId">
-              <mat-option value="">Sem categoria</mat-option>
               @for (c of categoriasFiltradas(); track c.id) {
                 <mat-option [value]="c.id">{{ c.nome }}</mat-option>
               }

@@ -7,18 +7,21 @@
 
 <!-- Filtros -->
 <div class="filters">
-  <mat-select
-    class="filter-categoria"
-    [(ngModel)]="categoriaId"
-    (ngModelChange)="onFiltroChange()"
-    placeholder="Todas as categorias"
-    aria-label="Filtrar por categoria"
-  >
-    <mat-option value="">Todas as categorias</mat-option>
-    @for (cat of categorias(); track cat.id) {
-      <mat-option [value]="cat.id">{{ cat.nome }}</mat-option>
-    }
-  </mat-select>
+  <mat-form-field appearance="outline" class="busca-field">
+    <mat-label>Buscar por nome</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input #buscaInput matInput [value]="busca()" (input)="onBusca($event)" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="filter-categoria">
+    <mat-label>Categoria</mat-label>
+    <mat-select [(ngModel)]="categoriaId" (ngModelChange)="onFiltroChange()" aria-label="Filtrar por categoria">
+      <mat-option value="">Todas as categorias</mat-option>
+      @for (cat of categorias(); track cat.id) {
+        <mat-option [value]="cat.id">{{ cat.nome }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
   <mat-slide-toggle
     [checked]="apenasAtivos()"

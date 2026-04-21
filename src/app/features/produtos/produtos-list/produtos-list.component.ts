@@ -1,14 +1,19 @@
 import {
+  AfterViewInit,
   ChangeDetectionStrategy,
   Component,
   computed,
+  ElementRef,
   inject,
   OnInit,
   signal,
+  ViewChild,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
@@ -32,7 +37,9 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
     FormsModule,
     MatTableModule,
     MatButtonModule,
+    MatFormFieldModule,
     MatIconModule,
+    MatInputModule,
     MatSelectModule,
     MatSlideToggleModule,
     MatPaginatorModule,
@@ -42,11 +49,13 @@ import { PageHeaderComponent } from '../../../shared/components/page-header/page
   templateUrl: './produtos-list.component.html',
   styleUrl: './produtos-list.component.scss',
 })
-export class ProdutosListComponent implements OnInit {
+export class ProdutosListComponent implements OnInit, AfterViewInit {
   private readonly produtoService = inject(ProdutoService);
   private readonly categoriaService = inject(CategoriaProdutoService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+
+  @ViewChild('buscaInput') buscaInput?: ElementRef<HTMLInputElement>;
 
   readonly colunas = ['nome', 'categoria', 'precoVenda', 'precoCusto', 'estoque', 'status', 'acoes'];
   readonly pageSize = 20;
@@ -59,6 +68,7 @@ export class ProdutosListComponent implements OnInit {
   readonly categorias = signal<CategoriaProduto[]>([]);
   readonly apenasAtivos = signal(true);
   readonly abaixoDoMinimo = signal(false);
+  readonly busca = signal('');
 
   categoriaId = '';
 
@@ -77,6 +87,10 @@ export class ProdutosListComponent implements OnInit {
     this.carregarProdutos();
   }
 
+  ngAfterViewInit(): void {
+    this.buscaInput?.nativeElement.focus();
+  }
+
   carregarProdutos(): void {
     this.carregando.set(true);
     this.erro.set(null);
@@ -86,8 +100,9 @@ export class ProdutosListComponent implements OnInit {
         page: this.page(),
         size: this.pageSize,
         categoriaId: this.categoriaId || undefined,
-        ativos: this.apenasAtivos() ? true : undefined,
+        ativos: this.apenasAtivos(),
         abaixoDoMinimo: this.abaixoDoMinimo() ? true : undefined,
+        busca: this.busca() || undefined,
       })
       .subscribe({
         next: (res) => {
@@ -108,6 +123,12 @@ export class ProdutosListComponent implements OnInit {
   }
 
   onFiltroChange(): void {
+    this.page.set(0);
+    this.carregarProdutos();
+  }
+
+  onBusca(event: Event): void {
+    this.busca.set((event.target as HTMLInputElement).value);
     this.page.set(0);
     this.carregarProdutos();
   }

@@ -219,11 +219,18 @@ export class LancamentoFormComponent implements OnInit {
       categoriaId:        raw.categoriaId  || undefined,
       clienteId:          raw.clienteId    || undefined,
       fornecedorId:       raw.fornecedorId || undefined,
-      itens: this.itensArray.controls.map((g) => ({
-        produtoId:  g.value.produtoId,
-        quantidade: g.value.quantidade,
-        desconto:   Math.round((g.value.desconto ?? 0) * 100),
-      })),
+      itens: this.itensArray.controls.map((g) => {
+        const produtoId = g.value.produtoId as string;
+        const produto = this.produtos().find((p) => p.id === produtoId);
+        return {
+          produtoId,
+          quantidade: g.value.quantidade as number,
+          desconto: Math.round((g.value.desconto ?? 0) * 100),
+          ...(raw.tipo === 'SAIDA_CAIXA'
+            ? { valorUnitario: produto?.precoCusto ?? produto?.precoVenda ?? 0 }
+            : {}),
+        };
+      }),
     };
 
     this.lancamentoService.criar(body).subscribe({

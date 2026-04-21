@@ -5,7 +5,7 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Nome *</mat-label>
-      <input matInput formControlName="nome" autocomplete="off" />
+      <input matInput formControlName="nome" autocomplete="off" cdkFocusInitial />
       @if (form.controls.nome.invalid && form.controls.nome.touched) {
         <mat-error>Nome é obrigatório</mat-error>
       }
@@ -13,7 +13,10 @@
 
     <mat-form-field appearance="outline">
       <mat-label>Documento (CPF/CNPJ)</mat-label>
-      <input matInput formControlName="documento" autocomplete="off" />
+      <input matInput formControlName="documento" autocomplete="off" inputmode="numeric" documentMask />
+      @if (form.controls.documento.hasError('documentoInvalido') && form.controls.documento.touched) {
+        <mat-error>CPF deve ter 11 dígitos ou CNPJ 14 dígitos (apenas números)</mat-error>
+      }
     </mat-form-field>
 
     <div class="form-row">
@@ -35,7 +38,17 @@
       <mat-slide-toggle formControlName="ativo">Ativo</mat-slide-toggle>
     }
 
-    @if (erro()) {
+    @if (idParaReativar()) {
+      <div class="reativacao-banner" role="alert">
+        <p>Já existe um fornecedor inativo com esse documento. Deseja reativá-lo?</p>
+        <div class="reativacao-actions">
+          <button mat-button type="button" [disabled]="reativando()" (click)="cancelarReativacao()">Não</button>
+          <button mat-flat-button color="primary" type="button" [disabled]="reativando()" (click)="reativar()">
+            @if (reativando()) { <mat-spinner diameter="16" /> } @else { Reativar }
+          </button>
+        </div>
+      </div>
+    } @else if (erro()) {
       <p class="error-msg" role="alert">{{ erro() }}</p>
     }
   </form>

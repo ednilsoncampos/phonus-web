@@ -1,5 +1,6 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -8,16 +9,27 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
+import { DocumentMaskDirective } from '../../../shared/directives/document-mask.directive';
 import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
 
 export interface FornecedorDialogData {
   fornecedor?: Fornecedor;
 }
 
+function documentoValidator(control: AbstractControl): ValidationErrors | null {
+  const digits = (control.value as string)?.replace(/\D/g, '') ?? '';
+  if (!digits) return null;
+  if (digits.length !== 11 && digits.length !== 14) {
+    return { documentoInvalido: true };
+  }
+  return null;
+}
+
 @Component({
   selector: 'app-fornecedor-dialog',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
+    A11yModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
@@ -25,6 +37,7 @@ export interface FornecedorDialogData {
     MatInputModule,
     MatProgressSpinnerModule,
     MatSlideToggleModule,
+    DocumentMaskDirective,
     PhoneMaskDirective,
   ],
   templateUrl: './fornecedor-dialog.component.html',
@@ -39,10 +52,12 @@ export class FornecedorDialogComponent {
   readonly editando = !!this.data.fornecedor;
   readonly salvando = signal(false);
   readonly erro = signal<string | null>(null);
+  readonly idParaReativar = signal<string | null>(null);
+  readonly reativando = signal(false);
 
   readonly form = this.fb.group({
     nome:      [this.data.fornecedor?.nome      ?? '', Validators.required],
-    documento: [this.data.fornecedor?.documento ?? ''],
+    documento: [this.data.fornecedor?.documento ?? '', documentoValidator],
     email:     [this.data.fornecedor?.email     ?? '', Validators.email],
     telefone:  [this.data.fornecedor?.telefone  ?? ''],
     ativo:     [this.data.fornecedor?.ativo     ?? true],
@@ -54,6 +69,7 @@ export class FornecedorDialogComponent {
 
     this.salvando.set(true);
     this.erro.set(null);
+    this.idParaReativar.set(null);
 
     const { nome, documento, email, telefone, ativo } = this.form.getRawValue();
 
@@ -77,11 +93,45 @@ export class FornecedorDialogComponent {
         this.salvando.set(false);
         this.dialogRef.close(fornecedor);
       },
-      error: (err) => {
+      error: (err: { status?: number; error?: { message?: string; details?: { idExistente?: string } } }) => {
         this.salvando.set(false);
-        this.erro.set(err?.error?.message ?? 'Erro ao salvar. Tente novamente.');
+        if (err.status === 409 && err.error?.details?.idExistente) {
+          this.idParaReativar.set(err.error.details.idExistente);
+        } else {
+          this.erro.set(err?.error?.message ?? 'Erro ao salvar. Tente novamente.');
+        }
       },
     });
+  }
+
+  reativar(): void {
+    const id = this.idParaReativar();
+    if (!id) return;
+
+    this.reativando.set(true);
+    const { nome, documento, email, telefone } = this.form.getRawValue();
+
+    this.service.atualizar(id, {
+      nome,
+      documento: documento || undefined,
+      email: email || undefined,
+      telefone: telefone || undefined,
+      ativo: true,
+    }).subscribe({
+      next: (fornecedor) => {
+        this.reativando.set(false);
+        this.dialogRef.close(fornecedor);
+      },
+      error: (err: { error?: { message?: string } }) => {
+        this.reativando.set(false);
+        this.idParaReativar.set(null);
+        this.erro.set(err?.error?.message ?? 'Erro ao reativar. Tente novamente.');
+      },
+    });
+  }
+
+  cancelarReativacao(): void {
+    this.idParaReativar.set(null);
   }
 
   cancelar(): void {

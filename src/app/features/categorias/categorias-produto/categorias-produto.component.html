@@ -5,6 +5,18 @@
   </button>
 </app-page-header>
 
+<div class="filters">
+  <mat-form-field appearance="outline" class="busca-field">
+    <mat-label>Buscar por nome</mat-label>
+    <mat-icon matPrefix>search</mat-icon>
+    <input #buscaInput matInput [value]="busca()" (input)="onBusca($event)" autocomplete="off" />
+  </mat-form-field>
+
+  <mat-slide-toggle [checked]="apenasAtivas()" (change)="setApenasAtivas($event.checked)">
+    Somente ativas
+  </mat-slide-toggle>
+</div>
+
 @if (carregando()) {
   <div class="state-center" role="status" aria-label="Carregando categorias">
     <mat-spinner diameter="48" />
@@ -19,7 +31,7 @@
 } @else if (categorias().length === 0) {
   <div class="state-center">
     <mat-icon aria-hidden="true">category</mat-icon>
-    <span>Nenhuma categoria cadastrada.</span>
+    <span>Nenhuma categoria encontrada.</span>
   </div>
 } @else {
   <div class="table-wrap">

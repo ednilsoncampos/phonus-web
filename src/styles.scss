@@ -17,9 +17,11 @@ body {
   height: 100%;
 }
 
-/* Dialogs: padding-top para evitar clipagem do floating label no primeiro campo */
+/* Dialogs: padding-top + remove overflow que causa barra de rolagem desnecessária */
 .mat-mdc-dialog-content {
   padding-top: 12px !important;
+  max-height: none !important;
+  overflow: visible !important;
 }
 
 /* Snackbar de erro global */

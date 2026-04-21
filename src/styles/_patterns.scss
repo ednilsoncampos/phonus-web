@@ -35,13 +35,12 @@
 .filters {
   display: flex;
   flex-wrap: wrap;
-  align-items: flex-end;
+  align-items: center;
   gap: 12px;
   margin-bottom: 24px;
 
-  // Alinha botões com a borda visível do mat-form-field outline
-  // (que tem ~22px de espaço de subscript abaixo da borda)
-  button { margin-bottom: 22px; }
+  button          { margin-bottom: 15px; }
+  mat-slide-toggle { margin-bottom: 15px; }
 }
 
 // ----- Tabelas -----------------------------------------------
