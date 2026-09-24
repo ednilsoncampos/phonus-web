@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { tap } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { TokenService } from './token.service';
-import { AuthResponse, LoginRequest } from '../models/auth.model';
+import { AlterarSenhaRequest, AuthResponse, LoginRequest } from '../models/auth.model';
 import { Papel, Usuario } from '../models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
@@ -41,6 +41,10 @@ export class AuthService {
 
   reenviarAtivacao(email: string) {
     return this.api.post<void>('/auth/reenviar-ativacao', { email });
+  }
+
+  alterarSenha(body: AlterarSenhaRequest) {
+    return this.api.put<void>('/auth/senha', body);
   }
 
   refresh(refreshToken: string) {

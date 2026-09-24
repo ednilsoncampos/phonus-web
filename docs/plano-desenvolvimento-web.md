@@ -414,8 +414,85 @@
 
 ---
 
-## Etapa 14 — Deploy Final
+## Etapa 14 — Correções de Contrato (Homologação Backend)
 
+> Ajustes identificados ao comparar o painel web com `docs/melhorias-mobile.md` e
+> `claude-analise/correcoes-e-melhorias-web.txt` (mudanças de contrato feitas para homologação).
+> `/auth/ativar` e `/auth/reset-password` são páginas HTML servidas pelo próprio backend —
+> **não exigem tela Angular**. Os itens abaixo são os que de fato dependem do painel web.
+
+### 14.1 Login — tratamento de 403 e 429 ✅
+- [x] Tratar erro `403` no login (conta não ativada): exibir mensagem e botão "Reenviar e-mail de ativação"
+- [x] Botão de reenvio chama `AuthService.reenviarAtivacao(email)` (já existe no service)
+- [x] Tratar erro `429` no login: exibir mensagem com tempo de espera lido do header `Retry-After`
+
+### 14.2 Tratamento genérico de 429 ✅
+- [x] `httpErrorInterceptor`: adicionar caso para `429` (mensagem padrão + respeitar `Retry-After` quando presente)
+
+### 14.3 Reaceite de Termos de Uso ✅
+- [x] `TermosService.statusAceite()` — `GET /termos/aceite/status`
+- [x] `TermosService.aceitar(termosId)` — `POST /termos/aceite`
+- [x] Verificação após login (no `ShellComponent`): se `aceito = false`, exibir os termos vigentes em dialog bloqueante até o aceite
+- [x] `ReaceiteTermosDialog` — dialog dedicado (baseado no mesmo padrão do `PreviewTermosDialogComponent`) com ação "Li e aceito os termos"
+- [x] Validado manualmente no browser contra o backend local — dialog aparece com `aceito: false` e fecha após aceite, sem bloquear o dashboard depois
+
+### 14.4 Alterar Senha (conta autenticada) ✅
+- [x] `AuthService.alterarSenha(senhaAtual, novaSenha)` — `PUT /auth/senha`
+- [x] Nova tela/dialog `AlterarSenhaDialog`, acessível pelo menu do usuário na `TopbarComponent`
+- [x] Validador reativo: mínimo 8 caracteres, letras e números, diferente do e-mail (mesma regra do backend)
+- [x] Tratar `400` (senha atual incorreta / política não atendida)
+- [x] Sucesso encerra todas as sessões, inclusive a atual — `TopbarComponent` chama `logout()` após confirmação
+
+### 14.5 Cooldown de reenvio de ativação ✅
+- [x] Desabilitar o botão "Reenviar ativação" por 2 minutos após o clique (contagem regressiva)
+- [x] Aplicar em `usuarios-list` (já existente) e no novo botão da tela de login (14.1)
+- [x] Validado manualmente no browser: botão desabilita e snackbar de sucesso aparece após reenvio
+
+---
+
+## Etapa 15 — Testes de Homologação
+
+### 15.1 Regressão automatizada ✅
+- [x] Rodar `npm test` completo — 251 testes / 50 arquivos, todos passando
+- [x] Adicionar testes unitários para os itens novos da Etapa 14 (login 403/429, `TermosService`, `AlterarSenhaDialog`, `ReaceiteTermosDialog`, `httpErrorInterceptor`)
+- [x] Corrigidos testes que já estavam quebrados antes da Etapa 14 (mismatch de tipos `ENTRADA`/`SAIDA` vs `ENTRADA_CAIXA`/`SAIDA_CAIXA` em categorias de lançamento; testes de listas com dialog desatualizados após migração para reload via paginação server-side; rótulos de forma de pagamento; item inicial do formulário de lançamento; navegação do formulário de produto após salvar)
+
+### 15.2 Roteiro manual
+> Base: `docs/homologacao/sequencia-testes.md`. Executar com `ng serve` local e navegador.
+
+- [x] Login com usuário ROOT real contra o backend local — sem erros de console/rede
+- [x] Reaceite de termos — validado end-to-end (dialog aparece com `aceito: false`, aceita e libera o dashboard)
+- [x] Alterar senha — dialog abre e valida corretamente (não submetido para não invalidar a sessão de uso corrente)
+- [x] Reenvio de convite/ativação com cooldown — validado end-to-end em `/usuarios`
+- [x] Dashboard não vem mais zerado — confirmado visualmente (saldo de caixa, a pagar, contas vencidas com valores reais)
+- [x] Cenário do roteiro: cadastrar usuário ROOT (empresa) → convidar ADMIN → convidar OPERADOR → validar permissões visíveis no menu
+  - ROOT (`camposolution.suporte@gmail.com`) cria a empresa via `POST /auth/registro`, ativa pelo link do e-mail (Brevo) e loga no painel
+  - Convite de ADMIN e OPERADOR pelo dialog funcionam; e-mail duplicado é bloqueado com `409` e mensagem exibida corretamente no dialog
+  - ADMIN vê o menu sem "Termos" e sem opção de convidar ROOT; ao convidar, só aparece a opção "Operador"
+  - OPERADOR loga e só vê "Dashboard" no menu; navegação direta a `/usuarios`, `/termos` etc. é bloqueada pelo `roleGuard` (redireciona para `/dashboard`)
+  - **Bug encontrado e corrigido:** `UsuariosListComponent.podeDesativar()` não considerava o papel de quem estava logado — um ADMIN via o botão "Desativar" habilitado inclusive para o ROOT e para outro ADMIN (o backend bloqueava com `403`, mas o front não deveria nem oferecer a ação). Corrigido para respeitar a matriz de papéis (ADMIN só desativa OPERADOR; ninguém desativa a si mesmo ou o SUPER_ROOT); testes atualizados
+- [ ] Repetir o cenário acima para uma segunda empresa — validar isolamento entre tenants (não executado nesta rodada; ficou só uma empresa de teste)
+- [x] Cadastrar produto (com categoria) e ajustar estoque — funcionou; venda com estoque insuficiente retorna `422` com mensagem clara ("Estoque insuficiente para realizar a operação"), tratada na tela
+- [x] Lançamentos `ENTRADA_CAIXA`/`SAIDA_CAIXA` — criados com sucesso (venda vinculada a produto e compra), dashboard atualizou o saldo de caixa corretamente (R$ 15 entrada − R$ 10 saída = R$ 5 exibido)
+- [x] Filtros por período (`dataInicio`/`dataFim`) na lista de lançamentos — testado com período que inclui os lançamentos (2 resultados) e período que exclui (0 resultados), sem erros de rede
+- [ ] Sessão: login com credenciais erradas (401 genérico), conta não ativada (403 + reenvio), várias tentativas seguidas (429) — não executado para não acionar rate limit na conta real de uso
+- [ ] Troca de senha — confirmar logout de todas as sessões (não executado no smoke test para não derrubar a sessão em uso)
+- [ ] Publicar nova versão dos termos (Módulo Termos) e validar o fluxo de reaceite em outro usuário logado
+- [x] Paginação — controle de paginação presente e funcional na lista de lançamentos (`size=20`); não testado com volume > 100 itens
+
+**Observação para decisão do produto:** OPERADOR consegue logar no painel web e ver uma Dashboard mínima (só o card de KPIs, sem menu além de "Dashboard"), em vez de ser bloqueado por completo. Bate com a regra de rota (`roleGuard` não está no path `/dashboard`), mas diverge um pouco do texto do plano ("OPERADOR ❌ Sem acesso ao painel web"). Funcionalmente é inofensivo (nada mais é acessível), mas vale decidir se isso deve virar um bloqueio explícito (ex.: redirecionar OPERADOR direto para `/403` após login).
+
+### 15.3 Acessibilidade
+- [ ] Rodar AXE (extensão Chrome) em todas as páginas
+- [ ] Corrigir violações encontradas
+
+---
+
+## Etapa 16 — Deploy Final
+
+> Preparação documentada em `docs/deploy-configuracao-manual.md`. Execução fica para depois da Etapa 15.
+
+- [ ] Revisar `docs/deploy-configuracao-manual.md` e configurar o que for necessário externamente
 - [ ] Testar build de produção localmente (`npm run build`)
 - [ ] Verificar `dist/phonus-web/browser` gerado corretamente
 - [ ] Confirmar URL da API de produção no Vercel (Environment Variables)
@@ -443,4 +520,6 @@
 | 11 | Assinaturas (view) | 3 |
 | 12 | Testes Unitários | 1–11 |
 | 13 | Qualidade e Acessibilidade | Todas |
-| 14 | Deploy Final | Todas |
+| 14 | Correções de Contrato (Homologação) | 1, 9 |
+| 15 | Testes de Homologação | 14 |
+| 16 | Deploy Final | 15 |

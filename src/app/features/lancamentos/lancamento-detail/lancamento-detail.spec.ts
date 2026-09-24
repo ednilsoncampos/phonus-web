@@ -139,10 +139,10 @@ describe('LancamentoDetail', () => {
     const fixture = TestBed.createComponent(LancamentoDetail);
     const comp = fixture.componentInstance as any;
 
-    expect(comp.formaLabel('PIX')).toBe('PIX');
+    expect(comp.formaLabel('PIX')).toBe('Pix');
     expect(comp.formaLabel('DINHEIRO')).toBe('Dinheiro');
-    expect(comp.formaLabel('DEBITO')).toBe('Débito');
-    expect(comp.formaLabel('CREDITO')).toBe('Crédito');
+    expect(comp.formaLabel('DEBITO')).toBe('Cartão de Débito');
+    expect(comp.formaLabel('CREDITO')).toBe('Cartão de Crédito');
     expect(comp.formaLabel('CHEQUE')).toBe('Cheque');
     expect(comp.formaLabel('PROMISSORIA')).toBe('Promissória');
   });

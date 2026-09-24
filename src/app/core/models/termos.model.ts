@@ -14,3 +14,9 @@ export interface CriarTermosRequest {
   conteudo: string;
   declaracaoAceite: string;
 }
+
+export interface StatusAceiteTermos {
+  termosId: string;
+  versao: string;
+  aceito: boolean;
+}

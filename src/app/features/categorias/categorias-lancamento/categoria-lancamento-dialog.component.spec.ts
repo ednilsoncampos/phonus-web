@@ -6,7 +6,7 @@ import { CategoriaLancamentoDialogComponent } from './categoria-lancamento-dialo
 import { CategoriaLancamentoService } from '../../../core/services/categoria-lancamento.service';
 import { CategoriaLancamento } from '../../../core/models/categoria-lancamento.model';
 
-const mockCat: CategoriaLancamento = { id: 'cat1', nome: 'Salário', tipo: 'ENTRADA', ativo: true };
+const mockCat: CategoriaLancamento = { id: 'cat1', nome: 'Salário', tipo: 'ENTRADA_CAIXA', ativo: true };
 
 const dialogRefMock = { close: vi.fn() };
 
@@ -44,7 +44,7 @@ describe('CategoriaLancamentoDialogComponent — criação', () => {
     fixture.detectChanges();
     const comp = fixture.componentInstance;
 
-    comp.form.patchValue({ nome: 'Salário', tipo: 'ENTRADA' });
+    comp.form.patchValue({ nome: 'Salário', tipo: 'ENTRADA_CAIXA' });
     comp.salvar();
 
     expect(service.criar).toHaveBeenCalled();

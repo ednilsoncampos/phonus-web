@@ -67,6 +67,52 @@ describe('LoginComponent', () => {
     expect(comp.errorMessage()).toBe('Erro ao conectar. Tente novamente.');
   });
 
+  it('exibe erro 403 e oferece reenvio de ativação', () => {
+    vi.spyOn(authService, 'login').mockReturnValue(
+      throwError(() => ({ status: 403, headers: { get: () => null } })),
+    );
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+
+    const comp = fixture.componentInstance as any;
+    comp.form.setValue({ email: 'a@b.com', senha: '123456' });
+    comp.submit();
+
+    expect(comp.showResendActivation()).toBe(true);
+    expect(comp.errorMessage()).toContain('não foi ativada');
+  });
+
+  it('exibe erro 429 e bloqueia o botão de entrar pelo tempo do Retry-After', () => {
+    vi.spyOn(authService, 'login').mockReturnValue(
+      throwError(() => ({ status: 429, headers: { get: () => '30' } })),
+    );
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+
+    const comp = fixture.componentInstance as any;
+    comp.form.setValue({ email: 'a@b.com', senha: '123456' });
+    comp.submit();
+
+    expect(comp.errorMessage()).toBe('Muitas tentativas. Aguarde 30s e tente novamente.');
+    expect(comp.loginBlockedSeconds()).toBe(30);
+  });
+
+  it('reenviarAtivacao dispara cooldown mesmo em caso de erro', () => {
+    vi.spyOn(authService, 'reenviarAtivacao').mockReturnValue(throwError(() => ({ status: 500 })));
+
+    const fixture = TestBed.createComponent(LoginComponent);
+    fixture.detectChanges();
+
+    const comp = fixture.componentInstance as any;
+    comp.form.setValue({ email: 'a@b.com', senha: '123456' });
+    comp.reenviarAtivacao();
+
+    expect(comp.isResending()).toBe(false);
+    expect(comp.resendCooldown()).toBe(120);
+  });
+
   it('login bem-sucedido chama loadMe e navega para /dashboard', () => {
     vi.spyOn(authService, 'login').mockReturnValue(of({ accessToken: 'acc', refreshToken: 'ref' }));
     const loadMeSpy = vi.spyOn(authService, 'loadMe').mockReturnValue(

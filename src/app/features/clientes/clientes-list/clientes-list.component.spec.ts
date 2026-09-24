@@ -77,7 +77,7 @@ describe('ClientesListComponent', () => {
     expect(service.listar).toHaveBeenCalledTimes(2); // ngOnInit + onPage
   });
 
-  it('abrirDialog novo cliente: quando fecha com resultado, adiciona à lista', () => {
+  it('abrirDialog novo cliente: quando fecha com resultado, recarrega a lista', () => {
     const novoCliente: Cliente = { id: 'c2', nome: 'Maria', ativo: true };
     vi.spyOn(dialog, 'open').mockReturnValue({
       afterClosed: () => of(novoCliente),
@@ -90,10 +90,10 @@ describe('ClientesListComponent', () => {
     comp.abrirDialog();
 
     expect(dialog.open).toHaveBeenCalled();
-    expect(comp.clientes()).toContain(novoCliente);
+    expect(service.listar).toHaveBeenCalledTimes(2); // ngOnInit + reload após fechar dialog
   });
 
-  it('abrirDialog edição: quando fecha com resultado, atualiza o item existente', () => {
+  it('abrirDialog edição: quando fecha com resultado, recarrega a lista', () => {
     const clienteAtualizado: Cliente = { id: 'c1', nome: 'João Atualizado', ativo: true };
     vi.spyOn(dialog, 'open').mockReturnValue({
       afterClosed: () => of(clienteAtualizado),
@@ -105,6 +105,20 @@ describe('ClientesListComponent', () => {
 
     comp.abrirDialog(mockCliente);
 
-    expect(comp.clientes()).toEqual([clienteAtualizado]);
+    expect(service.listar).toHaveBeenCalledTimes(2); // ngOnInit + reload após fechar dialog
+  });
+
+  it('abrirDialog: quando fecha sem resultado, não recarrega a lista', () => {
+    vi.spyOn(dialog, 'open').mockReturnValue({
+      afterClosed: () => of(undefined),
+    } as any);
+
+    const fixture = TestBed.createComponent(ClientesListComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.abrirDialog();
+
+    expect(service.listar).toHaveBeenCalledTimes(1); // apenas ngOnInit
   });
 });

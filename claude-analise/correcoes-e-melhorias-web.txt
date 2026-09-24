@@ -1,5 +1,49 @@
-Este padrão de pesquisa e campo ativo ficou bom: claude-analise\padrao-campo-ativo.png.
-Agora melhore um pouquinho o alinhamento do botao "Somente ativos", ele pode subir um pouco para ficar exatamente no meio.
-Aplique essa melhoria nas telas que usam o filtro de ativos.
+As definiçoes abaixo em sua maioria sao para o aplicativo android
+mas voce pode usar como referencia para o web.
 
-Valide o entendimento
+Use o projeto: C:\Users\ednil\Documents\Desenvolvimento\Kotlin\CalorIA\CalorIADaily
+como referencia de arquitetura e melhorias.
+Use a pasta: C:\Users\ednil\Documents\Desenvolvimento\Kotlin\CalorIA\CalorIADaily\docs\seguranca\analise-seguranca-mobile.md
+como referencia de segurança.
+
+Gere arquivos e pastas similares aos citados acima.
+
+Este projeto tem um plano de implementaçao? Em qual esta esta?
+
+O contrato do backend foi atualizado veja no arquivo docs/swagger-phonus-api-v1.yaml.
+Veja tambem algumas das mudanças citadas neste arquivo docs/melhorias-mobile.md.
+
+Use o arquivo docs/plano-implementacao-web.md ou docs/plano-desenvolvimento-web.md para registrar as novas etapas de desenvolvimeto.
+
+Segue alugmas notas que podem ser redundantes
+
+Bloqueantes (sem isso o app não funciona):
+1. Cadastro de empresa: POST /auth/registro agora pede nomeEmpresa, tipoDocumento (CPF ou CNPJ), documento e termosId. O termosId é obrigatório, é um UUID e vem de GET /termos/atual.
+2. Termos: o aceite vai junto no cadastro. É preciso tirar a chamada a /termos/aceite que o app faz logo depois de cadastrar.
+3. Tipos de lançamento: ENTRADA/SAIDA viraram ENTRADA_CAIXA/SAIDA_CAIXA. Isso vale para modelos, filtros e a tela de voz.
+4. Senha: mínimo de 8 caracteres, com letras e números, e diferente do e-mail.
+
+Sessão:
+- Senha errada ou e-mail sem conta responde 401 com mensagem genérica.
+- Conta não ativada responde 403, e só quando a senha está certa.
+- Excesso de tentativas responde 429, com o cabeçalho Retry-After.
+- O refresh token só vale em /auth/refresh. Diante de um 401, o app deve tentar o refresh uma vez e, se falhar, voltar ao login.
+- Trocar ou redefinir a senha derruba todas as sessões, inclusive a atual.
+- Depois do login, o app deve consultar GET /termos/aceite/status e pedir o aceite de novo quando sair uma versão nova dos termos.
+
+Papéis:
+- ROOT e ADMIN veem a empresa inteira; o OPERADOR vê só o que ele mesmo lançou.
+- O OPERADOR não cria nem edita cadastros e não acessa estoque nem gestão de usuários.
+- O ADMIN só convida OPERADOR.
+- O documento tem a matriz completa de permissões para o app esconder o que cada papel não pode fazer.
+
+E-mails:
+- "Esqueci a senha" e "reenviar ativação" respondem sempre igual, exista a conta ou não. O app deve mostrar uma mensagem neutra ("se o e-mail estiver cadastrado…").
+- Há um intervalo de 2 minutos entre envios para a mesma conta.
+- Cadastros não ativados e convites não aceitos são removidos depois de 7 dias.
+
+Outros ajustes:
+- A paginação aceita no máximo 100 itens por página.
+- JSON malformado ou parâmetro inválido agora responde 400, e não mais 500.
+- Os filtros por data voltaram a funcionar.
+- Caixa, dashboard e contas deixaram de vir zerados.

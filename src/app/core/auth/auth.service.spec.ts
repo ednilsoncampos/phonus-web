@@ -100,4 +100,14 @@ describe('AuthService', () => {
 
     expect(saveSpy).toHaveBeenCalledWith('newAcc', 'newRef');
   });
+
+  it('alterarSenha faz PUT /auth/senha com o corpo correto', () => {
+    service.alterarSenha({ senhaAtual: 'atual123', novaSenha: 'novaSenha123' }).subscribe();
+
+    const req = httpMock.expectOne(
+      (r) => r.url.endsWith('/auth/senha') && r.method === 'PUT',
+    );
+    expect(req.request.body).toEqual({ senhaAtual: 'atual123', novaSenha: 'novaSenha123' });
+    req.flush(null);
+  });
 });

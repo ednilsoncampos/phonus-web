@@ -64,9 +64,11 @@
           @if (!u.ativo) {
             <button
               mat-icon-button
-              matTooltip="Reenviar convite por e-mail"
+              [matTooltip]="cooldownRestante(u.id) > 0
+                ? 'Aguarde ' + cooldownRestante(u.id) + 's para reenviar'
+                : 'Reenviar convite por e-mail'"
               [attr.aria-label]="'Reenviar convite para ' + u.nome"
-              [disabled]="reenviandoPara() === u.id"
+              [disabled]="reenviandoPara() === u.id || cooldownRestante(u.id) > 0"
               (click)="reenviarConvite(u)"
             >
               <mat-icon>forward_to_inbox</mat-icon>

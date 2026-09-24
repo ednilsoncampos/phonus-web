@@ -86,9 +86,10 @@ describe('LancamentoFormComponent', () => {
     fixture.detectChanges();
     const comp = fixture.componentInstance;
 
-    expect(comp.itemGroups()).toHaveLength(0);
-    comp.adicionarItem();
+    // ngOnInit já adiciona um item padrão para o usuário não começar com a lista vazia
     expect(comp.itemGroups()).toHaveLength(1);
+    comp.adicionarItem();
+    expect(comp.itemGroups()).toHaveLength(2);
   });
 
   it('removerItem remove o grupo correto do array', () => {
@@ -98,10 +99,10 @@ describe('LancamentoFormComponent', () => {
 
     comp.adicionarItem();
     comp.adicionarItem();
-    expect(comp.itemGroups()).toHaveLength(2);
+    expect(comp.itemGroups()).toHaveLength(3);
 
     comp.removerItem(0);
-    expect(comp.itemGroups()).toHaveLength(1);
+    expect(comp.itemGroups()).toHaveLength(2);
   });
 
   it('precoReferencia retorna o preço do produto pelo id', () => {

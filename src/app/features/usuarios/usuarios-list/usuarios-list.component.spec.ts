@@ -49,17 +49,40 @@ describe('UsuariosListComponent', () => {
     expect(comp.papelCss('ADMIN')).toBe('badge badge--blue');
   });
 
-  it('podeDesativar retorna false para SUPER_ROOT', () => {
+  it('podeDesativar retorna false para SUPER_ROOT, mesmo visto pelo ROOT', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', ativo: true });
     const fixture = TestBed.createComponent(UsuariosListComponent);
     const comp = fixture.componentInstance;
     const superRoot: Usuario = { ...mockUsuario, papel: 'SUPER_ROOT' };
     expect(comp.podeDesativar(superRoot)).toBe(false);
   });
 
-  it('podeDesativar retorna true para outros papéis', () => {
+  it('podeDesativar retorna false para o próprio usuário logado', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ ...mockUsuario, id: 'me', papel: 'ROOT' });
     const fixture = TestBed.createComponent(UsuariosListComponent);
     const comp = fixture.componentInstance;
-    expect(comp.podeDesativar(mockUsuario)).toBe(true);
+    expect(comp.podeDesativar({ ...mockUsuario, id: 'me', papel: 'ROOT' })).toBe(false);
+  });
+
+  it('podeDesativar: ROOT pode desativar ADMIN e OPERADOR', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', ativo: true });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'ADMIN' })).toBe(true);
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'OPERADOR' })).toBe(true);
+  });
+
+  it('podeDesativar: ADMIN só pode desativar OPERADOR', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ADMIN');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ADMIN', ativo: true });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'OPERADOR' })).toBe(true);
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'ADMIN' })).toBe(false);
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'ROOT' })).toBe(false);
   });
 
   it('carregar preenche usuarios', () => {

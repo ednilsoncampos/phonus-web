@@ -44,7 +44,7 @@ describe('CategoriasProdutoComponent', () => {
     expect(comp.categorias()).toEqual([]);
   });
 
-  it('abrirDialog novo: quando fecha com resultado, adiciona à lista', () => {
+  it('abrirDialog novo: quando fecha com resultado, recarrega a lista', () => {
     const novaCategoria: CategoriaProduto = { id: 'cp2', nome: 'Bebidas', ativo: true };
     vi.spyOn(dialog, 'open').mockReturnValue({
       afterClosed: () => of(novaCategoria),
@@ -57,6 +57,20 @@ describe('CategoriasProdutoComponent', () => {
     comp.abrirDialog();
 
     expect(dialog.open).toHaveBeenCalled();
-    expect(comp.categorias()).toContain(novaCategoria);
+    expect(service.listar).toHaveBeenCalledTimes(2); // ngOnInit + reload após fechar dialog
+  });
+
+  it('abrirDialog: quando fecha sem resultado, não recarrega a lista', () => {
+    vi.spyOn(dialog, 'open').mockReturnValue({
+      afterClosed: () => of(undefined),
+    } as any);
+
+    const fixture = TestBed.createComponent(CategoriasProdutoComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.abrirDialog();
+
+    expect(service.listar).toHaveBeenCalledTimes(1); // apenas ngOnInit
   });
 });

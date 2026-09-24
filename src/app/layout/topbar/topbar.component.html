@@ -24,6 +24,10 @@
   </button>
 
   <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="abrirAlterarSenha()">
+      <mat-icon aria-hidden="true">lock_reset</mat-icon>
+      Alterar senha
+    </button>
     <button mat-menu-item (click)="auth.logout()">
       <mat-icon aria-hidden="true">logout</mat-icon>
       Sair

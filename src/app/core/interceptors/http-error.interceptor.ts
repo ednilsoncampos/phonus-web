@@ -14,6 +14,11 @@ const HTTP_MESSAGES: Record<number, string> = {
 export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const notification = inject(ErrorNotificationService);
 
+  // Rotas de autenticação tratam suas próprias mensagens de erro (login, alterar senha, etc.)
+  if (req.url.includes('/auth/')) {
+    return next(req);
+  }
+
   return next(req).pipe(
     catchError((error: unknown) => {
       if (!(error instanceof HttpErrorResponse)) {
@@ -22,6 +27,16 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
       // 401 é tratado pelo tokenRefreshInterceptor
       if (error.status === 401) {
+        return throwError(() => error);
+      }
+
+      if (error.status === 429) {
+        const retryAfter = error.headers.get('Retry-After');
+        notification.show(
+          retryAfter
+            ? `Muitas tentativas. Tente novamente em ${retryAfter}s.`
+            : 'Muitas tentativas. Aguarde um instante e tente novamente.',
+        );
         return throwError(() => error);
       }
 
