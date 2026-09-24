@@ -10,6 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ProdutoService } from '../../../core/services/produto.service';
 import { CategoriaProdutoService } from '../../../core/services/categoria-produto.service';
 import { Produto } from '../../../core/models/produto.model';
@@ -36,6 +37,7 @@ export class ProdutoDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  protected readonly auth = inject(AuthService);
 
   readonly carregando = signal(false);
   readonly erro = signal<string | null>(null);

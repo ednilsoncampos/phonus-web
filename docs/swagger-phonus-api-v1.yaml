@@ -3707,6 +3707,19 @@
             "format": "date-time",
             "description": "Data e hora de criação (ISO 8601)",
             "example": "2026-02-22T10:00:00-03:00"
+          },
+          "permissoes": {
+            "type": "array",
+            "description": "Recursos que o papel do usuário libera na API (mesma matriz aplicada pelo servidor). Use para decidir o que exibir na UI — o servidor sempre reforça com 403.",
+            "example": [
+              "LANCAMENTOS_REGISTRAR",
+              "FINANCEIRO_CONSULTAR",
+              "CADASTROS_CONSULTAR",
+              "CONTA_PROPRIA"
+            ],
+            "items": {
+              "type": "string"
+            }
           }
         },
         "required": [
@@ -3714,7 +3727,8 @@
           "email",
           "id",
           "nome",
-          "papel"
+          "papel",
+          "permissoes"
         ]
       },
       "CriarTermosRequest": {

@@ -19,6 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../../../core/auth/auth.service';
 import { CategoriaProdutoService } from '../../../core/services/categoria-produto.service';
 import { CategoriaProduto } from '../../../core/models/categoria-produto.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -48,6 +49,7 @@ import {
 export class CategoriasProdutoComponent implements OnInit, AfterViewInit {
   private readonly service = inject(CategoriaProdutoService);
   private readonly dialog = inject(MatDialog);
+  protected readonly auth = inject(AuthService);
 
   @ViewChild('buscaInput') buscaInput?: ElementRef<HTMLInputElement>;
 

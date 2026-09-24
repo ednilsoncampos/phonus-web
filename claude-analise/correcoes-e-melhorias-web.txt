@@ -1,49 +1,56 @@
-As definiçoes abaixo em sua maioria sao para o aplicativo android
-mas voce pode usar como referencia para o web.
+O contrato foi atualizado: docs/swagger-phonus-api-v1.yaml
+para refletir a centralizacao das permissoes.
 
-Use o projeto: C:\Users\ednil\Documents\Desenvolvimento\Kotlin\CalorIA\CalorIADaily
-como referencia de arquitetura e melhorias.
-Use a pasta: C:\Users\ednil\Documents\Desenvolvimento\Kotlin\CalorIA\CalorIADaily\docs\seguranca\analise-seguranca-mobile.md
-como referencia de segurança.
+Veja um resumo
+Centralização de Permissões — Phonus FC API
 
-Gere arquivos e pastas similares aos citados acima.
+Problema: as regras de "quem pode fazer o quê" (ROOT/ADMIN/OPERADOR) estavam hardcoded em 39 pontos espalhados por 17 controllers do backend, e o front tinha que replicar essa mesma tabela manualmente em código próprio — sem nenhuma garantia de que as duas cópias ficassem sincronizadas.
 
-Este projeto tem um plano de implementaçao? Em qual esta esta?
+O que mudou: o backend agora tem uma matriz única (papel × recurso) como fonte de verdade, e passou a expor essa matriz pela própria API.
 
-O contrato do backend foi atualizado veja no arquivo docs/swagger-phonus-api-v1.yaml.
-Veja tambem algumas das mudanças citadas neste arquivo docs/melhorias-mobile.md.
+Impacto direto para o front: GET /auth/me agora retorna um novo campo, além do papel:
 
-Use o arquivo docs/plano-implementacao-web.md ou docs/plano-desenvolvimento-web.md para registrar as novas etapas de desenvolvimeto.
+{
+  "id": "uuid",
+  "nome": "João da Silva",
+  "papel": "ADMIN",
+  "permissoes": [
+    "LANCAMENTOS_REGISTRAR",
+    "FINANCEIRO_CONSULTAR",
+    "CADASTROS_CONSULTAR",
+    "CADASTROS_GERENCIAR",
+    "ESTOQUE_GERENCIAR",
+    "USUARIOS_GERENCIAR",
+    "CONTA_PROPRIA"
+  ]
+}
 
-Segue alugmas notas que podem ser redundantes
+Como o front deve usar: trocar qualquer if (papel === 'ROOT' || papel === 'ADMIN') espalhado pela UI por permissoes.includes('CADASTROS_GERENCIAR') (etc.). O backend continua sendo a autoridade real — sempre retorna 403 se a UI deixar passar algo indevido — mas agora front e back leem da mesma regra, então não há mais risco de a UI mostrar um botão que a API vai recusar (ou esconder algo que ela liberaria).
 
-Bloqueantes (sem isso o app não funciona):
-1. Cadastro de empresa: POST /auth/registro agora pede nomeEmpresa, tipoDocumento (CPF ou CNPJ), documento e termosId. O termosId é obrigatório, é um UUID e vem de GET /termos/atual.
-2. Termos: o aceite vai junto no cadastro. É preciso tirar a chamada a /termos/aceite que o app faz logo depois de cadastrar.
-3. Tipos de lançamento: ENTRADA/SAIDA viraram ENTRADA_CAIXA/SAIDA_CAIXA. Isso vale para modelos, filtros e a tela de voz.
-4. Senha: mínimo de 8 caracteres, com letras e números, e diferente do e-mail.
+Os 10 recursos possíveis (nomes usados em permissoes[]):
 
-Sessão:
-- Senha errada ou e-mail sem conta responde 401 com mensagem genérica.
-- Conta não ativada responde 403, e só quando a senha está certa.
-- Excesso de tentativas responde 429, com o cabeçalho Retry-After.
-- O refresh token só vale em /auth/refresh. Diante de um 401, o app deve tentar o refresh uma vez e, se falhar, voltar ao login.
-- Trocar ou redefinir a senha derruba todas as sessões, inclusive a atual.
-- Depois do login, o app deve consultar GET /termos/aceite/status e pedir o aceite de novo quando sair uma versão nova dos termos.
+┌─────────────────────────────────┬────────────────────────────────────────────────────────────────────────────┐
+│             Recurso             │                                O que libera                                │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ LANCAMENTOS_REGISTRAR           │ Lançar (voz/texto), baixar parcela, registrar pagamento                    │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ FINANCEIRO_CONSULTAR            │ Caixa, dashboard, contas, relatórios de lançamentos/pagamentos/competência │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ CADASTROS_CONSULTAR             │ Ver produtos, clientes, fornecedores, categorias                           │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ CADASTROS_GERENCIAR             │ Criar/editar/desativar produtos, clientes, fornecedores, categorias        │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ ESTOQUE_GERENCIAR               │ Ajuste de estoque, movimentações, relatórios de estoque/margem             │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ USUARIOS_GERENCIAR              │ Listar, convidar, desativar usuários                                       │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ USUARIOS_ALTERAR_PAPEL          │ Alterar papel de um usuário                                                │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ TERMOS_GERENCIAR                │ Administrar versões dos termos (só plataforma)                             │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ CONTA_PROPRIA                   │ Ver/editar a própria conta, senha, aceite de termos                        │
+├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
+│ ASSINATURA_ENTITLEMENT_QUALQUER │ Ver entitlement de assinatura de outro usuário                             │
+└─────────────────────────────────┴────────────────────────────────────────────────────────────────────────────┘
 
-Papéis:
-- ROOT e ADMIN veem a empresa inteira; o OPERADOR vê só o que ele mesmo lançou.
-- O OPERADOR não cria nem edita cadastros e não acessa estoque nem gestão de usuários.
-- O ADMIN só convida OPERADOR.
-- O documento tem a matriz completa de permissões para o app esconder o que cada papel não pode fazer.
-
-E-mails:
-- "Esqueci a senha" e "reenviar ativação" respondem sempre igual, exista a conta ou não. O app deve mostrar uma mensagem neutra ("se o e-mail estiver cadastrado…").
-- Há um intervalo de 2 minutos entre envios para a mesma conta.
-- Cadastros não ativados e convites não aceitos são removidos depois de 7 dias.
-
-Outros ajustes:
-- A paginação aceita no máximo 100 itens por página.
-- JSON malformado ou parâmetro inválido agora responde 400, e não mais 500.
-- Os filtros por data voltaram a funcionar.
-- Caixa, dashboard e contas deixaram de vir zerados.
+Compatibilidade: mudança aditiva (só acrescenta um campo novo), não quebra nada existente.

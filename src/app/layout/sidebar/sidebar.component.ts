@@ -9,27 +9,27 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { AuthService } from '../../core/auth/auth.service';
-import { Papel } from '../../core/models/usuario.model';
+import { Permissao } from '../../core/models/usuario.model';
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
-  roles: Papel[] | null; // null = todos os papéis
+  permissao: Permissao;
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', roles: null },
-  { label: 'Usuários', icon: 'group', route: '/usuarios', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Cat. Produto', icon: 'category', route: '/categorias/produto', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Produtos', icon: 'inventory_2', route: '/produtos', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Estoque', icon: 'warehouse', route: '/estoque', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Clientes', icon: 'people', route: '/clientes', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Fornecedores', icon: 'local_shipping', route: '/fornecedores', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Cat. Lançamento', icon: 'label', route: '/categorias/lancamento', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Lançamentos', icon: 'receipt_long', route: '/lancamentos', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
-  { label: 'Termos', icon: 'gavel', route: '/termos', roles: ['SUPER_ROOT', 'ROOT'] },
-  { label: 'Relatórios', icon: 'bar_chart', route: '/relatorios/margem', roles: ['SUPER_ROOT', 'ROOT', 'ADMIN'] },
+  { label: 'Dashboard', icon: 'dashboard', route: '/dashboard', permissao: 'FINANCEIRO_CONSULTAR' },
+  { label: 'Usuários', icon: 'group', route: '/usuarios', permissao: 'USUARIOS_GERENCIAR' },
+  { label: 'Cat. Produto', icon: 'category', route: '/categorias/produto', permissao: 'CADASTROS_CONSULTAR' },
+  { label: 'Produtos', icon: 'inventory_2', route: '/produtos', permissao: 'CADASTROS_CONSULTAR' },
+  { label: 'Estoque', icon: 'warehouse', route: '/estoque', permissao: 'ESTOQUE_GERENCIAR' },
+  { label: 'Clientes', icon: 'people', route: '/clientes', permissao: 'CADASTROS_CONSULTAR' },
+  { label: 'Fornecedores', icon: 'local_shipping', route: '/fornecedores', permissao: 'CADASTROS_CONSULTAR' },
+  { label: 'Cat. Lançamento', icon: 'label', route: '/categorias/lancamento', permissao: 'CADASTROS_CONSULTAR' },
+  { label: 'Lançamentos', icon: 'receipt_long', route: '/lancamentos', permissao: 'FINANCEIRO_CONSULTAR' },
+  { label: 'Termos', icon: 'gavel', route: '/termos', permissao: 'TERMOS_GERENCIAR' },
+  { label: 'Relatórios', icon: 'bar_chart', route: '/relatorios/margem', permissao: 'ESTOQUE_GERENCIAR' },
 ];
 
 @Component({
@@ -44,9 +44,7 @@ export class SidebarComponent {
   readonly collapsed = input(false);
 
   protected readonly visibleItems = computed(() => {
-    const papel = this.auth.papel();
-    return NAV_ITEMS.filter(
-      (item) => item.roles === null || (papel !== null && item.roles.includes(papel)),
-    );
+    const permissoes = this.auth.permissoes();
+    return NAV_ITEMS.filter((item) => permissoes.includes(item.permissao));
   });
 }

@@ -23,6 +23,7 @@ describe('UsuariosListComponent', () => {
 
     vi.spyOn(usuarioService, 'listar').mockReturnValue(of([mockUsuario]));
     vi.spyOn(authService, 'hasRole').mockReturnValue(true);
+    vi.spyOn(authService, 'hasPermissao').mockReturnValue(true);
   });
 
   it('papelLabel("ADMIN") retorna "Admin"', () => {

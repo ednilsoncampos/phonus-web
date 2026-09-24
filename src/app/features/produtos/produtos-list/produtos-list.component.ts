@@ -21,6 +21,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../../core/auth/auth.service';
 import { ProdutoService } from '../../../core/services/produto.service';
 import { CategoriaProdutoService } from '../../../core/services/categoria-produto.service';
 import { Produto } from '../../../core/models/produto.model';
@@ -54,6 +55,7 @@ export class ProdutosListComponent implements OnInit, AfterViewInit {
   private readonly categoriaService = inject(CategoriaProdutoService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  protected readonly auth = inject(AuthService);
 
   @ViewChild('buscaInput') buscaInput?: ElementRef<HTMLInputElement>;
 

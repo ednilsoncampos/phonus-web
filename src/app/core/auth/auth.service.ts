@@ -4,7 +4,7 @@ import { tap } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { TokenService } from './token.service';
 import { AlterarSenhaRequest, AuthResponse, LoginRequest } from '../models/auth.model';
-import { Papel, Usuario } from '../models/usuario.model';
+import { Papel, Permissao, Usuario } from '../models/usuario.model';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -18,10 +18,16 @@ export class AuthService {
   readonly currentUser = this._user.asReadonly();
   readonly isLoggedIn = computed(() => this._user() !== null);
   readonly papel = computed(() => this._user()?.papel ?? null);
+  readonly permissoes = computed(() => this._user()?.permissoes ?? []);
 
   hasRole(...roles: Papel[]): boolean {
     const p = this._user()?.papel;
     return p != null && roles.includes(p);
+  }
+
+  hasPermissao(...permissoes: Permissao[]): boolean {
+    const minhas = this._user()?.permissoes ?? [];
+    return permissoes.some((p) => minhas.includes(p));
   }
 
   login(credentials: LoginRequest) {

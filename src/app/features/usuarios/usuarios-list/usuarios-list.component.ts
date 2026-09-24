@@ -62,7 +62,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
   private cooldownTimer?: ReturnType<typeof setInterval>;
 
   readonly podeConvidar = computed(() =>
-    this.authService.hasRole('SUPER_ROOT', 'ROOT', 'ADMIN'),
+    this.authService.hasPermissao('USUARIOS_GERENCIAR'),
   );
 
   ngOnInit(): void {

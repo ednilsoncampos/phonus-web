@@ -18,6 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../../../core/auth/auth.service';
 import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -49,6 +50,7 @@ import {
 export class FornecedoresListComponent implements OnInit, AfterViewInit {
   private readonly service = inject(FornecedorService);
   private readonly dialog = inject(MatDialog);
+  protected readonly auth = inject(AuthService);
 
   @ViewChild('buscaInput') buscaInput?: ElementRef<HTMLInputElement>;
 

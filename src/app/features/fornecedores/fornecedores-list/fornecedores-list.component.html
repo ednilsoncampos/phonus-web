@@ -1,8 +1,10 @@
 <app-page-header title="Fornecedores">
-  <button mat-flat-button color="primary" (click)="abrirDialog()">
-    <mat-icon>add</mat-icon>
-    Novo fornecedor
-  </button>
+  @if (auth.hasPermissao('CADASTROS_GERENCIAR')) {
+    <button mat-flat-button color="primary" (click)="abrirDialog()">
+      <mat-icon>add</mat-icon>
+      Novo fornecedor
+    </button>
+  }
 </app-page-header>
 
 <div class="filters">
@@ -72,14 +74,16 @@
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef class="col-acoes"></th>
         <td mat-cell *matCellDef="let f" class="col-acoes">
-          <button
-            mat-icon-button
-            matTooltip="Editar"
-            [attr.aria-label]="'Editar ' + f.nome"
-            (click)="abrirDialog(f)"
-          >
-            <mat-icon>edit</mat-icon>
-          </button>
+          @if (auth.hasPermissao('CADASTROS_GERENCIAR')) {
+            <button
+              mat-icon-button
+              matTooltip="Editar"
+              [attr.aria-label]="'Editar ' + f.nome"
+              (click)="abrirDialog(f)"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+          }
         </td>
       </ng-container>
 

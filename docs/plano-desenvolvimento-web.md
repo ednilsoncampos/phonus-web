@@ -480,7 +480,7 @@
 - [ ] Publicar nova versão dos termos (Módulo Termos) e validar o fluxo de reaceite em outro usuário logado
 - [x] Paginação — controle de paginação presente e funcional na lista de lançamentos (`size=20`); não testado com volume > 100 itens
 
-**Observação para decisão do produto:** OPERADOR consegue logar no painel web e ver uma Dashboard mínima (só o card de KPIs, sem menu além de "Dashboard"), em vez de ser bloqueado por completo. Bate com a regra de rota (`roleGuard` não está no path `/dashboard`), mas diverge um pouco do texto do plano ("OPERADOR ❌ Sem acesso ao painel web"). Funcionalmente é inofensivo (nada mais é acessível), mas vale decidir se isso deve virar um bloqueio explícito (ex.: redirecionar OPERADOR direto para `/403` após login).
+**Resolvido na Etapa 16:** a dúvida sobre o que o OPERADOR deveria acessar no painel web (antes só via Dashboard, por acidente — rota sem guard) foi resolvida adotando o modelo de permissões centralizadas do backend. Ver Etapa 16.
 
 ### 15.3 Acessibilidade
 - [ ] Rodar AXE (extensão Chrome) em todas as páginas
@@ -488,9 +488,53 @@
 
 ---
 
-## Etapa 16 — Deploy Final
+## Etapa 16 — Migração para permissões centralizadas (`permissoes[]`)
 
-> Preparação documentada em `docs/deploy-configuracao-manual.md`. Execução fica para depois da Etapa 15.
+> Contexto: o backend centralizou as regras de "quem pode fazer o quê" numa matriz única
+> (papel × recurso) e passou a expor isso via `GET /auth/me` → campo `permissoes: string[]`.
+> Antes, o front replicava a mesma tabela manualmente com `papel === 'ROOT' || papel === 'ADMIN'`
+> espalhado pelo código — sem garantia de sincronia com o backend. Ver
+> `claude-analise/correcoes-e-melhorias-web.txt` para o resumo original da mudança.
+>
+> Os 10 recursos possíveis: `LANCAMENTOS_REGISTRAR`, `FINANCEIRO_CONSULTAR`,
+> `CADASTROS_CONSULTAR`, `CADASTROS_GERENCIAR`, `ESTOQUE_GERENCIAR`, `USUARIOS_GERENCIAR`,
+> `USUARIOS_ALTERAR_PAPEL`, `TERMOS_GERENCIAR`, `CONTA_PROPRIA`, `ASSINATURA_ENTITLEMENT_QUALQUER`.
+>
+> **Achado confirmado em `GET /auth/me` real (2026-09-24):** `TERMOS_GERENCIAR` é exclusivo do
+> SUPER_ROOT — nem ROOT nem ADMIN têm essa permissão (`POST /termos/admin` retorna `403` pra
+> ambos). Isso é uma mudança de comportamento em relação ao texto antigo do plano ("Termos —
+> ROOT"), confirmada e assumida por decisão do usuário: "só o super root cria termos".
+
+### 17.1 Modelo e infraestrutura ✅
+- [x] `Permissao` (union type com os 10 valores) e `Usuario.permissoes?: Permissao[]` em `usuario.model.ts`
+- [x] `AuthService.permissoes` (computed) e `AuthService.hasPermissao(...)` 
+- [x] `landing-route.ts` — resolve a primeira rota acessível por prioridade de permissão (usada como destino padrão e como fallback do guard)
+- [x] `permission-guard.ts` (substituiu `role.guard.ts`) — `data: { permissao: Permissao }` por rota, redireciona via `landingRoute()` quando nega
+
+### 17.2 Rotas e menu ✅
+- [x] `app.routes.ts` — cada rota mapeada pro recurso certo (`dashboard`→`FINANCEIRO_CONSULTAR`, `usuarios`→`USUARIOS_GERENCIAR`, `produtos`/`clientes`/`fornecedores`/`categorias/*`→`CADASTROS_CONSULTAR` (leitura) ou `CADASTROS_GERENCIAR` (escrita, em `/novo` e `/editar`), `estoque`→`ESTOQUE_GERENCIAR`, `termos`→`TERMOS_GERENCIAR`, `lancamentos`→`FINANCEIRO_CONSULTAR`, `lancamentos/novo`→`LANCAMENTOS_REGISTRAR`, `relatorios/margem`→`ESTOQUE_GERENCIAR`)
+- [x] `dashboard` passou a ter guard (antes não tinha nenhum — só funcionava aberto a todos por acidente)
+- [x] `SidebarComponent` — `NavItem.permissao` no lugar de `roles: Papel[]`
+
+### 17.3 Esconder ações de escrita para quem só tem `CADASTROS_CONSULTAR` ✅
+- [x] `produtos-list`, `produto-detail`, `clientes-list`, `fornecedores-list`, `categorias-produto`, `categorias-lancamento` — botões "Novo"/"Editar"/"Desativar" só aparecem com `CADASTROS_GERENCIAR`; "Histórico de estoque" só com `ESTOQUE_GERENCIAR`
+- [x] `dashboard` — atalhos rápidos separados por permissão específica (`CADASTROS_GERENCIAR`, `ESTOQUE_GERENCIAR`, `USUARIOS_GERENCIAR`) em vez de um flag único
+- [x] `usuarios-list.podeConvidar` — trocado de `hasRole(...)` pra `hasPermissao('USUARIOS_GERENCIAR')`
+- [x] `usuarios-list.podeDesativar` **não** virou permissão — continua sendo hierarquia entre papéis (ADMIN só desativa OPERADOR, ninguém desativa a si mesmo ou o SUPER_ROOT), que é uma regra ortogonal à lista de recursos
+
+### 17.4 Validação ✅
+- [x] Testes unitários atualizados/criados (`permission-guard.spec.ts`, `sidebar.component.spec.ts`, `dashboard.component.spec.ts`) — suíte completa: 255 testes / 50 arquivos
+- [x] Validado no navegador com as 3 contas reais (ROOT, ADMIN, OPERADOR — ver Etapa 15): menu, guard de rota e botões de escrita batendo exatamente com o `permissoes[]` retornado por cada uma
+- [ ] SUPER_ROOT não testado no navegador (sem a senha da conta seed) — comportamento assumido a partir do texto do perfil ("não participa do dia a dia operacional"), não confirmado via `GET /auth/me` real
+
+### Resultado prático para o OPERADOR
+Antes só via Dashboard (por acidente). Agora vê, de forma intencional: **Dashboard** (escopado ao que ele lançou), **Lançamentos** (listar + criar), e leitura de **Produtos, Clientes, Fornecedores, Cat. Produto, Cat. Lançamento** (sem botões de criar/editar). Continua sem acesso a Estoque, Usuários, Termos e Relatórios de margem.
+
+---
+
+## Etapa 17 — Deploy Final
+
+> Preparação documentada em `docs/deploy-configuracao-manual.md`. Execução fica para depois das Etapas 15 e 16.
 
 - [ ] Revisar `docs/deploy-configuracao-manual.md` e configurar o que for necessário externamente
 - [ ] Testar build de produção localmente (`npm run build`)
@@ -522,4 +566,5 @@
 | 13 | Qualidade e Acessibilidade | Todas |
 | 14 | Correções de Contrato (Homologação) | 1, 9 |
 | 15 | Testes de Homologação | 14 |
-| 16 | Deploy Final | 15 |
+| 16 | Permissões centralizadas (`permissoes[]`) | 3, 5, 7, 8, 9 |
+| 17 | Deploy Final | 15, 16 |
