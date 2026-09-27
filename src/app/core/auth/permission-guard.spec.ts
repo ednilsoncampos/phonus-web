@@ -32,7 +32,7 @@ describe('permissionGuard', () => {
 
   it('retorna true quando o usuário tem a permissão exigida pela rota', () => {
     const user: Usuario = {
-      id: '1', nome: 'Root', email: 'r@r.com', papel: 'ROOT', ativo: true,
+      id: '1', nome: 'Root', email: 'r@r.com', papel: 'ROOT', status: 'ATIVO',
       permissoes: ['USUARIOS_GERENCIAR', 'FINANCEIRO_CONSULTAR'],
     };
     vi.spyOn(authService, 'currentUser').mockReturnValue(user);
@@ -42,7 +42,7 @@ describe('permissionGuard', () => {
 
   it('redireciona para a landing route do usuário quando falta a permissão', () => {
     const user: Usuario = {
-      id: '1', nome: 'Op', email: 'o@o.com', papel: 'OPERADOR', ativo: true,
+      id: '1', nome: 'Op', email: 'o@o.com', papel: 'OPERADOR', status: 'ATIVO',
       permissoes: ['LANCAMENTOS_REGISTRAR', 'FINANCEIRO_CONSULTAR'],
     };
     vi.spyOn(authService, 'currentUser').mockReturnValue(user);
@@ -53,7 +53,7 @@ describe('permissionGuard', () => {
   });
 
   it('redireciona para /403 quando o usuário não tem nenhuma permissão conhecida', () => {
-    const user: Usuario = { id: '1', nome: 'X', email: 'x@x.com', papel: 'OPERADOR', ativo: true, permissoes: [] };
+    const user: Usuario = { id: '1', nome: 'X', email: 'x@x.com', papel: 'OPERADOR', status: 'ATIVO', permissoes: [] };
     vi.spyOn(authService, 'currentUser').mockReturnValue(user);
 
     const result = runGuard(mockRoute('USUARIOS_GERENCIAR'));

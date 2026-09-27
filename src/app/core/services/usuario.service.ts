@@ -31,6 +31,10 @@ export class UsuarioService {
     return this.api.delete<void>(`/usuarios/${id}`);
   }
 
+  reativar(id: string) {
+    return this.api.patch<void>(`/usuarios/${id}/reativar`);
+  }
+
   buscarEntitlement(usuarioId: string) {
     return this.api.get<EntitlementResponse>(`/usuarios/${usuarioId}/entitlement`);
   }

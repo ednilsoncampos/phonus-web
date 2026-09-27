@@ -28,7 +28,7 @@ describe('UsuarioService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/usuarios') && r.method === 'POST');
     expect(req.request.body).toEqual(body);
-    req.flush({ id: '1', ...body, ativo: true });
+    req.flush({ id: '1', ...body, status: 'CONVIDADO' });
   });
 
   it('desativar faz DELETE /usuarios/:id', () => {
@@ -36,6 +36,14 @@ describe('UsuarioService', () => {
 
     const req = httpMock.expectOne((r) => r.url.endsWith('/usuarios/u1'));
     expect(req.request.method).toBe('DELETE');
+    req.flush(null);
+  });
+
+  it('reativar faz PATCH /usuarios/:id/reativar', () => {
+    service.reativar('u1').subscribe();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/usuarios/u1/reativar'));
+    expect(req.request.method).toBe('PATCH');
     req.flush(null);
   });
 

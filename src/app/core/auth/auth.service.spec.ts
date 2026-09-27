@@ -11,7 +11,7 @@ const mockUser: Usuario = {
   nome: 'Admin',
   email: 'admin@test.com',
   papel: 'ADMIN',
-  ativo: true,
+  status: 'ATIVO',
 };
 
 describe('AuthService', () => {

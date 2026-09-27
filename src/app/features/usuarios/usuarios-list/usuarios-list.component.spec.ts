@@ -7,7 +7,7 @@ import { UsuarioService } from '../../../core/services/usuario.service';
 import { AuthService } from '../../../core/auth/auth.service';
 import { Papel, Usuario } from '../../../core/models/usuario.model';
 
-const mockUsuario: Usuario = { id: 'u1', nome: 'João', email: 'j@j.com', papel: 'ADMIN', ativo: true };
+const mockUsuario: Usuario = { id: 'u1', nome: 'João', email: 'j@j.com', papel: 'ADMIN', status: 'ATIVO' };
 
 describe('UsuariosListComponent', () => {
   let usuarioService: UsuarioService;
@@ -52,7 +52,7 @@ describe('UsuariosListComponent', () => {
 
   it('podeDesativar retorna false para SUPER_ROOT, mesmo visto pelo ROOT', () => {
     vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
-    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', ativo: true });
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
     const fixture = TestBed.createComponent(UsuariosListComponent);
     const comp = fixture.componentInstance;
     const superRoot: Usuario = { ...mockUsuario, papel: 'SUPER_ROOT' };
@@ -67,9 +67,18 @@ describe('UsuariosListComponent', () => {
     expect(comp.podeDesativar({ ...mockUsuario, id: 'me', papel: 'ROOT' })).toBe(false);
   });
 
+  it('podeDesativar retorna false para usuário que já está INATIVO ou CONVIDADO', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    expect(comp.podeDesativar({ ...mockUsuario, status: 'INATIVO' })).toBe(false);
+    expect(comp.podeDesativar({ ...mockUsuario, status: 'CONVIDADO' })).toBe(false);
+  });
+
   it('podeDesativar: ROOT pode desativar ADMIN e OPERADOR', () => {
     vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
-    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', ativo: true });
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
     const fixture = TestBed.createComponent(UsuariosListComponent);
     const comp = fixture.componentInstance;
     expect(comp.podeDesativar({ ...mockUsuario, papel: 'ADMIN' })).toBe(true);
@@ -78,12 +87,66 @@ describe('UsuariosListComponent', () => {
 
   it('podeDesativar: ADMIN só pode desativar OPERADOR', () => {
     vi.spyOn(authService, 'papel').mockReturnValue('ADMIN');
-    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ADMIN', ativo: true });
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ADMIN', status: 'ATIVO' });
     const fixture = TestBed.createComponent(UsuariosListComponent);
     const comp = fixture.componentInstance;
     expect(comp.podeDesativar({ ...mockUsuario, papel: 'OPERADOR' })).toBe(true);
     expect(comp.podeDesativar({ ...mockUsuario, papel: 'ADMIN' })).toBe(false);
     expect(comp.podeDesativar({ ...mockUsuario, papel: 'ROOT' })).toBe(false);
+  });
+
+  it('podeReativar retorna true só para status INATIVO, respeitando a hierarquia', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'OPERADOR', status: 'INATIVO' })).toBe(true);
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'OPERADOR', status: 'ATIVO' })).toBe(false);
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'OPERADOR', status: 'CONVIDADO' })).toBe(false);
+  });
+
+  it('podeReativar retorna false para SUPER_ROOT mesmo INATIVO', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'SUPER_ROOT', status: 'INATIVO' })).toBe(false);
+  });
+
+  it('podeReativar: ADMIN não pode reativar outro ADMIN inativo', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ADMIN');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ADMIN', status: 'ATIVO' });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'ADMIN', status: 'INATIVO' })).toBe(false);
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'OPERADOR', status: 'INATIVO' })).toBe(true);
+  });
+
+  it('podeReenviarConvite retorna true só para status CONVIDADO', () => {
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+
+    expect(comp.podeReenviarConvite({ ...mockUsuario, status: 'CONVIDADO' })).toBe(true);
+    expect(comp.podeReenviarConvite({ ...mockUsuario, status: 'INATIVO' })).toBe(false);
+    expect(comp.podeReenviarConvite({ ...mockUsuario, status: 'ATIVO' })).toBe(false);
+  });
+
+  it('confirmarReativar chama usuarioService.reativar e atualiza o status para ATIVO', () => {
+    const dialogRefMock = { afterClosed: () => of(true) };
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    comp.usuarios.set([{ ...mockUsuario, status: 'INATIVO' }]);
+
+    vi.spyOn((comp as any).dialog, 'open').mockReturnValue(dialogRefMock as any);
+    vi.spyOn(usuarioService, 'reativar').mockReturnValue(of(undefined));
+
+    comp.confirmarReativar({ ...mockUsuario, status: 'INATIVO' });
+
+    expect(usuarioService.reativar).toHaveBeenCalledWith(mockUsuario.id);
+    expect(comp.usuarios()[0].status).toBe('ATIVO');
   });
 
   it('carregar preenche usuarios', () => {

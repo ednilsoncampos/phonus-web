@@ -32,7 +32,7 @@ describe('AlterarSenhaDialog', () => {
       nome: 'Usuário',
       email,
       papel: 'ADMIN',
-      ativo: true,
+      status: 'ATIVO',
     });
   }
 

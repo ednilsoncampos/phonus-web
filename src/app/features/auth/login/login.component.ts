@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../core/auth/auth.service';
+import { landingRoute } from '../../../core/auth/landing-route';
 import { environment } from '../../../../environments/environment';
 
 const RESEND_ACTIVATION_COOLDOWN_SECONDS = 120;
@@ -63,7 +64,7 @@ export class LoginComponent {
     this.authService.login({ email: email!, senha: senha! }).subscribe({
       next: () => {
         this.authService.loadMe().subscribe({
-          next: () => this.router.navigate(['/dashboard']),
+          next: () => this.router.navigate([landingRoute(this.authService.permissoes())]),
           error: () => {
             this.isLoading.set(false);
             this.errorMessage.set('Erro ao carregar dados do usuário.');

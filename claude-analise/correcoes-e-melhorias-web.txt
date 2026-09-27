@@ -1,56 +1,10 @@
-O contrato foi atualizado: docs/swagger-phonus-api-v1.yaml
-para refletir a centralizacao das permissoes.
+Veja a discussao no backend:
+Login já funciona hoje, independente da matriz. Como vimos, loadUserByUsername resolve o tenant e autentica via usuario_global + usuario, sem passar por @PreAuthorize. O SUPER_ROOT já consegue logar e receber um JWT válido. O que falta na matriz não bloqueia o login — bloqueia tudo que vem depois, a começar pelo próprio GET /auth/me. Então hoje o SUPER_ROOT "loga" (ganha token) mas não consegue chamar nenhum endpoint protegido, nem o /auth/me — do ponto de vista de quem usa o app, isso parece login quebrado, mas tecnicamente é autorização.
+Sobre o redirecionamento do front por permissão: sim, é exatamente assim que o sistema foi desenhado. O CLAUDE.md já documenta isso: GET /auth/me expõe UsuarioResponse.permissoes[] — a mesma matriz que os @PreAuthorize usam no backend — "front consome essa lista em vez de reimplementar a tabela de papéis". Ou seja, a tela pós-login não deveria ter um if (papel == "ROOT") ... else if (papel == "ADMIN") fixo; ela deveria olhar o array permissoes retornado e decidir o que mostrar/pra onde mandar o usuário com base nisso.
+O ponto prático: se eu só adicionar SUPER_ROOT em CONTA_PROPRIA, o /auth/me passa a responder, mas o array permissoes dele vai conter só ["TERMOS_GERENCIAR", "CONTA_PROPRIA"] — nada de FINANCEIRO_CONSULTAR, USUARIOS_GERENCIAR, etc. Então o front, seguindo a própria lista, não deveria redirecionar o SUPER_ROOT pro dashboard normal da empresa (caixa, lançamentos, usuários) — ele não tem acesso a nada disso hoje. O destino natural seria uma tela de administração de termos de uso (ou uma tela de perfil/landing mínima), já que é o único recurso que a matriz libera pra esse papel.
 
-Veja um resumo
-Centralização de Permissões — Phonus FC API
-
-Problema: as regras de "quem pode fazer o quê" (ROOT/ADMIN/OPERADOR) estavam hardcoded em 39 pontos espalhados por 17 controllers do backend, e o front tinha que replicar essa mesma tabela manualmente em código próprio — sem nenhuma garantia de que as duas cópias ficassem sincronizadas.
-
-O que mudou: o backend agora tem uma matriz única (papel × recurso) como fonte de verdade, e passou a expor essa matriz pela própria API.
-
-Impacto direto para o front: GET /auth/me agora retorna um novo campo, além do papel:
-
-{
-  "id": "uuid",
-  "nome": "João da Silva",
-  "papel": "ADMIN",
-  "permissoes": [
-    "LANCAMENTOS_REGISTRAR",
-    "FINANCEIRO_CONSULTAR",
-    "CADASTROS_CONSULTAR",
-    "CADASTROS_GERENCIAR",
-    "ESTOQUE_GERENCIAR",
-    "USUARIOS_GERENCIAR",
-    "CONTA_PROPRIA"
-  ]
-}
-
-Como o front deve usar: trocar qualquer if (papel === 'ROOT' || papel === 'ADMIN') espalhado pela UI por permissoes.includes('CADASTROS_GERENCIAR') (etc.). O backend continua sendo a autoridade real — sempre retorna 403 se a UI deixar passar algo indevido — mas agora front e back leem da mesma regra, então não há mais risco de a UI mostrar um botão que a API vai recusar (ou esconder algo que ela liberaria).
-
-Os 10 recursos possíveis (nomes usados em permissoes[]):
-
-┌─────────────────────────────────┬────────────────────────────────────────────────────────────────────────────┐
-│             Recurso             │                                O que libera                                │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ LANCAMENTOS_REGISTRAR           │ Lançar (voz/texto), baixar parcela, registrar pagamento                    │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ FINANCEIRO_CONSULTAR            │ Caixa, dashboard, contas, relatórios de lançamentos/pagamentos/competência │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ CADASTROS_CONSULTAR             │ Ver produtos, clientes, fornecedores, categorias                           │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ CADASTROS_GERENCIAR             │ Criar/editar/desativar produtos, clientes, fornecedores, categorias        │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ ESTOQUE_GERENCIAR               │ Ajuste de estoque, movimentações, relatórios de estoque/margem             │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ USUARIOS_GERENCIAR              │ Listar, convidar, desativar usuários                                       │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ USUARIOS_ALTERAR_PAPEL          │ Alterar papel de um usuário                                                │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ TERMOS_GERENCIAR                │ Administrar versões dos termos (só plataforma)                             │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ CONTA_PROPRIA                   │ Ver/editar a própria conta, senha, aceite de termos                        │
-├─────────────────────────────────┼────────────────────────────────────────────────────────────────────────────┤
-│ ASSINATURA_ENTITLEMENT_QUALQUER │ Ver entitlement de assinatura de outro usuário                             │
-└─────────────────────────────────┴────────────────────────────────────────────────────────────────────────────┘
-
-Compatibilidade: mudança aditiva (só acrescenta um campo novo), não quebra nada existente.
+Abaixo sao as mudanças do backend
+- MatrizPermissoes.kt: CONTA_PROPRIA agora inclui EnumPapel.SUPER_ROOT — corrige o 403 no /auth/me visto no log. SUPER_ROOT continua sem FINANCEIRO_CONSULTAR, USUARIOS_GERENCIAR, CADASTROS_* etc. (escopo aprovado: só conta própria + termos de uso).
+- MatrizPermissoesTest.kt: novo teste travando esse contrato (SUPER_ROOT tem CONTA_PROPRIA, não tem os recursos de empresa).
+- CLAUDE.md: nota explicando que a hierarquia (podeGerenciar) não implica herança de recursos na matriz, e que o front deve usar permissoes[] de /auth/me para decidir o redirecionamento pós-login — não só o papel.
+- docs/api-reference-mobile.md: adicionada a linha do SUPER_ROOT na tabela de papéis, deixando explícito para quem for construir a tela web que ele precisa de um destino próprio (ex.: administração de termos), não o dashboard normal da empresa.

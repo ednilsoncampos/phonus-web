@@ -1,5 +1,7 @@
 export type Papel = 'SUPER_ROOT' | 'ROOT' | 'ADMIN' | 'OPERADOR';
 
+export type StatusUsuario = 'ATIVO' | 'INATIVO' | 'CONVIDADO';
+
 export type Permissao =
   | 'LANCAMENTOS_REGISTRAR'
   | 'FINANCEIRO_CONSULTAR'
@@ -17,7 +19,7 @@ export interface Usuario {
   nome: string;
   email: string;
   papel: Papel;
-  ativo: boolean;
+  status: StatusUsuario;
   permissoes?: Permissao[];
   cidade?: string;
   estado?: string;

@@ -3,6 +3,6 @@ export const environment = {
   apiUrl: '/api/v1',
   devCredentials: {
     email: 'ednilsoncampos@gmail.com',
-    senha: 'dev@123',
+    senha: 'A.123456a',
   },
 };

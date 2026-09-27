@@ -61,7 +61,7 @@ describe('DashboardComponent', () => {
       nome: 'João',
       email: 'j@j.com',
       papel: 'ADMIN',
-      ativo: true,
+      status: 'ATIVO',
     });
     const fixture = TestBed.createComponent(DashboardComponent);
     fixture.detectChanges();

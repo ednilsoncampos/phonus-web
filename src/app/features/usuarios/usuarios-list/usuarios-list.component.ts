@@ -122,13 +122,25 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     return `badge ${PAPEL_CONFIG[papel]?.css ?? ''}`;
   }
 
-  podeDesativar(usuario: Usuario): boolean {
+  private podeGerenciar(usuario: Usuario): boolean {
     if (usuario.papel === 'SUPER_ROOT') return false;
     if (usuario.id === this.authService.currentUser()?.id) return false;
 
     const meuPapel = this.authService.papel();
     if (meuPapel === 'ADMIN') return usuario.papel === 'OPERADOR';
     return meuPapel === 'ROOT' || meuPapel === 'SUPER_ROOT';
+  }
+
+  podeDesativar(usuario: Usuario): boolean {
+    return usuario.status === 'ATIVO' && this.podeGerenciar(usuario);
+  }
+
+  podeReativar(usuario: Usuario): boolean {
+    return usuario.status === 'INATIVO' && this.podeGerenciar(usuario);
+  }
+
+  podeReenviarConvite(usuario: Usuario): boolean {
+    return usuario.status === 'CONVIDADO';
   }
 
   abrirConvidar(): void {
@@ -193,11 +205,45 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
       this.usuarioService.desativar(usuario.id).subscribe({
         next: () => {
           this.usuarios.update((lista) =>
-            lista.map((u) => (u.id === usuario.id ? { ...u, ativo: false } : u)),
+            lista.map((u) => (u.id === usuario.id ? { ...u, status: 'INATIVO' } : u)),
           );
         },
         error: () => {
           // erro silencioso — o usuário pode tentar novamente via reload
+        },
+      });
+    });
+  }
+
+  confirmarReativar(usuario: Usuario): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Reativar usuário',
+        message: `Deseja reativar o usuário "${usuario.nome}"? Ele voltará a ter acesso ao sistema com a senha atual.`,
+        confirmLabel: 'Reativar',
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmado: boolean) => {
+      if (!confirmado) return;
+
+      this.usuarioService.reativar(usuario.id).subscribe({
+        next: () => {
+          this.usuarios.update((lista) =>
+            lista.map((u) => (u.id === usuario.id ? { ...u, status: 'ATIVO' } : u)),
+          );
+          this.snackBar.open(`${usuario.nome} foi reativado(a).`, 'Fechar', {
+            duration: 6000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-success'],
+          });
+        },
+        error: (err) => {
+          if (err?.status === 422) {
+            this.snackBar.open(
+              err?.error?.message ?? 'Não foi possível reativar este usuário.',
+              'Fechar',
+              { duration: 7000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-error'] },
+            );
+          }
         },
       });
     });

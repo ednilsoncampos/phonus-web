@@ -2056,6 +2056,37 @@
         ]
       }
     },
+    "/usuarios/{id}/reativar": {
+      "patch": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Reativar usuário",
+        "description": "Reativa um usuário INATIVO (que já foi ATIVO e foi desativado). Não é possível reativar SUPER_ROOT, usuário já ATIVO, ou CONVIDADO (nunca ativou o convite — reenvie o convite em vez de reativar).",
+        "operationId": "reativar",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/usuarios/{id}/papel": {
       "patch": {
         "tags": [
@@ -3697,10 +3728,15 @@
             ],
             "example": "ROOT"
           },
-          "ativo": {
-            "type": "boolean",
-            "description": "Indica se o usuário está ativo",
-            "example": true
+          "status": {
+            "type": "string",
+            "description": "Status do usuário: ATIVO (convite aceito, pode logar), INATIVO (foi desativado) ou CONVIDADO (convite enviado, ainda não ativou a conta)",
+            "enum": [
+              "ATIVO",
+              "INATIVO",
+              "CONVIDADO"
+            ],
+            "example": "ATIVO"
           },
           "createdAt": {
             "type": "string",
@@ -3723,12 +3759,12 @@
           }
         },
         "required": [
-          "ativo",
           "email",
           "id",
           "nome",
           "papel",
-          "permissoes"
+          "permissoes",
+          "status"
         ]
       },
       "CriarTermosRequest": {
