@@ -12,6 +12,20 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'registro',
+    loadComponent: () =>
+      import('./features/auth/register/register.component').then(
+        (m) => m.RegisterComponent,
+      ),
+  },
+  {
+    path: 'verifique-email',
+    loadComponent: () =>
+      import('./features/auth/verify-email/verify-email.component').then(
+        (m) => m.VerifyEmailComponent,
+      ),
+  },
+  {
     path: 'esqueceu-senha',
     loadComponent: () =>
       import('./features/auth/forgot-password/forgot-password.component').then(

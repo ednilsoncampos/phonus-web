@@ -114,4 +114,29 @@ Cenario de teste adicional:
 - Lançamento `ENTRADA_CAIXA` e `SAIDA_CAIXA` → dashboard atualizou o saldo de caixa corretamente
 - Filtros de data (`dataInicio`/`dataFim`) na lista de lançamentos → resultado correto dentro e fora do período, sem erro 500
 
-**Nota:** o token de `token_ativacao_usuario` fica em texto plano no banco, mas `GET /auth/ativar` exige também o parâmetro `e` (gerado só dentro do link do e-mail) — não dá para montar o link de ativação manualmente a partir do banco; a ativação real precisa do e-mail.
+**Nota:** o token de `token_ativacao_usuario` fica em texto plano no banco. O link de ativação é `GET /auth/ativar?token=<token>&e=<empresaId>` — o `e` é o **id da empresa** (o schema do tenant é `t_<id sem hifens>`), não o e-mail. Portanto o link pode ser montado a partir do banco (`public.empresa` + `token_ativacao_usuario`), sem depender do e-mail. (Esta nota foi corrigida em 2026-09-29; antes dizia que não era possível.)
+
+---
+
+## Execução — 2026-09-29 (banco zerado, cadastro de empresa pelo web — Etapa 18)
+
+**Contas usadas:**
+- ROOT (empresa "Empresa de Teste Ltda", CNPJ 11.222.333/0001-81): `ednilson.campos.dev@gmail.com` / `A.123456a` — ativa
+- SUPER_ROOT (seed do backend, empresa "Phonus Admin", CPF 111.444.777-35): `ednilsoncampos@gmail.com`
+- `camposolution.suporte@gmail.com` — informado pelo usuário, **não consumido** (usado só na tentativa de documento duplicado, rejeitada)
+
+**Fluxo `/registro` → `/verifique-email` → ativação → login: ✅ concluído**
+- Documento duplicado (CPF da empresa seed) → `409` `CPF/CNPJ já cadastrado`, exibido na tela; nenhum e-mail consumido
+- Cadastro válido → `201`, papel ROOT, status `CONVIDADO`; redireciona para `/verifique-email` com o e-mail
+- Aceite dos termos gravado em `usuario_aceite_termos` com o `termos_id` vigente
+- Login antes da ativação → `403`, mensagem de conta não ativada e botão "Reenviar e-mail de ativação"
+- Ativação pelo link do backend (`?token=...&e=<empresaId>`) → login `200` → `/dashboard` com o menu completo do ROOT
+- Validações no navegador: CNPJ/CPF inválido, trocar tipo limpa o documento, senha curta/sem número/igual ao e-mail, confirmação diferente, submit sem aceitar termos; payload sem `cidade`/`estado`
+- Reenvio de ativação → `200` com resposta genérica e contagem regressiva de 120 s
+- axe (WCAG A/AA) sem violações em `/registro` e `/verifique-email`
+
+**Observações da API:**
+- Token de ativação valeu 1 hora em dev (a doc antiga citava 3 minutos)
+- Sem o parâmetro `e` (ou com o e-mail no lugar), a ativação falha: o backend procura o token no schema `public`
+
+**Não testado:** CORS e rate limit/captcha em produção; isolamento entre tenants (segunda empresa ainda pendente — o e-mail `camposolution.suporte@gmail.com` está livre para isso).

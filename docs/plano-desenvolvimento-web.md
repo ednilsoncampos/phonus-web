@@ -31,10 +31,10 @@
 
 ### 0.3 Deploy
 - [x] Criar `vercel.json` com redirecionamento SPA
-- [ ] Commitar projeto no GitHub
-- [ ] Conectar repositório no Vercel
+- [x] Commitar projeto no GitHub
+- [x] Conectar repositório no Vercel
 - [ ] Configurar variável `NG_APP_API_URL` no Vercel (Production e Preview)
-- [ ] Validar deploy de teste na branch `main`
+- [x] Validar deploy de teste na branch `main` (web publicado na Vercel e funcionando — confirmado pelo usuário em 2026-09-29)
 
 ---
 
@@ -546,6 +546,38 @@ Antes só via Dashboard (por acidente). Agora vê, de forma intencional: **Dashb
 
 ---
 
+## Etapa 18 — Cadastro de empresa pelo web (opção B)
+
+> Decisão (2026-09-29): levar ao web só o formulário de cadastro e a tela "Verifique seu e-mail". A ativação da conta e o
+> reset de senha continuam nas páginas HTML do backend. Detalhes de contrato e decisões em
+> `docs/plano-implementacao-web.md` (Módulo 1, itens 1.5 a 1.8). Origem: `claude-analise/correcoes-e-melhorias-web.txt`.
+
+### 18.1 Implementação ✅
+- [x] `AuthService.registrar(RegistroRequest)` → `POST /auth/registro`; modelo `RegistroRequest` em `auth.model.ts`
+- [x] `shared/validators/documento.validator.ts` — CPF/CNPJ pelos dígitos verificadores e validador de grupo que acompanha o `tipoDocumento`
+- [x] `RegisterComponent` (`/registro`) — busca `GET /termos/atual`, exige aceite, envia `termosId`; reaproveita `senha.validator.ts` (`senhaForteValidator`, `senhaDiferenteDeEmailValidator`, `senhasConferemValidator`); tratamento de `409`/`400`/`429`
+- [x] `VerifyEmailComponent` (`/verifique-email`) — e-mail vem do `navigation state`; sem ele, pede o e-mail; reenvio via `POST /auth/reenviar-ativacao` com contagem de 120 s
+- [x] Rotas públicas `registro` e `verifique-email` + link "Criar conta" no login
+- [x] Payload sem `cidade`/`estado` (não existem no `OnboardingRequest` do swagger)
+
+### 18.2 Validação ✅
+- [x] Testes unitários (validadores, `RegisterComponent`, `VerifyEmailComponent`, `AuthService.registrar`) — suíte completa: 291 testes / 53 arquivos
+- [x] Build de produção sem warnings
+- [x] Navegador (Playwright/Edge): cadastro real, `/verifique-email`, login `403` antes da ativação, ativação, login e dashboard do ROOT; ver `docs/homologacao/sequencia-testes.md` (2026-09-29)
+- [x] axe (WCAG A/AA) sem violações nas duas telas
+- [x] Documento duplicado confirmado em dev: `409` `CPF/CNPJ já cadastrado`
+
+### 18.3 Pendências
+- [ ] CORS: incluir a origem do web (staging/prod) em `CORS_ALLOWED_ORIGINS` no backend
+- [ ] Rate limit e/ou captcha em `/auth/registro` (endpoint público que cria schema) — não documentado no swagger
+- [ ] Atualizar o swagger com o `409` de documento duplicado
+- [ ] Módulo 12 "Primeiros passos do ROOT" — adiado
+- [ ] Migrar ativação/reset para o web — futuro, exige o backend apontar os links do e-mail para o web
+- [ ] Termos exibidos em markdown cru (`##`, `**`) — igual ao preview já existente; renderizar markdown é melhoria opcional
+- [ ] Contraste dos links "Esqueceu a senha?" e "Criar conta" no login (verde `#0d9f5a` sobre branco, ~3,4:1) — pré-existente, não corrigido
+
+---
+
 ## Resumo das Etapas
 
 | Etapa | Descrição | Depende de |
@@ -568,3 +600,4 @@ Antes só via Dashboard (por acidente). Agora vê, de forma intencional: **Dashb
 | 15 | Testes de Homologação | 14 |
 | 16 | Permissões centralizadas (`permissoes[]`) | 3, 5, 7, 8, 9 |
 | 17 | Deploy Final | 15, 16 |
+| 18 | Cadastro de empresa pelo web (opção B) | 1, 9, 14 |

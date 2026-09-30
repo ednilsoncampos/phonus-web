@@ -101,6 +101,20 @@ src/styles/
 |---|---|---|
 | 0 | Configuração do projeto | ✅ Concluída |
 | 1 | Autenticação + Shell | ✅ Concluída |
+| 2 a 11 | Dashboard, Usuários, Categorias, Produtos, Estoque, Clientes, Fornecedores, Termos, Margem, Assinaturas | ✅ Concluídas |
+| 12 | Testes Unitários | ✅ Concluída |
+| 13 | Qualidade e Acessibilidade | ✅ Concluída |
+| 14 | Correções de Contrato (Homologação) | ✅ Concluída |
+| 15 | Testes de Homologação | 🟡 Parcial (falta 2ª empresa/isolamento entre tenants) |
+| 16 | Permissões centralizadas (`permissoes[]`) | ✅ Concluída |
+| 17 | Deploy Final | 🟡 Web publicado na Vercel e funcionando; checklist individual não verificado |
+| 18 | Cadastro de empresa pelo web (opção B: `/registro` + `/verifique-email`; ativação no backend) | ✅ Concluída (pendências de backend: CORS, rate limit/captcha) |
+
+Fonte de verdade do progresso: `docs/plano-desenvolvimento-web.md` (Resumo das Etapas).
+
+---|---|---|
+| 0 | Configuração do projeto | ✅ Concluída |
+| 1 | Autenticação + Shell | ✅ Concluída |
 | 2 | Dashboard | ⬜ Próxima |
 | 3 | Usuários | ⬜ |
 | 4 | Categorias | ⬜ |
@@ -121,7 +135,7 @@ src/styles/
 
 - Backend local: `http://localhost:8080/api/v1`
 - Backend prod: `process.env['NG_APP_API_URL']` (configurar no Vercel)
-- Auth: `POST /auth/login`, `GET /auth/me`, `POST /auth/refresh`, `POST /auth/esqueceu-senha`
+- Auth: `POST /auth/login`, `GET /auth/me`, `POST /auth/refresh`, `POST /auth/esqueceu-senha`, `POST /auth/registro`, `POST /auth/reenviar-ativacao`
 - Paginação: `PageResponse<T>` — `{ content, page, size, totalElements, totalPages, last }`
 - Endpoints paginados: produtos, clientes, fornecedores, estoque/movimentacoes
 - Endpoints sem paginação (array): usuários, categorias, termos

@@ -8,6 +8,16 @@ export interface LoginRequest {
   senha: string;
 }
 
+export interface RegistroRequest {
+  nomeEmpresa: string;
+  tipoDocumento: 'CNPJ' | 'CPF';
+  documento: string;
+  nome: string;
+  email: string;
+  senha: string;
+  termosId: string;
+}
+
 export interface RefreshRequest {
   refreshToken: string;
 }
