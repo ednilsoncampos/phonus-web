@@ -101,6 +101,26 @@ describe('AuthService', () => {
     expect(saveSpy).toHaveBeenCalledWith('newAcc', 'newRef');
   });
 
+  it('registrar faz POST /auth/registro com o corpo correto', () => {
+    const body = {
+      nomeEmpresa: 'Padaria do João',
+      tipoDocumento: 'CNPJ' as const,
+      documento: '11222333000181',
+      nome: 'João da Silva',
+      email: 'joao@padaria.com.br',
+      senha: 'senha1234',
+      termosId: 'termos-1',
+    };
+
+    service.registrar(body).subscribe();
+
+    const req = httpMock.expectOne(
+      (r) => r.url.endsWith('/auth/registro') && r.method === 'POST',
+    );
+    expect(req.request.body).toEqual(body);
+    req.flush({}, { status: 201, statusText: 'Created' });
+  });
+
   it('alterarSenha faz PUT /auth/senha com o corpo correto', () => {
     service.alterarSenha({ senhaAtual: 'atual123', novaSenha: 'novaSenha123' }).subscribe();
 
