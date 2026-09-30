@@ -29,14 +29,9 @@ rodar o primeiro deploy em produção. Nada aqui exige mudança no repositório.
 
 ## 3. Variáveis de ambiente
 
-| Variável | Onde configurar | Valor |
-|---|---|---|
-| `NG_APP_API_URL` | Vercel → Project Settings → Environment Variables | URL base da API em produção (ex.: `https://api.phonus.com.br/api/v1`) |
-
-- [ ] Definir `NG_APP_API_URL` no ambiente **Production**
-- [ ] Definir `NG_APP_API_URL` no ambiente **Preview** (pode apontar para uma API de homologação, se existir)
-- `src/environments/environment.prod.ts` já lê essa variável via `process.env['NG_APP_API_URL']` — não há
-  outras chaves ou segredos no build de produção (`devCredentials` é `null`)
+Nenhuma. A URL da API de produção (`https://phonus.camposolution.com.br/api/v1`) está fixa em
+`src/environments/environment.prod.ts`. O builder do Angular não injeta `process.env` no navegador,
+então uma variável `NG_APP_API_URL` na Vercel não teria efeito.
 
 ## 4. Branch e deploy
 
