@@ -64,4 +64,26 @@ describe('TermosService', () => {
     expect(result?.ativo).toBe(true);
     expect(result?.titulo).toBe('Termos de Uso');
   });
+
+  it('statusAceite faz GET /termos/aceite/status', () => {
+    let result: { termosId: string; versao: string; aceito: boolean } | undefined;
+    service.statusAceite().subscribe((r) => (result = r));
+
+    httpMock
+      .expectOne((r) => r.url.endsWith('/termos/aceite/status'))
+      .flush({ termosId: 't1', versao: '1.0', aceito: false });
+
+    expect(result?.aceito).toBe(false);
+    expect(result?.termosId).toBe('t1');
+  });
+
+  it('aceitar faz POST /termos/aceite com o termosId', () => {
+    service.aceitar('t1').subscribe();
+
+    const req = httpMock.expectOne(
+      (r) => r.url.endsWith('/termos/aceite') && r.method === 'POST',
+    );
+    expect(req.request.body).toEqual({ termosId: 't1' });
+    req.flush(null);
+  });
 });

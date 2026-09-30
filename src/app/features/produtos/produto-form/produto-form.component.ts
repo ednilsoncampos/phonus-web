@@ -140,9 +140,9 @@ export class ProdutoFormComponent implements OnInit {
       : this.produtoService.criar(body);
 
     req$.subscribe({
-      next: () => {
+      next: (produto) => {
         this.salvando.set(false);
-        this.router.navigate(['/produtos']);
+        this.router.navigate(['/produtos', produto.id]);
       },
       error: (err) => {
         this.salvando.set(false);

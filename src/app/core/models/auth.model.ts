@@ -11,3 +11,8 @@ export interface LoginRequest {
 export interface RefreshRequest {
   refreshToken: string;
 }
+
+export interface AlterarSenhaRequest {
+  senhaAtual: string;
+  novaSenha: string;
+}

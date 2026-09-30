@@ -11,6 +11,7 @@ import { Produto } from '../../../core/models/produto.model';
 const mockProduto: Produto = {
   id: 'p1',
   nome: 'Produto Teste',
+  categoriaId: 'cat1',
   precoVenda: 2000,
   precoCusto: 1200,
   quantidadeEstoque: 5,
@@ -61,7 +62,14 @@ describe('ProdutoFormComponent — modo criação', () => {
     fixture.detectChanges();
     const comp = fixture.componentInstance;
 
-    comp.form.patchValue({ nome: 'Produto X', precoVenda: 20, unidadeMedida: 'UN', estoqueMinimo: 1 });
+    comp.form.patchValue({
+      nome: 'Produto X',
+      categoriaId: 'cat1',
+      precoVenda: 20,
+      precoCusto: 10,
+      unidadeMedida: 'UN',
+      estoqueMinimo: 1,
+    });
     comp.salvar();
 
     expect(produtoService.criar).toHaveBeenCalledWith(
@@ -78,7 +86,14 @@ describe('ProdutoFormComponent — modo criação', () => {
     fixture.detectChanges();
     const comp = fixture.componentInstance;
 
-    comp.form.patchValue({ nome: 'Produto X', precoVenda: 10, unidadeMedida: 'UN', estoqueMinimo: 0 });
+    comp.form.patchValue({
+      nome: 'Produto X',
+      categoriaId: 'cat1',
+      precoVenda: 10,
+      precoCusto: 5,
+      unidadeMedida: 'UN',
+      estoqueMinimo: 1,
+    });
     comp.salvar();
 
     expect(comp.erro()).toBe('Nome duplicado.');

@@ -2,14 +2,14 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { Component, signal } from '@angular/core';
 import { SidebarComponent } from './sidebar.component';
 import { AuthService } from '../../core/auth/auth.service';
+import { Permissao } from '../../core/models/usuario.model';
 
 describe('SidebarComponent — visibleItems', () => {
   let authService: AuthService;
 
-  function setup(papel: string | null) {
+  function setup(permissoes: Permissao[]) {
     TestBed.configureTestingModule({
       imports: [SidebarComponent],
       providers: [
@@ -19,56 +19,49 @@ describe('SidebarComponent — visibleItems', () => {
       ],
     });
     authService = TestBed.inject(AuthService);
-    vi.spyOn(authService, 'papel').mockReturnValue(papel as any);
+    vi.spyOn(authService, 'permissoes').mockReturnValue(permissoes);
   }
 
-  it('OPERADOR vê apenas Dashboard', () => {
-    setup('OPERADOR');
+  it('OPERADOR (sem CADASTROS_GERENCIAR/ESTOQUE_GERENCIAR/USUARIOS_GERENCIAR) vê Dashboard, Lançamentos e cadastros de leitura', () => {
+    setup(['LANCAMENTOS_REGISTRAR', 'FINANCEIRO_CONSULTAR', 'CADASTROS_CONSULTAR', 'CONTA_PROPRIA']);
 
     const fixture = TestBed.createComponent(SidebarComponent);
     fixture.detectChanges();
 
     const component = fixture.componentInstance as any;
-    const items: { route: string }[] = component.visibleItems();
-    expect(items.every((i) => i.route === '/dashboard')).toBe(true);
-    expect(items).toHaveLength(1);
+    const routes: string[] = component.visibleItems().map((i: { route: string }) => i.route);
+    expect(routes).toEqual(
+      expect.arrayContaining(['/dashboard', '/lancamentos', '/produtos', '/clientes', '/fornecedores', '/categorias/produto', '/categorias/lancamento']),
+    );
+    expect(routes).not.toContain('/estoque');
+    expect(routes).not.toContain('/usuarios');
+    expect(routes).not.toContain('/termos');
+    expect(routes).not.toContain('/relatorios/margem');
   });
 
-  it('ADMIN vê Dashboard e outros itens restritos a ADMIN', () => {
-    setup('ADMIN');
+  it('ADMIN vê Dashboard e cadastros, mas não Termos', () => {
+    setup([
+      'LANCAMENTOS_REGISTRAR', 'FINANCEIRO_CONSULTAR', 'CADASTROS_CONSULTAR',
+      'CADASTROS_GERENCIAR', 'ESTOQUE_GERENCIAR', 'USUARIOS_GERENCIAR', 'CONTA_PROPRIA',
+    ]);
 
     const fixture = TestBed.createComponent(SidebarComponent);
     fixture.detectChanges();
 
     const component = fixture.componentInstance as any;
-    const items: { route: string }[] = component.visibleItems();
-    const routes = items.map((i) => i.route);
+    const routes: string[] = component.visibleItems().map((i: { route: string }) => i.route);
     expect(routes).toContain('/dashboard');
     expect(routes).toContain('/produtos');
     expect(routes).not.toContain('/termos');
   });
 
-  it('ROOT vê todos os itens incluindo Termos', () => {
-    setup('ROOT');
+  it('sem permissões nenhum item aparece', () => {
+    setup([]);
 
     const fixture = TestBed.createComponent(SidebarComponent);
     fixture.detectChanges();
 
     const component = fixture.componentInstance as any;
-    const items: { route: string }[] = component.visibleItems();
-    const routes = items.map((i) => i.route);
-    expect(routes).toContain('/termos');
-    expect(routes).toContain('/dashboard');
-  });
-
-  it('null papel vê apenas itens com roles === null', () => {
-    setup(null);
-
-    const fixture = TestBed.createComponent(SidebarComponent);
-    fixture.detectChanges();
-
-    const component = fixture.componentInstance as any;
-    const items: { roles: string[] | null }[] = component.visibleItems();
-    expect(items.every((i) => i.roles === null)).toBe(true);
+    expect(component.visibleItems()).toHaveLength(0);
   });
 });

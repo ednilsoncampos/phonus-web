@@ -50,8 +50,11 @@ export class DashboardComponent implements OnInit {
   readonly erro = signal<string | null>(null);
   private readonly dados = signal<DashboardData | null>(null);
 
-  readonly podeVerAtalhos = computed(() =>
-    this.authService.hasRole('ROOT', 'ADMIN', 'SUPER_ROOT'),
+  readonly podeGerenciarCadastros = computed(() => this.authService.hasPermissao('CADASTROS_GERENCIAR'));
+  readonly podeGerenciarEstoque = computed(() => this.authService.hasPermissao('ESTOQUE_GERENCIAR'));
+  readonly podeGerenciarUsuarios = computed(() => this.authService.hasPermissao('USUARIOS_GERENCIAR'));
+  readonly temAtalhos = computed(() =>
+    this.podeGerenciarCadastros() || this.podeGerenciarEstoque() || this.podeGerenciarUsuarios(),
   );
 
   readonly saudacao = computed(() => {

@@ -11,11 +11,13 @@
   </div>
 } @else if (produto()) {
   <app-page-header [title]="produto()!.nome" subtitle="Detalhe do produto">
-    <button mat-stroked-button (click)="irEstoque()">
-      <mat-icon>inventory</mat-icon>
-      Histórico de estoque
-    </button>
-    @if (produto()!.ativo) {
+    @if (auth.hasPermissao('ESTOQUE_GERENCIAR')) {
+      <button mat-stroked-button (click)="irEstoque()">
+        <mat-icon>inventory</mat-icon>
+        Histórico de estoque
+      </button>
+    }
+    @if (produto()!.ativo && auth.hasPermissao('CADASTROS_GERENCIAR')) {
       <button mat-stroked-button color="warn" (click)="confirmarDesativar()">
         <mat-icon>block</mat-icon>
         Desativar

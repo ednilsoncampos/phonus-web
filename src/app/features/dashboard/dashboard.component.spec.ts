@@ -32,6 +32,7 @@ describe('DashboardComponent', () => {
 
     vi.spyOn(dashboardService, 'carregar').mockReturnValue(of(mockData));
     vi.spyOn(authService, 'hasRole').mockReturnValue(true);
+    vi.spyOn(authService, 'hasPermissao').mockReturnValue(true);
   });
 
   it('carregar preenche kpiCards com 5 cards', () => {
@@ -60,7 +61,7 @@ describe('DashboardComponent', () => {
       nome: 'João',
       email: 'j@j.com',
       papel: 'ADMIN',
-      ativo: true,
+      status: 'ATIVO',
     });
     const fixture = TestBed.createComponent(DashboardComponent);
     fixture.detectChanges();
@@ -91,6 +92,28 @@ describe('DashboardComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(cardComRoute.route, {
       queryParams: cardComRoute.queryParams,
     });
+  });
+
+  it('temAtalhos é false quando o usuário não tem nenhuma das permissões de gestão', () => {
+    vi.spyOn(authService, 'hasPermissao').mockReturnValue(false);
+    const fixture = TestBed.createComponent(DashboardComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    expect(comp.temAtalhos()).toBe(false);
+  });
+
+  it('temAtalhos é true quando o usuário tem só CADASTROS_GERENCIAR', () => {
+    vi.spyOn(authService, 'hasPermissao').mockImplementation(
+      (...permissoes) => permissoes.includes('CADASTROS_GERENCIAR' as any),
+    );
+    const fixture = TestBed.createComponent(DashboardComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    expect(comp.podeGerenciarCadastros()).toBe(true);
+    expect(comp.podeGerenciarEstoque()).toBe(false);
+    expect(comp.temAtalhos()).toBe(true);
   });
 
   it('navegar(card sem route) não chama router.navigate', () => {

@@ -13,6 +13,24 @@
       </div>
     }
 
+    @if (showResendActivation()) {
+      <button
+        mat-stroked-button
+        type="button"
+        class="login-resend"
+        [disabled]="isResending() || resendCooldown() > 0"
+        (click)="reenviarAtivacao()"
+      >
+        @if (isResending()) {
+          <mat-spinner diameter="18" aria-hidden="true" />
+        } @else if (resendCooldown() > 0) {
+          Aguarde {{ resendCooldown() }}s para reenviar
+        } @else {
+          Reenviar e-mail de ativação
+        }
+      </button>
+    }
+
     <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
       <mat-form-field appearance="outline" class="login-field">
         <mat-label>E-mail</mat-label>
@@ -57,11 +75,13 @@
         mat-flat-button
         class="login-btn"
         type="submit"
-        [disabled]="isLoading()"
+        [disabled]="isLoading() || loginBlockedSeconds() > 0"
         aria-label="Entrar"
       >
         @if (isLoading()) {
           <mat-spinner diameter="20" aria-hidden="true" />
+        } @else if (loginBlockedSeconds() > 0) {
+          Aguarde {{ loginBlockedSeconds() }}s
         } @else {
           Entrar
         }

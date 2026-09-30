@@ -49,34 +49,50 @@
       <ng-container matColumnDef="status">
         <th mat-header-cell *matHeaderCellDef>Status</th>
         <td mat-cell *matCellDef="let u">
-          <span
-            [class]="u.ativo ? 'status-ativo' : 'status-inativo'"
-            [attr.aria-label]="u.ativo ? 'Ativo' : 'Inativo'"
-          >
-            {{ u.ativo ? 'Ativo' : 'Inativo' }}
-          </span>
+          @switch (u.status) {
+            @case ('ATIVO') {
+              <span class="status-ativo">Ativo</span>
+            }
+            @case ('CONVIDADO') {
+              <span class="status-convidado">Convidado</span>
+            }
+            @default {
+              <span class="status-inativo">Inativo</span>
+            }
+          }
         </td>
       </ng-container>
 
       <ng-container matColumnDef="acoes">
         <th mat-header-cell *matHeaderCellDef class="col-acoes"></th>
         <td mat-cell *matCellDef="let u" class="col-acoes">
-          @if (!u.ativo) {
+          @if (podeReenviarConvite(u)) {
             <button
               mat-icon-button
-              matTooltip="Reenviar convite por e-mail"
+              [matTooltip]="cooldownRestante(u.id) > 0
+                ? 'Aguarde ' + cooldownRestante(u.id) + 's para reenviar'
+                : 'Reenviar convite por e-mail'"
               [attr.aria-label]="'Reenviar convite para ' + u.nome"
-              [disabled]="reenviandoPara() === u.id"
+              [disabled]="reenviandoPara() === u.id || cooldownRestante(u.id) > 0"
               (click)="reenviarConvite(u)"
             >
               <mat-icon>forward_to_inbox</mat-icon>
             </button>
           }
+          @if (podeReativar(u)) {
+            <button
+              mat-icon-button
+              matTooltip="Reativar"
+              [attr.aria-label]="'Reativar ' + u.nome"
+              (click)="confirmarReativar(u)"
+            >
+              <mat-icon>person_check</mat-icon>
+            </button>
+          }
           @if (podeDesativar(u)) {
             <button
               mat-icon-button
-              [matTooltip]="u.ativo ? 'Desativar' : 'Usuário inativo'"
-              [disabled]="!u.ativo"
+              matTooltip="Desativar"
               [attr.aria-label]="'Desativar ' + u.nome"
               (click)="confirmarDesativar(u)"
             >

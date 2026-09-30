@@ -6,7 +6,7 @@ import { ConvidarUsuarioDialogComponent } from './convidar-usuario-dialog.compon
 import { UsuarioService } from '../../../core/services/usuario.service';
 import { Usuario } from '../../../core/models/usuario.model';
 
-const mockUsuario: Usuario = { id: 'u2', nome: 'Novo', email: 'n@n.com', papel: 'OPERADOR', ativo: true };
+const mockUsuario: Usuario = { id: 'u2', nome: 'Novo', email: 'n@n.com', papel: 'OPERADOR', status: 'CONVIDADO' };
 const dialogRefMock = { close: vi.fn() };
 
 describe('ConvidarUsuarioDialogComponent — papelDoConvidante ADMIN', () => {

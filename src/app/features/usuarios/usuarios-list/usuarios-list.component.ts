@@ -3,6 +3,7 @@ import {
   Component,
   computed,
   inject,
+  OnDestroy,
   OnInit,
   signal,
 } from '@angular/core';
@@ -22,6 +23,8 @@ import {
   ConvidarUsuarioDialogComponent,
   ConvidarUsuarioDialogData,
 } from '../convidar-usuario-dialog/convidar-usuario-dialog.component';
+
+const REENVIO_COOLDOWN_SECONDS = 120;
 
 const PAPEL_CONFIG: Record<Papel, { label: string; css: string }> = {
   SUPER_ROOT: { label: 'Super Root', css: 'badge--purple' },
@@ -44,7 +47,7 @@ const PAPEL_CONFIG: Record<Papel, { label: string; css: string }> = {
   templateUrl: './usuarios-list.component.html',
   styleUrl: './usuarios-list.component.scss',
 })
-export class UsuariosListComponent implements OnInit {
+export class UsuariosListComponent implements OnInit, OnDestroy {
   private readonly usuarioService = inject(UsuarioService);
   private readonly authService = inject(AuthService);
   private readonly dialog = inject(MatDialog);
@@ -55,13 +58,44 @@ export class UsuariosListComponent implements OnInit {
   readonly erro = signal<string | null>(null);
   readonly usuarios = signal<Usuario[]>([]);
   readonly reenviandoPara = signal<string | null>(null);
+  readonly cooldowns = signal<Record<string, number>>({});
+  private cooldownTimer?: ReturnType<typeof setInterval>;
 
   readonly podeConvidar = computed(() =>
-    this.authService.hasRole('SUPER_ROOT', 'ROOT', 'ADMIN'),
+    this.authService.hasPermissao('USUARIOS_GERENCIAR'),
   );
 
   ngOnInit(): void {
     this.carregar();
+  }
+
+  ngOnDestroy(): void {
+    if (this.cooldownTimer) clearInterval(this.cooldownTimer);
+  }
+
+  cooldownRestante(usuarioId: string): number {
+    return this.cooldowns()[usuarioId] ?? 0;
+  }
+
+  private iniciarCooldown(usuarioId: string): void {
+    this.cooldowns.update((map) => ({ ...map, [usuarioId]: REENVIO_COOLDOWN_SECONDS }));
+
+    if (this.cooldownTimer) return;
+
+    this.cooldownTimer = setInterval(() => {
+      this.cooldowns.update((map) => {
+        const next: Record<string, number> = {};
+        for (const [id, seconds] of Object.entries(map)) {
+          if (seconds - 1 > 0) next[id] = seconds - 1;
+        }
+        return next;
+      });
+
+      if (Object.keys(this.cooldowns()).length === 0 && this.cooldownTimer) {
+        clearInterval(this.cooldownTimer);
+        this.cooldownTimer = undefined;
+      }
+    }, 1000);
   }
 
   carregar(): void {
@@ -88,8 +122,25 @@ export class UsuariosListComponent implements OnInit {
     return `badge ${PAPEL_CONFIG[papel]?.css ?? ''}`;
   }
 
+  private podeGerenciar(usuario: Usuario): boolean {
+    if (usuario.papel === 'SUPER_ROOT') return false;
+    if (usuario.id === this.authService.currentUser()?.id) return false;
+
+    const meuPapel = this.authService.papel();
+    if (meuPapel === 'ADMIN') return usuario.papel === 'OPERADOR';
+    return meuPapel === 'ROOT' || meuPapel === 'SUPER_ROOT';
+  }
+
   podeDesativar(usuario: Usuario): boolean {
-    return usuario.papel !== 'SUPER_ROOT';
+    return usuario.status === 'ATIVO' && this.podeGerenciar(usuario);
+  }
+
+  podeReativar(usuario: Usuario): boolean {
+    return usuario.status === 'INATIVO' && this.podeGerenciar(usuario);
+  }
+
+  podeReenviarConvite(usuario: Usuario): boolean {
+    return usuario.status === 'CONVIDADO';
   }
 
   abrirConvidar(): void {
@@ -113,11 +164,14 @@ export class UsuariosListComponent implements OnInit {
   }
 
   reenviarConvite(usuario: Usuario): void {
+    if (this.cooldownRestante(usuario.id) > 0) return;
+
     this.reenviandoPara.set(usuario.id);
 
     this.authService.reenviarAtivacao(usuario.email).subscribe({
       next: () => {
         this.reenviandoPara.set(null);
+        this.iniciarCooldown(usuario.id);
         this.snackBar.open(
           `Convite reenviado para ${usuario.email}! Peça ao usuário para verificar o e-mail e a pasta de spam.`,
           'Fechar',
@@ -126,6 +180,7 @@ export class UsuariosListComponent implements OnInit {
       },
       error: () => {
         this.reenviandoPara.set(null);
+        this.iniciarCooldown(usuario.id);
         this.snackBar.open(
           'Não foi possível reenviar o convite. Tente novamente.',
           'Fechar',
@@ -150,11 +205,45 @@ export class UsuariosListComponent implements OnInit {
       this.usuarioService.desativar(usuario.id).subscribe({
         next: () => {
           this.usuarios.update((lista) =>
-            lista.map((u) => (u.id === usuario.id ? { ...u, ativo: false } : u)),
+            lista.map((u) => (u.id === usuario.id ? { ...u, status: 'INATIVO' } : u)),
           );
         },
         error: () => {
           // erro silencioso — o usuário pode tentar novamente via reload
+        },
+      });
+    });
+  }
+
+  confirmarReativar(usuario: Usuario): void {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Reativar usuário',
+        message: `Deseja reativar o usuário "${usuario.nome}"? Ele voltará a ter acesso ao sistema com a senha atual.`,
+        confirmLabel: 'Reativar',
+      },
+    });
+
+    ref.afterClosed().subscribe((confirmado: boolean) => {
+      if (!confirmado) return;
+
+      this.usuarioService.reativar(usuario.id).subscribe({
+        next: () => {
+          this.usuarios.update((lista) =>
+            lista.map((u) => (u.id === usuario.id ? { ...u, status: 'ATIVO' } : u)),
+          );
+          this.snackBar.open(`${usuario.nome} foi reativado(a).`, 'Fechar', {
+            duration: 6000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-success'],
+          });
+        },
+        error: (err) => {
+          if (err?.status === 422) {
+            this.snackBar.open(
+              err?.error?.message ?? 'Não foi possível reativar este usuário.',
+              'Fechar',
+              { duration: 7000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-error'] },
+            );
+          }
         },
       });
     });

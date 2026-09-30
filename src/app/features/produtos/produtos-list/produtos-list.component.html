@@ -1,8 +1,10 @@
 <app-page-header title="Produtos">
-  <button mat-flat-button color="primary" (click)="novo()">
-    <mat-icon>add</mat-icon>
-    Novo produto
-  </button>
+  @if (auth.hasPermissao('CADASTROS_GERENCIAR')) {
+    <button mat-flat-button color="primary" (click)="novo()">
+      <mat-icon>add</mat-icon>
+      Novo produto
+    </button>
+  }
 </app-page-header>
 
 <!-- Filtros -->

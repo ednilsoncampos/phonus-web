@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { AuthService } from '../../../core/auth/auth.service';
 import { CategoriaLancamentoService } from '../../../core/services/categoria-lancamento.service';
 import { CategoriaLancamento, TipoCategoria } from '../../../core/models/categoria-lancamento.model';
 import { PageHeaderComponent } from '../../../shared/components/page-header/page-header.component';
@@ -48,6 +49,7 @@ const TIPO_CSS: Record<TipoCategoria, string> = {
 export class CategoriasLancamentoComponent implements OnInit {
   private readonly service = inject(CategoriaLancamentoService);
   private readonly dialog = inject(MatDialog);
+  protected readonly auth = inject(AuthService);
 
   readonly colunas = ['nome', 'tipo', 'status', 'acoes'];
   readonly carregando = signal(false);

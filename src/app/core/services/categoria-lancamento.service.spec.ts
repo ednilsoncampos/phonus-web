@@ -7,7 +7,7 @@ import { CategoriaLancamento } from '../models/categoria-lancamento.model';
 const mockCategoria: CategoriaLancamento = {
   id: 'cat1',
   nome: 'Alimentação',
-  tipo: 'SAIDA',
+  tipo: 'SAIDA_CAIXA',
   ativo: true,
 };
 
@@ -31,24 +31,24 @@ describe('CategoriaLancamentoService', () => {
 
     httpMock.expectOne((r) => r.url.endsWith('/categorias-lancamento')).flush([mockCategoria]);
     expect(result).toHaveLength(1);
-    expect(result![0].tipo).toBe('SAIDA');
+    expect(result![0].tipo).toBe('SAIDA_CAIXA');
   });
 
   it('criar faz POST /categorias-lancamento com os dados corretos', () => {
     let result: CategoriaLancamento | undefined;
-    service.criar({ nome: 'Salário', tipo: 'ENTRADA' }).subscribe((r) => (result = r));
+    service.criar({ nome: 'Salário', tipo: 'ENTRADA_CAIXA' }).subscribe((r) => (result = r));
 
     const req = httpMock.expectOne(
       (r) => r.url.endsWith('/categorias-lancamento') && r.method === 'POST',
     );
     expect(req.request.body.nome).toBe('Salário');
-    expect(req.request.body.tipo).toBe('ENTRADA');
-    req.flush({ ...mockCategoria, nome: 'Salário', tipo: 'ENTRADA' });
+    expect(req.request.body.tipo).toBe('ENTRADA_CAIXA');
+    req.flush({ ...mockCategoria, nome: 'Salário', tipo: 'ENTRADA_CAIXA' });
     expect(result?.nome).toBe('Salário');
   });
 
   it('editar faz PUT /categorias-lancamento/:id', () => {
-    service.editar('cat1', { nome: 'Alimentação Editada', tipo: 'AMBOS', ativo: false }).subscribe();
+    service.editar('cat1', { nome: 'Alimentação Editada', tipo: 'ENTRADA_CAIXA', ativo: false }).subscribe();
 
     const req = httpMock.expectOne(
       (r) => r.url.endsWith('/categorias-lancamento/cat1') && r.method === 'PUT',

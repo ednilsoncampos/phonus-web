@@ -45,21 +45,27 @@
     </div>
 
     <!-- Atalhos rápidos -->
-    @if (podeVerAtalhos()) {
+    @if (temAtalhos()) {
       <p class="section-title">Atalhos rápidos</p>
       <div class="shortcuts">
-        <button mat-stroked-button color="primary" (click)="ir(['/produtos'], { acao: 'novo' })">
-          <mat-icon>add</mat-icon>
-          Novo produto
-        </button>
-        <button mat-stroked-button color="primary" (click)="ir(['/estoque'])">
-          <mat-icon>inventory</mat-icon>
-          Ajustar estoque
-        </button>
-        <button mat-stroked-button color="primary" (click)="ir(['/usuarios'], { acao: 'convidar' })">
-          <mat-icon>person_add</mat-icon>
-          Convidar usuário
-        </button>
+        @if (podeGerenciarCadastros()) {
+          <button mat-stroked-button color="primary" (click)="ir(['/produtos'], { acao: 'novo' })">
+            <mat-icon>add</mat-icon>
+            Novo produto
+          </button>
+        }
+        @if (podeGerenciarEstoque()) {
+          <button mat-stroked-button color="primary" (click)="ir(['/estoque'])">
+            <mat-icon>inventory</mat-icon>
+            Ajustar estoque
+          </button>
+        }
+        @if (podeGerenciarUsuarios()) {
+          <button mat-stroked-button color="primary" (click)="ir(['/usuarios'], { acao: 'convidar' })">
+            <mat-icon>person_add</mat-icon>
+            Convidar usuário
+          </button>
+        }
       </div>
     }
   }

@@ -1,6 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { ApiService } from '../api/api.service';
-import { CriarTermosRequest, Termos } from '../models/termos.model';
+import { CriarTermosRequest, StatusAceiteTermos, Termos } from '../models/termos.model';
 
 @Injectable({ providedIn: 'root' })
 export class TermosService {
@@ -16,5 +16,13 @@ export class TermosService {
 
   buscarAtual() {
     return this.api.get<Termos>('/termos/atual');
+  }
+
+  statusAceite() {
+    return this.api.get<StatusAceiteTermos>('/termos/aceite/status');
+  }
+
+  aceitar(termosId: string) {
+    return this.api.post<void>('/termos/aceite', { termosId });
   }
 }
