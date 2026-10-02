@@ -86,10 +86,95 @@ describe('LancamentoFormComponent', () => {
     fixture.detectChanges();
     const comp = fixture.componentInstance;
 
-    // ngOnInit já adiciona um item padrão para o usuário não começar com a lista vazia
-    expect(comp.itemGroups()).toHaveLength(1);
+    // itens são opcionais: o formulário começa sem nenhum
+    expect(comp.itemGroups()).toHaveLength(0);
     comp.adicionarItem();
-    expect(comp.itemGroups()).toHaveLength(2);
+    expect(comp.itemGroups()).toHaveLength(1);
+  });
+
+  it('avança do passo 1 sem itens', () => {
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.avancar();
+
+    expect(comp.passo()).toBe(2);
+  });
+
+  it('não avança do passo 1 com item sem produto', () => {
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.adicionarItem();
+    comp.avancar();
+
+    expect(comp.passo()).toBe(1);
+  });
+
+  it('exige descrição para avançar do passo 2 quando não há itens', () => {
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.avancar();
+    comp.form.controls.descricao.setValue('   ');
+    comp.avancar();
+    expect(comp.passo()).toBe(2);
+
+    comp.form.controls.descricao.setValue('Aluguel');
+    comp.avancar();
+    expect(comp.passo()).toBe(3);
+  });
+
+  it('não exige descrição quando há itens', () => {
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.adicionarItem();
+    expect(comp.form.controls.descricao.valid).toBe(true);
+    comp.removerItem(0);
+    expect(comp.form.controls.descricao.valid).toBe(false);
+  });
+
+  it('salvar sem itens envia a descrição informada e omite itens', () => {
+    const criarSpy = vi.spyOn(lancamentoService, 'criar').mockReturnValue(
+      of({ id: 'l1', usuarioId: 'u1', tipo: 'SAIDA_CAIXA', descricao: 'Aluguel', valorTotal: 100, formaPagamento: 'PIX', origem: 'TEXTO', dataLancamento: '2026-04-01', parcelas: [], itens: [] }),
+    );
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.form.patchValue({ descricao: ' Aluguel ', valorTotal: 1500 });
+    comp.salvar();
+
+    const body = criarSpy.mock.calls[0][0];
+    expect(body.descricao).toBe('Aluguel');
+    expect(body.valorTotal).toBe(150000);
+    expect(body.itens).toBeUndefined();
+  });
+
+  it('salvar com itens e descrição em branco usa os nomes dos produtos', () => {
+    const criarSpy = vi.spyOn(lancamentoService, 'criar').mockReturnValue(
+      of({ id: 'l1', usuarioId: 'u1', tipo: 'SAIDA_CAIXA', descricao: 'Produto A', valorTotal: 100, formaPagamento: 'PIX', origem: 'TEXTO', dataLancamento: '2026-04-01', parcelas: [], itens: [] }),
+    );
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.produtos.set([
+      { id: 'p1', nome: 'Produto A', precoVenda: 2500, quantidadeEstoque: 10, estoqueMinimo: 1, abaixoDoMinimo: false, unidadeMedida: 'UN', ativo: true, criadoPor: 'u1' },
+    ]);
+    comp.adicionarItem();
+    comp.itemGroups()[0].patchValue({ produtoId: 'p1' });
+    comp.form.patchValue({ valorTotal: 25 });
+    comp.salvar();
+
+    const body = criarSpy.mock.calls[0][0];
+    expect(body.descricao).toBe('Produto A');
+    expect(body.itens).toHaveLength(1);
   });
 
   it('removerItem remove o grupo correto do array', () => {
@@ -99,10 +184,10 @@ describe('LancamentoFormComponent', () => {
 
     comp.adicionarItem();
     comp.adicionarItem();
-    expect(comp.itemGroups()).toHaveLength(3);
+    expect(comp.itemGroups()).toHaveLength(2);
 
     comp.removerItem(0);
-    expect(comp.itemGroups()).toHaveLength(2);
+    expect(comp.itemGroups()).toHaveLength(1);
   });
 
   it('precoReferencia retorna o preço do produto pelo id', () => {

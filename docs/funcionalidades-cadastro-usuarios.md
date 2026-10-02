@@ -154,23 +154,17 @@ Conferido e sem divergência: campos do cadastro e do convite; limites (200/150/
 - **Entitlement de terceiros:** `GET /usuarios/{outroId}/entitlement` dá 403 para qualquer papel; por isso não aparece no detalhe do usuário.
 - **`/auth/ativar`:** não é chamado pelo web (ativação via link do e-mail no backend).
 
-### 8.4 Pendência de produto: lançamento sem itens (decisão em aberto)
+### 8.4 Lançamento sem itens (implementado)
 
-Fora do escopo de cadastro e usuários, mas descoberta nos testes de escopo financeiro.
+O backend trata `itens` como opcional (serviço, despesa, receita avulsa, venda pelo total). O wizard de `/lancamentos/novo`
+(`lancamento-form.component.ts`) foi ajustado:
 
-- **Backend:** `itens` é opcional em `LancamentoRequest` (padrão: lista vazia). `CriarLancamentoUseCase` só processa itens
-  se a lista não estiver vazia. O lançamento é o "fato econômico" (valor total, descrição, forma de pagamento); parcelas,
-  pagamentos e caixa não dependem de produto. O estoque só é movimentado quando há itens (venda baixa, compra repõe),
-  e é daí que vem o 422 "Estoque insuficiente".
-- **Casos reais sem item:** serviço de autônomo, despesas (aluguel, luz, imposto, salário), receitas avulsas (sinal,
-  adiantamento) e venda pelo total do dia. A entrada principal do produto é por voz ("recebi 300 do João"), sem produto.
-- **Web hoje:** o wizard de `/lancamentos/novo` (`lancamento-form.component.ts`, método `avancar()`) exige ao menos um
-  item com produto no passo 1 ("Adicione pelo menos um produto."). Para testar foi preciso criar categoria, produto
-  (estoque mínimo maior que zero) e dar entrada de estoque. Pela tela não dá para registrar serviço, despesa nem receita avulsa.
-- **Mudança proposta (não implementada):** tornar o passo 1 opcional (permitir avançar sem itens, mantendo produto,
-  quantidade e desconto quando houver); enviar `itens` vazio ou omitido; deixar o valor total sempre editável; conferir
-  como a lista e o detalhe do lançamento tratam um lançamento sem itens; atualizar testes do formulário e validar no navegador.
-- **A decidir:** se o passo "Itens" some do wizard ou vira opcional; e se o valor total continua preenchido a partir dos itens quando existirem.
+- O passo 1 ("Itens") continua no wizard, mas é **opcional**: começa sem nenhum item e permite avançar com a lista vazia.
+  Um item adicionado precisa ter produto e quantidade válidos.
+- O passo 2 ganhou o campo **Descrição**. **Sem itens ela é obrigatória** (informada pelo usuário, máx. 300). Com itens,
+  se ficar em branco, usa os nomes dos produtos (comportamento anterior).
+- Sem itens, o request omite `itens`. O valor total (passo 3) já era editável e obrigatório.
+- Lista e detalhe já tratavam lançamento sem itens.
 
 ## 9. Resumo de endpoints usados
 

@@ -77,8 +77,8 @@ export class LancamentoFormComponent implements OnInit {
 
   readonly form = this.fb.group({
     tipo:               ['SAIDA_CAIXA' as TipoLancamento, Validators.required],
-    descricao:          [''],
-    valorTotal:         [null as number | null, [Validators.required, Validators.min(0.01)]],
+    descricao:          ['', [Validators.required, Validators.maxLength(300)]],
+    valorTotal:        [null as number | null, [Validators.required, Validators.min(0.01)]],
     formaPagamento:     ['PIX' as FormaPagamento, Validators.required],
     dataLancamento:     ['', Validators.required],
     quantidadeParcelas: [1, [Validators.min(1)]],
@@ -150,20 +150,21 @@ export class LancamentoFormComponent implements OnInit {
     this.produtoService.listar({ size: 200, ativos: true }).subscribe({ next: (r) => { this.produtos.set(r.content); onLoad(); }, error: onLoad });
 
     this.itensArray.valueChanges.subscribe(() => this.calcularTotal());
-
-    this.adicionarItem();
+    this.atualizarObrigatoriedadeDescricao();
   }
 
   adicionarItem(): void {
     this.itensArray.insert(0, this.novoItemGroup());
     this.itemGroups.set([...this.itensArray.controls]);
     this.calcularTotal();
+    this.atualizarObrigatoriedadeDescricao();
   }
 
   removerItem(index: number): void {
     this.itensArray.removeAt(index);
     this.itemGroups.set([...this.itensArray.controls]);
     this.calcularTotal();
+    this.atualizarObrigatoriedadeDescricao();
   }
 
   precoReferencia(produtoId: string): number {
@@ -173,16 +174,14 @@ export class LancamentoFormComponent implements OnInit {
   avancar(): void {
     if (this.passo() === 1) {
       this.itensArray.controls.forEach((g) => g.markAllAsTouched());
-      if (this.itensArray.length === 0) {
-        this.erroItens.set('Adicione pelo menos um produto.');
-        return;
-      }
       if (this.itensArray.invalid) return;
       this.erroItens.set(null);
     } else if (this.passo() === 2) {
-      this.form.controls.tipo.markAsTouched();
-      this.form.controls.dataLancamento.markAsTouched();
-      if (this.form.controls.tipo.invalid || this.form.controls.dataLancamento.invalid) return;
+      const { tipo, dataLancamento, descricao } = this.form.controls;
+      tipo.markAsTouched();
+      dataLancamento.markAsTouched();
+      descricao.markAsTouched();
+      if (tipo.invalid || dataLancamento.invalid || descricao.invalid) return;
     }
     this.passo.update((p) => p + 1);
   }
@@ -194,23 +193,35 @@ export class LancamentoFormComponent implements OnInit {
   salvar(): void {
     this.form.controls.formaPagamento.markAsTouched();
     this.form.controls.valorTotal.markAsTouched();
-    if (this.form.controls.formaPagamento.invalid || this.form.controls.valorTotal.invalid) return;
-
-    const descricao = this.itensArray.controls
-      .map((g) => this.produtos().find((p) => p.id === g.get('produtoId')?.value)?.nome ?? '')
-      .filter((nome) => nome)
-      .join(', ')
-      .substring(0, 300);
-    this.form.controls.descricao.setValue(descricao);
+    this.form.controls.descricao.markAsTouched();
+    if (
+      this.form.controls.formaPagamento.invalid ||
+      this.form.controls.valorTotal.invalid ||
+      this.form.controls.descricao.invalid
+    ) return;
 
     this.salvando.set(true);
     this.erro.set(null);
 
     const raw = this.form.getRawValue();
+    const itens = this.itensArray.controls.map((g) => {
+      const produtoId = g.value.produtoId as string;
+      const produto = this.produtos().find((p) => p.id === produtoId);
+      return {
+        produtoId,
+        quantidade: g.value.quantidade as number,
+        desconto: Math.round((g.value.desconto ?? 0) * 100),
+        ...(raw.tipo === 'SAIDA_CAIXA'
+          ? { valorUnitario: produto?.precoCusto ?? produto?.precoVenda ?? 0 }
+          : {}),
+      };
+    });
+
+    const descricao = raw.descricao.trim() || this.descricaoDosItens();
 
     const body: CriarLancamentoRequest = {
       tipo:               raw.tipo,
-      descricao:          raw.descricao,
+      descricao,
       valorTotal:         Math.round((raw.valorTotal ?? 0) * 100),
       formaPagamento:     raw.formaPagamento,
       origem:             'TEXTO',
@@ -219,18 +230,7 @@ export class LancamentoFormComponent implements OnInit {
       categoriaId:        raw.categoriaId  || undefined,
       clienteId:          raw.clienteId    || undefined,
       fornecedorId:       raw.fornecedorId || undefined,
-      itens: this.itensArray.controls.map((g) => {
-        const produtoId = g.value.produtoId as string;
-        const produto = this.produtos().find((p) => p.id === produtoId);
-        return {
-          produtoId,
-          quantidade: g.value.quantidade as number,
-          desconto: Math.round((g.value.desconto ?? 0) * 100),
-          ...(raw.tipo === 'SAIDA_CAIXA'
-            ? { valorUnitario: produto?.precoCusto ?? produto?.precoVenda ?? 0 }
-            : {}),
-        };
-      }),
+      itens:              itens.length > 0 ? itens : undefined,
     };
 
     this.lancamentoService.criar(body).subscribe({
@@ -247,6 +247,24 @@ export class LancamentoFormComponent implements OnInit {
 
   cancelar(): void {
     this.router.navigate(['/lancamentos']);
+  }
+
+  private descricaoDosItens(): string {
+    return this.itensArray.controls
+      .map((g) => this.produtos().find((p) => p.id === g.get('produtoId')?.value)?.nome ?? '')
+      .filter((nome) => nome)
+      .join(', ')
+      .substring(0, 300);
+  }
+
+  // Sem itens a descrição é informada pelo usuário; com itens, vem dos nomes dos produtos se ficar em branco.
+  private atualizarObrigatoriedadeDescricao(): void {
+    const validadores = [Validators.maxLength(300)];
+    if (this.itensArray.length === 0) {
+      validadores.push(Validators.required, Validators.pattern(/\S/));
+    }
+    this.form.controls.descricao.setValidators(validadores);
+    this.form.controls.descricao.updateValueAndValidity();
   }
 
   private calcularTotal(): void {
