@@ -9,7 +9,7 @@ import { Fornecedor } from '../../../core/models/fornecedor.model';
 const mockFornecedor: Fornecedor = {
   id: 'f1',
   nome: 'Distribuidora ABC',
-  documento: '12.345.678/0001-00',
+  documento: '11.222.333/0001-81',
   email: 'contato@distribuidora.com',
   telefone: '(11) 3333-4444',
   ativo: true,
@@ -42,6 +42,19 @@ describe('FornecedorDialogComponent — criação', () => {
     comp.form.patchValue({ nome: '' });
     comp.salvar();
 
+    expect(criarSpy).not.toHaveBeenCalled();
+  });
+
+  it('documento com dígito verificador inválido impede salvar', () => {
+    const criarSpy = vi.spyOn(service, 'criar');
+    const fixture = TestBed.createComponent(FornecedorDialogComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.form.patchValue({ nome: 'Fulano', documento: '111.111.111-11' });
+    comp.salvar();
+
+    expect(comp.form.controls.documento.hasError('documentoInvalido')).toBe(true);
     expect(criarSpy).not.toHaveBeenCalled();
   });
 

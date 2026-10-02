@@ -1,6 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,18 +11,10 @@ import { ClienteService } from '../../../core/services/cliente.service';
 import { Cliente } from '../../../core/models/cliente.model';
 import { DocumentMaskDirective } from '../../../shared/directives/document-mask.directive';
 import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
+import { cpfCnpjValido } from '../../../shared/validators/documento.validator';
 
 export interface ClienteDialogData {
   cliente?: Cliente;
-}
-
-function documentoValidator(control: AbstractControl): ValidationErrors | null {
-  const digits = (control.value as string)?.replace(/\D/g, '') ?? '';
-  if (!digits) return null;
-  if (digits.length !== 11 && digits.length !== 14) {
-    return { documentoInvalido: true };
-  }
-  return null;
 }
 
 @Component({
@@ -57,7 +49,7 @@ export class ClienteDialogComponent {
 
   readonly form = this.fb.group({
     nome:      [this.data.cliente?.nome      ?? '', Validators.required],
-    documento: [this.data.cliente?.documento ?? '', documentoValidator],
+    documento: [this.data.cliente?.documento ?? '', cpfCnpjValido],
     email:     [this.data.cliente?.email     ?? '', Validators.email],
     telefone:  [this.data.cliente?.telefone  ?? ''],
     ativo:     [this.data.cliente?.ativo     ?? true],

@@ -1,1 +1,22 @@
-project_phonus_web_cadastro_usuarios.md
+Monte um plano macro de cenarios de testes para eu aprovar
+que inclua vendas, entrada, saida, laçamentos e cadastros.
+Salve os cenarios na pasta docs/homologacao.
+
+Veja abaixo o que cada perfil consegue fazer.
+┌───────────────────────────────────────────────────────────────┬──────┬───────┬──────────┐
+│                             Ação                              │ ROOT │ ADMIN │ OPERADOR │
+├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
+│ Registrar venda (POST /lancamentos, /lancamentos/interpretar) │ ✅   │ ✅    │ ✅       │
+├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
+│ Cadastrar ou editar produto                                   │ ✅   │ ✅    │ ❌       │
+├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
+│ Cadastrar ou editar fornecedor                                │ ✅   │ ✅    │ ❌       │
+├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
+│ Cadastrar ou editar cliente                                   │ ✅   │ ✅    │ ❌       │
+├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
+│ Consultar (GET) produtos, clientes e fornecedores             │ ✅   │ ✅    │ ✅       │
+└───────────────────────────────────────────────────────────────┴──────┴───────┴──────────┘
+
+- Venda: os três papéis registram. O LancamentoController inteiro usa LANCAMENTOS_REGISTRAR. O OPERADOR só enxerga os lançamentos que ele mesmo fez, porque o escopo financeiro é restrito ao autor.
+- Cadastros: POST e PUT de produto, cliente e fornecedor exigem CADASTROS_GERENCIAR, que só ROOT e ADMIN têm. O mesmo vale para as categorias e para PATCH /produtos/{id}/desativar.
+- Consulta: o OPERADOR só lê esses cadastros, o que basta para escolher um produto ou cliente ao registrar uma venda.

@@ -203,6 +203,68 @@ describe('LancamentoFormComponent', () => {
     expect(comp.precoReferencia('nao-existe')).toBe(0);
   });
 
+  describe('total sugerido', () => {
+    const produto = { id: 'p1', nome: 'Produto A', precoVenda: 2500, precoCusto: 1000, quantidadeEstoque: 10, estoqueMinimo: 1, abaixoDoMinimo: false, unidadeMedida: 'UN' as const, ativo: true, criadoPor: 'u1' };
+
+    function comItem(qtd: number, desconto = 0) {
+      const fixture = TestBed.createComponent(LancamentoFormComponent);
+      fixture.detectChanges();
+      const comp = fixture.componentInstance;
+      comp.produtos.set([produto]);
+      comp.adicionarItem();
+      comp.itemGroups()[0].patchValue({ produtoId: 'p1', quantidade: qtd, desconto });
+      return comp;
+    }
+
+    it('em saída usa o custo do produto', () => {
+      const comp = comItem(3);
+      comp.form.controls.tipo.setValue('SAIDA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(30);
+    });
+
+    it('em entrada usa o preço de venda e recalcula ao trocar o tipo', () => {
+      const comp = comItem(3);
+      comp.form.controls.tipo.setValue('ENTRADA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(75);
+      comp.form.controls.tipo.setValue('SAIDA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(30);
+    });
+
+    it('aplica o desconto por unidade, não sobre a linha', () => {
+      const comp = comItem(2, 3);
+      comp.form.controls.tipo.setValue('ENTRADA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(44);
+    });
+
+    it('desconto maior que o preço zera o valor da unidade, sem ficar negativo', () => {
+      const comp = comItem(2, 99);
+      comp.form.controls.tipo.setValue('ENTRADA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(0);
+    });
+
+    it('trocar o tipo sem itens não apaga o total digitado', () => {
+      const fixture = TestBed.createComponent(LancamentoFormComponent);
+      fixture.detectChanges();
+      const comp = fixture.componentInstance;
+      comp.form.controls.valorTotal.setValue(150);
+      comp.form.controls.tipo.setValue('ENTRADA_CAIXA');
+      expect(comp.form.controls.valorTotal.value).toBe(150);
+    });
+  });
+
+  it('forma a prazo com parcelas inválidas não chama criar', () => {
+    const criarSpy = vi.spyOn(lancamentoService, 'criar');
+    const fixture = TestBed.createComponent(LancamentoFormComponent);
+    fixture.detectChanges();
+    const comp = fixture.componentInstance;
+
+    comp.form.patchValue({ descricao: 'Compra', valorTotal: 100, formaPagamento: 'CREDITO', quantidadeParcelas: 0 });
+    comp.salvar();
+
+    expect(criarSpy).not.toHaveBeenCalled();
+    expect(comp.form.controls.quantidadeParcelas.touched).toBe(true);
+  });
+
   it('salvar navega para /lancamentos após sucesso', () => {
     vi.spyOn(lancamentoService, 'criar').mockReturnValue(
       of({ id: 'l1', usuarioId: 'u1', tipo: 'SAIDA_CAIXA', descricao: 'Teste', valorTotal: 100, formaPagamento: 'PIX', origem: 'TEXTO', dataLancamento: '2026-04-01', parcelas: [], itens: [] }),

@@ -1,5 +1,6 @@
 import { FormBuilder } from '@angular/forms';
-import { apenasDigitos, cnpjValido, cpfValido, documentoValido } from './documento.validator';
+import { FormControl } from '@angular/forms';
+import { apenasDigitos, cnpjValido, cpfCnpjValido, cpfValido, documentoValido } from './documento.validator';
 
 describe('documento.validator', () => {
   it('apenasDigitos remove qualquer caractere não numérico', () => {
@@ -55,6 +56,21 @@ describe('documento.validator', () => {
       form.controls['documento'].setValue('11222333000181');
 
       expect(form.controls['documento'].hasError('documentoInvalido')).toBe(false);
+    });
+  });
+  describe('cpfCnpjValido (por controle)', () => {
+    const erro = (v: string) => cpfCnpjValido(new FormControl(v));
+
+    it('aceita vazio, CPF e CNPJ válidos, com ou sem máscara', () => {
+      expect(erro('')).toBeNull();
+      expect(erro('529.982.247-25')).toBeNull();
+      expect(erro('11222333000181')).toBeNull();
+    });
+
+    it('rejeita dígito verificador errado, dígitos repetidos e tamanho diferente de 11 ou 14', () => {
+      expect(erro('52998224724')).toEqual({ documentoInvalido: true });
+      expect(erro('111.111.111-11')).toEqual({ documentoInvalido: true });
+      expect(erro('1234567890')).toEqual({ documentoInvalido: true });
     });
   });
 });

@@ -134,6 +134,7 @@ export class LancamentoFormComponent implements OnInit {
       } else {
         this.form.controls.clienteId.setValue('');
       }
+      if (this.itensArray.length > 0) this.calcularTotal();
     });
 
     this.carregando.set(true);
@@ -194,10 +195,12 @@ export class LancamentoFormComponent implements OnInit {
     this.form.controls.formaPagamento.markAsTouched();
     this.form.controls.valorTotal.markAsTouched();
     this.form.controls.descricao.markAsTouched();
+    this.form.controls.quantidadeParcelas.markAsTouched();
     if (
       this.form.controls.formaPagamento.invalid ||
       this.form.controls.valorTotal.invalid ||
-      this.form.controls.descricao.invalid
+      this.form.controls.descricao.invalid ||
+      (this.isPrazo() && this.form.controls.quantidadeParcelas.invalid)
     ) return;
 
     this.salvando.set(true);
@@ -267,14 +270,19 @@ export class LancamentoFormComponent implements OnInit {
     this.form.controls.descricao.updateValueAndValidity();
   }
 
+  // O desconto é por unidade (igual ao backend: valorUnitario = preço − desconto) e, em saída,
+  // o preço base é o custo — a mesma regra usada no corpo enviado por salvar().
   private calcularTotal(): void {
+    const saida = this.form.controls.tipo.value === 'SAIDA_CAIXA';
     const total = this.itensArray.controls.reduce((sum, g) => {
       const produtoId = g.get('produtoId')?.value as string;
       const produto = this.produtos().find((p) => p.id === produtoId);
-      const precoReais = (produto?.precoVenda ?? 0) / 100;
+      const centavos = saida
+        ? (produto?.precoCusto ?? produto?.precoVenda ?? 0)
+        : (produto?.precoVenda ?? 0);
       const quantidade = (g.get('quantidade')?.value as number) ?? 0;
       const desconto = (g.get('desconto')?.value as number) ?? 0;
-      return sum + Math.max(0, precoReais * quantidade - desconto);
+      return sum + Math.max(0, centavos / 100 - desconto) * quantidade;
     }, 0);
     this.form.controls.valorTotal.setValue(
       Math.round(total * 100) / 100,

@@ -205,7 +205,7 @@ tr.mat-row {
 
 // ----- Status inline (sem badge) ----------------------------
 
-.status-ativo   { color: var(--phonus-primary); font-weight: 600; }
+.status-ativo   { color: var(--phonus-primary-text); font-weight: 600; }
 .status-inativo { color: var(--phonus-text-secondary); }
 
 // ----- KPI grid (dashboard + relatórios) --------------------
@@ -253,7 +253,7 @@ tr.mat-row {
   mat-icon { font-size: 24px; width: 24px; height: 24px; }
 }
 
-.kpi-icon--green  { background: var(--phonus-primary-light); color: var(--phonus-primary); }
+.kpi-icon--green  { background: var(--phonus-primary-light); color: var(--phonus-primary-text); }
 .kpi-icon--blue   { background: #dbeafe; color: #1d4ed8; }
 .kpi-icon--red    { background: #fee2e2; color: #b91c1c; }
 .kpi-icon--orange { background: #ffedd5; color: #c2410c; }

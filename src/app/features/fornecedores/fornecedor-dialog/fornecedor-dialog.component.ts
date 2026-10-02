@@ -1,6 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { AbstractControl, NonNullableFormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,18 +11,10 @@ import { FornecedorService } from '../../../core/services/fornecedor.service';
 import { Fornecedor } from '../../../core/models/fornecedor.model';
 import { DocumentMaskDirective } from '../../../shared/directives/document-mask.directive';
 import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
+import { cpfCnpjValido } from '../../../shared/validators/documento.validator';
 
 export interface FornecedorDialogData {
   fornecedor?: Fornecedor;
-}
-
-function documentoValidator(control: AbstractControl): ValidationErrors | null {
-  const digits = (control.value as string)?.replace(/\D/g, '') ?? '';
-  if (!digits) return null;
-  if (digits.length !== 11 && digits.length !== 14) {
-    return { documentoInvalido: true };
-  }
-  return null;
 }
 
 @Component({
@@ -57,7 +49,7 @@ export class FornecedorDialogComponent {
 
   readonly form = this.fb.group({
     nome:      [this.data.fornecedor?.nome      ?? '', Validators.required],
-    documento: [this.data.fornecedor?.documento ?? '', documentoValidator],
+    documento: [this.data.fornecedor?.documento ?? '', cpfCnpjValido],
     email:     [this.data.fornecedor?.email     ?? '', Validators.email],
     telefone:  [this.data.fornecedor?.telefone  ?? ''],
     ativo:     [this.data.fornecedor?.ativo     ?? true],

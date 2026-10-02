@@ -65,6 +65,7 @@ export class LancamentoDetail implements OnInit {
     if (!l) return [];
     return (l.itens ?? []).map((item) => ({
       ...item,
+      subtotal: Math.round(item.quantidade * item.valorUnitario),
       nomeProduto: this.produtos().find((p) => p.id === item.produtoId)?.nome ?? item.produtoId,
     }));
   });

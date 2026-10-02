@@ -112,6 +112,16 @@ describe('LancamentoDetail', () => {
     expect(itens[0].nomeProduto).toBe('Produto A');
   });
 
+  it('itensComNome calcula o subtotal como quantidade × valor unitário já com desconto', () => {
+    vi.spyOn(lancamentoService, 'buscar').mockReturnValue(
+      of({ ...mockLancamento, itens: [{ ...mockItem, quantidade: 3, valorUnitarioOriginal: 2800, desconto: 300, valorUnitario: 2500 }] }),
+    );
+    const fixture = TestBed.createComponent(LancamentoDetail);
+    fixture.detectChanges();
+
+    expect(fixture.componentInstance.itensComNome()[0].subtotal).toBe(7500);
+  });
+
   it('itensComNome usa o produtoId como fallback quando o produto não é encontrado', () => {
     vi.spyOn(produtoService, 'listar').mockReturnValue(
       of({ content: [], totalElements: 0, totalPages: 0, page: 0, size: 200, last: true }),
