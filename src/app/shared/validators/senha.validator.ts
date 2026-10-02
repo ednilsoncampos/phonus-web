@@ -15,7 +15,20 @@ export function senhaDiferenteDeEmailValidator(getEmail: () => string | null | u
     const senha = control.value as string;
     const email = getEmail();
     if (!senha || !email) return null;
-    return senha.toLowerCase() === email.toLowerCase() ? { senhaIgualEmail: true } : null;
+    const senhaMin = senha.toLowerCase();
+    const emailMin = email.toLowerCase();
+    // O backend também recusa a senha igual à parte do e-mail antes do "@".
+    const usuario = emailMin.split('@')[0];
+    return senhaMin === emailMin || senhaMin === usuario ? { senhaIgualEmail: true } : null;
+  };
+}
+
+/** O backend limita a senha em bytes (UTF-8), então caracteres acentuados contam como 2. */
+export function senhaMaxBytesValidator(maxBytes: number): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value as string;
+    if (!value) return null;
+    return new TextEncoder().encode(value).length > maxBytes ? { maxbytes: true } : null;
   };
 }
 

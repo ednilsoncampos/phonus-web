@@ -21,6 +21,7 @@ import {
 import {
   senhaDiferenteDeEmailValidator,
   senhaForteValidator,
+  senhaMaxBytesValidator,
   senhasConferemValidator,
 } from '../../../shared/validators/senha.validator';
 
@@ -74,7 +75,7 @@ export class RegisterComponent {
         [
           Validators.required,
           Validators.minLength(SENHA_MIN),
-          Validators.maxLength(SENHA_MAX),
+          senhaMaxBytesValidator(SENHA_MAX),
           senhaForteValidator(),
           senhaDiferenteDeEmailValidator((): string | undefined => this.form?.controls.email.value?.trim()),
         ],
@@ -149,6 +150,11 @@ export class RegisterComponent {
         error: (err: HttpErrorResponse) => {
           this.isLoading.set(false);
           this.errorMessage.set(this.mensagemDeErro(err));
+          // Termos desatualizados: recarrega a versão vigente e exige novo aceite.
+          if (err.status === 422 && /termos/i.test(err.error?.message ?? '')) {
+            this.form.controls.aceite.setValue(false);
+            this.carregarTermos();
+          }
         },
       });
   }
@@ -161,6 +167,10 @@ export class RegisterComponent {
         return apiMessage ?? 'E-mail já cadastrado.';
       case 400:
         return apiMessage ?? 'Dados inválidos. Verifique as informações e tente novamente.';
+      case 404:
+        return apiMessage ?? 'Não há termos de uso ativos no momento. Tente novamente mais tarde.';
+      case 422:
+        return apiMessage ?? 'Não foi possível validar os dados informados.';
       case 429:
         return 'Muitas tentativas. Aguarde um instante e tente novamente.';
       default:

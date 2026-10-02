@@ -85,6 +85,47 @@ describe('UsuariosListComponent', () => {
     expect(comp.podeDesativar({ ...mockUsuario, papel: 'OPERADOR' })).toBe(true);
   });
 
+  it('podeDesativar: ROOT não pode desativar outro ROOT (backend exige papel inferior)', () => {
+    vi.spyOn(authService, 'papel').mockReturnValue('ROOT');
+    vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ROOT', status: 'ATIVO' });
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    expect(comp.podeDesativar({ ...mockUsuario, papel: 'ROOT' })).toBe(false);
+    expect(comp.podeReativar({ ...mockUsuario, papel: 'ROOT', status: 'INATIVO' })).toBe(false);
+  });
+
+  it('confirmarDesativar exibe a mensagem do backend quando falha', () => {
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    vi.spyOn((comp as any).dialog, 'open').mockReturnValue({ afterClosed: () => of(true) } as any);
+    vi.spyOn(usuarioService, 'desativar').mockReturnValue(
+      throwError(() => ({ status: 403, error: { message: 'Só é permitido desativar usuários com papel inferior ao seu' } })),
+    );
+    const snack = vi.spyOn((comp as any).snackBar, 'open');
+
+    comp.confirmarDesativar(mockUsuario);
+
+    expect(snack).toHaveBeenCalledWith(
+      'Só é permitido desativar usuários com papel inferior ao seu',
+      'Fechar',
+      expect.any(Object),
+    );
+  });
+
+  it('confirmarReativar exibe a mensagem do backend para qualquer status de erro', () => {
+    const fixture = TestBed.createComponent(UsuariosListComponent);
+    const comp = fixture.componentInstance;
+    vi.spyOn((comp as any).dialog, 'open').mockReturnValue({ afterClosed: () => of(true) } as any);
+    vi.spyOn(usuarioService, 'reativar').mockReturnValue(
+      throwError(() => ({ status: 404, error: { message: 'Usuário não encontrado' } })),
+    );
+    const snack = vi.spyOn((comp as any).snackBar, 'open');
+
+    comp.confirmarReativar({ ...mockUsuario, status: 'INATIVO' });
+
+    expect(snack).toHaveBeenCalledWith('Usuário não encontrado', 'Fechar', expect.any(Object));
+  });
+
   it('podeDesativar: ADMIN só pode desativar OPERADOR', () => {
     vi.spyOn(authService, 'papel').mockReturnValue('ADMIN');
     vi.spyOn(authService, 'currentUser').mockReturnValue({ id: 'me', nome: 'Eu', email: 'eu@e.com', papel: 'ADMIN', status: 'ATIVO' });

@@ -86,13 +86,13 @@
         >
           <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
-        <mat-hint>{{ senhaMin }} a 72 caracteres, com letra e número</mat-hint>
+        <mat-hint>{{ senhaMin }} a 72 caracteres (acentos contam como 2), com letra e número</mat-hint>
         @if (form.controls.senha.hasError('required')) {
           <mat-error>Senha é obrigatória</mat-error>
         } @else if (form.controls.senha.hasError('minlength')) {
           <mat-error>A senha deve ter no mínimo {{ senhaMin }} caracteres</mat-error>
-        } @else if (form.controls.senha.hasError('maxlength')) {
-          <mat-error>A senha deve ter no máximo 72 caracteres</mat-error>
+        } @else if (form.controls.senha.hasError('maxbytes')) {
+          <mat-error>A senha deve ter no máximo 72 bytes (letras acentuadas contam como 2)</mat-error>
         } @else if (form.controls.senha.hasError('senhaFraca')) {
           <mat-error>A senha deve conter letra e número</mat-error>
         } @else if (form.controls.senha.hasError('senhaIgualEmail')) {

@@ -146,6 +146,11 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'minha-conta',
+        loadComponent: () =>
+          import('./features/conta/minha-conta/minha-conta').then((m) => m.MinhaConta),
+      },
+      {
         path: 'termos',
         canActivate: [permissionGuard],
         data: { permissao: 'TERMOS_GERENCIAR' },

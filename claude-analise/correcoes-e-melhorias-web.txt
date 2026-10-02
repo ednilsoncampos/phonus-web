@@ -1,55 +1,249 @@
+# 28 - Cenário: ciclo de vida dos usuários de uma empresa (cadastro → convites → gestão)
+# Dependências: banco zerado e SUPER_ROOT dev desligado (padrão: SUPER_ROOT_HABILITADO=false); os
+#   e-mails abaixo são únicos na plataforma. Os tokens de ativação/convite são lidos no banco, então
+#   não é preciso abrir a caixa de e-mail (a Brevo envia os e-mails de verdade).
+# Versão executável: docs/homologacao/scripts/cenario-ciclo-usuarios.sh (79 verificações)
+#
+# Validado em 2026-10-01: 79 ok, 0 falha.
+#
+# E-mails (caixas reais do projeto):
+#   ROOT        ednilsoncampos@gmail.com            (cadastra a empresa)
+#   ADMIN       ednilson.campos.dev@gmail.com       (convidado pelo ROOT)
+#   OPERADOR    maria.cs.2239@gmail.com             (convidado pelo ROOT)
+#   OPERADOR 2  camposolution.suporte@gmail.com     (convidado pelo ROOT; usado em desativar/reativar)
+#
+# Cenário:
+#   1. Cadastrar a empresa e o ROOT e ativar a conta pelo link
+#   2. O ROOT convida ADMIN, OPERADOR e um 2º OPERADOR; cada um define a senha pelo link do convite
+#   3. Identidade de cada papel (/auth/me, GET /usuarios/{id}, entitlement)
+#   4. O ROOT gerencia usuários: promover/rebaixar, desativar/reativar, reenviar convite
+#   5. Recusas da hierarquia
+#   6. Escopo financeiro com os usuários criados
+#   7. Troca de senha invalida os tokens anteriores
+#
+# Variáveis: {{termosId}} (GET /termos/atual), {{empresaId}}, {{accessTokenRoot}}, {{accessTokenAdmin}},
+# {{accessTokenOperador}}, {{accessTokenOperador2}}, {{idRoot}}, {{idAdmin}}, {{idOperador}}, {{idOperador2}}
+#
+# Tokens de ativação/convite sem abrir o e-mail (schema = t_<empresaId sem hífens>):
+#   SELECT t.token FROM "t_<...>".token_ativacao_usuario t JOIN "t_<...>".usuario u ON u.id = t.usuario_id
+#   WHERE u.email = '<email>' AND NOT t.usado AND t.substituido_em IS NULL ORDER BY t.criado_em DESC LIMIT 1;
+# O empresaId sai de: SELECT empresa_id FROM public.usuario_global WHERE email = '<email do ROOT>';
+# Senhas: ROOT A.123456a; ADMIN, OPERADOR e OPERADOR 2 definem B.123456b no convite; ao final do passo 7 o ADMIN
+#   passa a C.123456c.
+# Atenção: o link de ativação do CADASTRO vale 3 minutos; o do CONVITE, 24 horas.
 
-O que o web precisa fazer igual ao mobile
-- Payload: o formato é o do CriarUsuarioRequestDto. Os campos obrigatórios são nomeEmpresa, tipoDocumento (CNPJ ou CPF), documento (só dígitos), nome, email, senha e termosId. cidade e estado são opcionais.
-- Termos de uso: antes de enviar, o web chama GET /termos/atual (público), mostra o texto e manda o termosId da versão vigente. Se a versão não for a vigente, a API rejeita.
-- Ativação por e-mail: o cadastro cria a empresa e o usuário ROOT com ativo=false e envia um e-mail de ativação. O login só funciona depois do clique em GET /auth/ativar?token=.... O web precisa ter uma tela de "verifique seu e-mail", e a página de ativação tem de abrir no navegador (o link do e-mail pode estar apontando para um deep link do app, então vale conferir).
-- Erros: e-mail duplicado retorna 409, dados inválidos retornam 400. Pelo fluxo de negócio, o documento também deve ser único por empresa, mas o swagger só documenta o 409 de e-mail. Vale checar como o backend responde a CNPJ/CPF duplicado.
 
-Pontos de atenção
-1. CORS: o backend só aceita as origens listadas em CORS_ALLOWED_ORIGINS, que por padrão é http://localhost:3000. É preciso incluir a origem do web em dev, staging e prod, senão o browser bloqueia a chamada. O mobile não passa por CORS, por isso nunca apareceu.
-2. Dois cadastros diferentes: /auth/registro cria uma empresa nova com um ROOT. O convite de OPERADOR ou ADMIN é outro fluxo, e o plano web já o trata como gestão de usuários. O web não deve misturar os dois.
-3. Fora do plano atual: docs/backend/plano-implementacao-web.md descreve o web como administrativo (cadastros, usuários, termos) e não lista a tela de auto-cadastro de empresa. Ela seria um módulo novo.
-4. Segurança: o endpoint é público e cria schema no banco. Como o web fica exposto na internet, vale ter captcha ou rate limit no cadastro. Confirme se o backend já tem rate limit.
-5. Validação: o web deve validar CPF/CNPJ (dígitos verificadores) e a força da senha antes de enviar, como o mobile faz.
+# =========================================================================
+# 28.1 - Passo 1: cadastrar a empresa e o ROOT
+# =========================================================================
 
-Alguns detalhes uteis:
- Além da tela de registro, estes itens do fluxo também podem ir para o web:
+curl --location 'http://localhost:8080/api/v1/auth/registro' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "nomeEmpresa": "Empresa Ciclo de Usuarios",
+    "tipoDocumento": "CNPJ",
+    "documento": "12.345.678/0001-95",
+    "nome": "Ednilson Root",
+    "email": "ednilsoncampos@gmail.com",
+    "senha": "A.123456a",
+    "termosId": "{{termosId}}"
+}'
 
-1. Ativação da conta
-- GET /auth/ativar?token=... é o link do e-mail. O token é um UUID e vale só 3 minutos (plano-desenvolvimento.md).
-- O login fica bloqueado até a ativação. O mobile responde 403 na conta não ativada, e só quando a senha está certa (docs/melhorias-mobile.md).
-- O web precisa de uma página que receba esse link e mostre sucesso, token expirado ou já usado.
-- Como o token expira em 3 minutos, o botão "Reenviar e-mail de ativação" (POST /auth/reenviar-ativacao) é essencial. O mobile já tem esse botão no RegisterViewModel.
-- Esse endpoint responde sempre a mesma mensagem, para não revelar se o e-mail existe. A doc sugere desabilitar o botão com contagem regressiva de 2 minutos.
+# Resposta esperada: 201, papel ROOT, status CONVIDADO (a conta só vale depois de ativada).
 
-2. Recuperação de senha
-- POST /auth/esqueceu-senha e POST /auth/reset-password.
-- Hoje o reset abre num formulário HTML servido pelo backend (GET /auth/reset-password). Se o web tiver a própria página, o link do e-mail precisa apontar para ela. Isso é uma decisão de backend.
+# --- Login antes de ativar (esperado 403: senha certa, conta não ativada) ---
+curl --location 'http://localhost:8080/api/v1/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "email": "ednilsoncampos@gmail.com", "senha": "A.123456a" }'
 
-3. Termos de uso no cadastro
-- O web busca GET /termos/atual, mostra o texto e exige o checkbox de aceite.
-- O termosId vai no payload e o aceite é gravado junto com a conta.
-- Se o usuário já tem conta e a versão dos termos mudou, existem GET /termos/aceite/status e POST /termos/aceite para reaceitar. O web precisa dessa tela também.
+# --- Ativar pelo link do e-mail (GET; o token vem do banco) → 200 "Conta Ativada!" ---
+curl --location 'http://localhost:8080/api/v1/auth/ativar?token=TOKEN_DO_CADASTRO&e={{empresaId}}'
 
-4. Regras de validação (copiar do mobile)
-- Senha: de 8 a 72 caracteres, com letra e número, e diferente do e-mail. Confirmação de senha no cliente.
-- Trocar tipoDocumento limpa o campo documento.
-- Nome da empresa, documento, nome, e-mail e senha são obrigatórios. Cidade e estado são opcionais e vão como null quando vazios.
-- Documento só com dígitos.
+# --- O mesmo link de novo (esperado 400: token já usado) ---
+curl --location 'http://localhost:8080/api/v1/auth/ativar?token=TOKEN_DO_CADASTRO&e={{empresaId}}'
 
-5. O que o cadastro cria no backend
-- Uma empresa (com schema próprio no banco) e um usuário ROOT inativo. O documento é único por empresa e o e-mail é único no sistema todo.
-- A criação roda em uma transação. Se falhar, o schema é apagado.
-- O web deve tratar 409 (e-mail ou documento duplicado) e mensagens de falha genéricas.
+# --- Login → {{accessTokenRoot}} (esperado 200); /auth/me traz papel ROOT e status ATIVO ---
+curl --location 'http://localhost:8080/api/v1/auth/login' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "email": "ednilsoncampos@gmail.com", "senha": "A.123456a" }'
 
-6. Período de cortesia
-- Depois do cadastro, a conta ganha 21 dias de acesso PREMIUM. O web pode mostrar isso na tela de boas-vindas ou de assinatura (diasCortesiaRestantes em /usuarios/{id}/entitlement).
 
-7. Primeiro acesso depois de ativar
-- O ROOT recém-criado entra, chama /auth/me e usa permissoes[].
-- Um fluxo de "primeiros passos" pode levar direto a convidar usuários e criar categorias e produtos, que já estão no plano web.
+# =========================================================================
+# 28.2 - Passo 2: o ROOT convida os outros papéis
+# =========================================================================
 
-Pontos que precisam de decisão (backend)
-- Para onde o link de ativação e o de reset devem apontar quando o cadastro for feito pelo web.
-- A origem do web em CORS_ALLOWED_ORIGINS.
-- Rate limit ou captcha no /auth/registro, que é público e cria schema.
+curl --location 'http://localhost:8080/api/v1/usuarios' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "nome": "Admin Dev", "email": "ednilson.campos.dev@gmail.com", "papel": "ADMIN" }'
+
+curl --location 'http://localhost:8080/api/v1/usuarios' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "nome": "Maria Operadora", "email": "maria.cs.2239@gmail.com", "papel": "OPERADOR" }'
+
+curl --location 'http://localhost:8080/api/v1/usuarios' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "nome": "Suporte Operador", "email": "camposolution.suporte@gmail.com", "papel": "OPERADOR" }'
+
+# Resposta esperada: 201 nos três (status CONVIDADO). Enquanto não ativam, o login deles dá 401
+# (a senha é desconhecida; o 403 "conta não ativada" só aparece com a senha certa).
+# GET /usuarios (ROOT) lista 3 CONVIDADO + 1 ATIVO.
+
+# --- Reenvio do convite ---
+# Dentro de 2 minutos do último e-mail é ignorado (cooldown), com a mesma resposta 200 de sempre.
+# Fora do cooldown gera um link novo e o antigo passa a dar 400.
+curl --location 'http://localhost:8080/api/v1/auth/reenviar-ativacao' \
+--header 'Content-Type: application/json' \
+--data-raw '{ "email": "camposolution.suporte@gmail.com" }'
+
+# Recusas (28.5) com e-mails que já existem: o papel é validado antes do e-mail, então nada é enviado.
+
+# --- Cada convidado define a senha pelo formulário do convite (esperado 200 "Conta Ativada!") ---
+curl --location 'http://localhost:8080/api/v1/auth/ativar' \
+--header 'Content-Type: application/x-www-form-urlencoded' \
+--data-urlencode 'token=TOKEN_DO_CONVITE' \
+--data-urlencode 'e={{empresaId}}' \
+--data-urlencode 'novaSenha=B.123456b' \
+--data-urlencode 'confirmaSenha=B.123456b'
+
+# Senha fraca no formulário (ex.: "somenteletras") → 400 e o convite continua valendo. Depois logar (04):
+# {{accessTokenAdmin}}, {{accessTokenOperador}}, {{accessTokenOperador2}} (senha B.123456b)
+
+
+# =========================================================================
+# 28.3 - Passo 3: identidade de cada papel
+# =========================================================================
+
+# Trocar o token e o id conforme o papel. Esperado: 200 nos três papéis.
+curl --location 'http://localhost:8080/api/v1/auth/me' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}'
+
+curl --location 'http://localhost:8080/api/v1/usuarios/{{idAdmin}}' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}'
+
+# Entitlement do próprio usuário: tier PREMIUM (cortesia de 21 dias), planoAtual null
+curl --location 'http://localhost:8080/api/v1/usuarios/{{idAdmin}}/entitlement' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}'
+
+# Cada usuário só consulta os próprios dados (esperado 403, inclusive para o ROOT):
+#   GET /usuarios/{{idAdmin}}              com o token do ROOT
+#   GET /usuarios/{{idRoot}}/entitlement   com o token do OPERADOR
+#
+# /auth/me → permissoes[]: USUARIOS_ALTERAR_PAPEL só aparece para o ROOT.
+# GET /usuarios: ROOT e ADMIN 200 (4 usuários), OPERADOR 403.
+
+
+# =========================================================================
+# 28.4 - Passo 4: o ROOT gerencia usuários
+# =========================================================================
+
+# --- Promover o OPERADOR a ADMIN (esperado 200) e conferir que o token dele já vale como ADMIN ---
+curl --location --request PATCH 'http://localhost:8080/api/v1/usuarios/{{idOperador}}/papel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "papel": "ADMIN" }'
+
+curl --location 'http://localhost:8080/api/v1/usuarios' \
+--header 'Authorization: Bearer {{accessTokenOperador}}'
+# Esperado 200 (o papel é lido do banco a cada requisição; não precisa logar de novo)
+
+# --- Rebaixar de volta a OPERADOR (esperado 200); a mesma listagem volta a dar 403 ---
+curl --location --request PATCH 'http://localhost:8080/api/v1/usuarios/{{idOperador}}/papel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "papel": "OPERADOR" }'
+
+# --- Desativar o 2º OPERADOR (esperado 204) ---
+curl --location --request DELETE 'http://localhost:8080/api/v1/usuarios/{{idOperador2}}' \
+--header 'Authorization: Bearer {{accessTokenRoot}}'
+
+# Depois de desativado:
+#   - o banco marca status INATIVO e a linha sai de public.usuario_global
+#   - login → 401; o token antigo → 401 em qualquer rota
+#   - POST /auth/reenviar-ativacao responde 200 mas NÃO o revive (só convite pendente é reenviado)
+
+# --- Reativar (esperado 204): volta a logar com a mesma senha ---
+curl --location --request PATCH 'http://localhost:8080/api/v1/usuarios/{{idOperador2}}/reativar' \
+--header 'Authorization: Bearer {{accessTokenRoot}}'
+
+# --- O ADMIN também desativa e reativa um OPERADOR (esperado 204 nos dois) ---
+curl --location --request DELETE 'http://localhost:8080/api/v1/usuarios/{{idOperador}}' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}'
+
+curl --location --request PATCH 'http://localhost:8080/api/v1/usuarios/{{idOperador}}/reativar' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}'
+# Logar de novo para renovar {{accessTokenOperador}} e {{accessTokenOperador2}}
+
+
+# =========================================================================
+# 28.5 - Passo 5: recusas da hierarquia
+# =========================================================================
+#
+# Chamada                                              | Quem       | Esperado
+# -----------------------------------------------------|------------|---------
+# DELETE /usuarios/{{idRoot}}                          | ADMIN      | 403
+# PATCH  /usuarios/{{idOperador}}/papel                | ADMIN      | 403
+# POST   /usuarios (papel ADMIN)                       | ADMIN      | 403 "ADMIN só pode convidar usuários com papel inferior ao seu"
+# POST   /usuarios (papel ROOT)                        | ADMIN      | 403
+# POST   /usuarios (qualquer papel)                    | OPERADOR   | 403
+# PATCH  /usuarios/{{idRoot}}/papel                    | ROOT       | 403 "Não é permitido alterar o próprio papel"
+# DELETE /usuarios/{{idRoot}}                          | ROOT       | 403 "Não é permitido desativar a própria conta"
+# PATCH  /usuarios/{{idOperador}}/papel {"papel":"ROOT"} | ROOT     | 403 "O papel ROOT só pode ser atribuído durante o onboarding da empresa"
+# POST   /usuarios (e-mail já cadastrado)              | ROOT       | 409
+# PATCH  /usuarios/{{idOperador}}/reativar (já ativo)  | ROOT       | 422 "Usuário já está ativo"
+# PATCH  /usuarios/00000000-0000-0000-0000-000000000000/papel | ROOT | 404
+
+curl --location --request PATCH 'http://localhost:8080/api/v1/usuarios/{{idRoot}}/papel' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenRoot}}' \
+--data-raw '{ "papel": "ADMIN" }'
+
+# Corpo de erro (todos): { "timestamp", "status", "error", "message", "path", "details" }
+
+
+# =========================================================================
+# 28.6 - Passo 6: escopo financeiro
+# =========================================================================
+
+# ADMIN, OPERADOR e OPERADOR 2 lançam uma venda cada (esperado 201); trocar o token e a descrição:
+curl --location 'http://localhost:8080/api/v1/lancamentos' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}' \
+--data-raw '{
+    "tipo": "ENTRADA_CAIXA",
+    "descricao": "Venda do admin",
+    "valorTotal": 5000,
+    "formaPagamento": "PIX",
+    "origem": "TEXTO",
+    "dataLancamento": "2026-10-01"
+}'
+# (operador: "Venda do operador", 2000; operador 2: "Venda do operador 2", 1000)
+
+# Escopo: ROOT e ADMIN veem os 3 lançamentos; cada OPERADOR vê só o próprio
+curl --location 'http://localhost:8080/api/v1/lancamentos' \
+--header 'Authorization: Bearer {{accessTokenOperador}}'
+
+# --- ROOT lê o lançamento de um operador (200); o OPERADOR lê o do ADMIN (403) ---
+curl --location 'http://localhost:8080/api/v1/lancamentos/UUID_DO_LANCAMENTO_DO_ADMIN' \
+--header 'Authorization: Bearer {{accessTokenOperador}}'
+
+# --- Caixa do ROOT soma a empresa inteira: saldoEmCentavos 8000 ---
+curl --location 'http://localhost:8080/api/v1/caixa' \
+--header 'Authorization: Bearer {{accessTokenRoot}}'
+
+
+# =========================================================================
+# 28.7 - Passo 7: troca de senha invalida os tokens anteriores
+# =========================================================================
+
+curl --location --request PUT 'http://localhost:8080/api/v1/auth/senha' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer {{accessTokenAdmin}}' \
+--data-raw '{ "senhaAtual": "B.123456b", "novaSenha": "C.123456c" }'
+
+# Resposta esperada: 204. Depois:
+#   - o token antigo do ADMIN → 401 em qualquer rota (credenciais_alteradas_em)
+#   - login com a senha antiga → 401; com a nova (C.123456c) → 200
+#   - nova troca informando a senha atual errada → 422 "Senha atual incorreta"

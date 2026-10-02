@@ -1,1 +1,78 @@
-<app-page-header title="Detalhe do Usuário" />
+<app-page-header title="Detalhe do Usuário">
+  <a mat-stroked-button routerLink="/usuarios">
+    <mat-icon>arrow_back</mat-icon>
+    Voltar
+  </a>
+</app-page-header>
+
+@if (carregando()) {
+  <div class="state-center" role="status" aria-label="Carregando usuário">
+    <mat-spinner diameter="48" />
+    <span>Carregando...</span>
+  </div>
+} @else if (erro()) {
+  <div class="state-center" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <span>{{ erro() }}</span>
+    <button mat-stroked-button (click)="carregar()">Tentar novamente</button>
+  </div>
+} @else if (usuario(); as u) {
+  <section class="detail-card" aria-label="Dados do usuário">
+    <div class="detail-grid">
+      <div class="detail-field">
+        <label>Nome</label>
+        <span>{{ u.nome }}</span>
+      </div>
+      <div class="detail-field">
+        <label>E-mail</label>
+        <span>{{ u.email }}</span>
+      </div>
+      <div class="detail-field">
+        <label>Papel</label>
+        <span>{{ papelLabel(u.papel) }}</span>
+      </div>
+      <div class="detail-field">
+        <label>Status</label>
+        <span>{{ statusLabel(u.status) }}</span>
+      </div>
+      @if (u.createdAt) {
+        <div class="detail-field">
+          <label>Criado em</label>
+          <span>{{ u.createdAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+        </div>
+      }
+    </div>
+
+    @if (podeAlterarPapel()) {
+      <hr class="section-divider" />
+      <form (submit)="$event.preventDefault(); salvarPapel()" class="actions-top" aria-label="Alterar papel">
+        <mat-form-field appearance="outline">
+          <mat-label>Novo papel</mat-label>
+          <mat-select [formControl]="novoPapel" aria-required="true">
+            @for (p of papeisDisponiveis(); track p.value) {
+              <mat-option [value]="p.value">{{ p.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          [disabled]="salvando() || novoPapel.invalid"
+        >
+          @if (salvando()) {
+            <mat-spinner diameter="18" aria-hidden="true" />
+          } @else {
+            Alterar papel
+          }
+        </button>
+      </form>
+    }
+  </section>
+} @else {
+  <div class="state-center" role="alert">
+    <mat-icon aria-hidden="true">person_off</mat-icon>
+    <span>Usuário não encontrado.</span>
+    <a mat-stroked-button routerLink="/usuarios">Voltar para a lista</a>
+  </div>
+}

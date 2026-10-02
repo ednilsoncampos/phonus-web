@@ -5,12 +5,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { RouterLink } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
 import { AlterarSenhaDialog } from '../../features/conta/alterar-senha-dialog/alterar-senha-dialog';
 
 @Component({
   selector: 'app-topbar',
-  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule],
+  imports: [MatToolbarModule, MatButtonModule, MatIconModule, MatMenuModule, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './topbar.component.html',
   styleUrl: './topbar.component.scss',
