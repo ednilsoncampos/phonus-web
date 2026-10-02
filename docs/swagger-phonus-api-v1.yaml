@@ -1674,8 +1674,8 @@
         "tags": [
           "Autenticação"
         ],
-        "summary": "Registrar novo usuário",
-        "description": "Cria uma nova conta de usuário. O e-mail deve ser único no sistema.",
+        "summary": "Cadastrar empresa (onboarding)",
+        "description": "Cria a empresa, o schema próprio dela e o primeiro usuário (papel ROOT), gravando o aceite dos termos vigentes (`termosId` de GET /termos/atual). A conta nasce inativa: o ROOT ativa pelo link enviado por e-mail. Erros: 400 (campo inválido ou senha fora da política), 404 (nenhum termo ativo), 409 (e-mail ou CPF/CNPJ já cadastrado), 422 (documento inválido ou termos desatualizados).",
         "operationId": "registrar",
         "requestBody": {
           "content": {
@@ -1709,7 +1709,17 @@
             }
           },
           "409": {
-            "description": "E-mail já cadastrado no sistema",
+            "description": "E-mail ou CPF/CNPJ já cadastrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "CPF/CNPJ inválido ou termos de uso fora da versão vigente",
             "content": {
               "application/json": {
                 "schema": {
@@ -2272,7 +2282,7 @@
           "Assinaturas"
         ],
         "summary": "Consultar entitlement do usuário",
-        "description": "Retorna o nível de acesso atual: assinatura ativa, período de cortesia ou FREE.",
+        "description": "Retorna o nível de acesso atual: assinatura ativa, período de cortesia ou FREE. Cada usuário consulta só o próprio entitlement (outro id → 403, inclusive para ROOT/ADMIN).",
         "operationId": "consultarEntitlement",
         "parameters": [
           {
@@ -2315,6 +2325,73 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/usuarios/{id}": {
+      "get": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Consultar os próprios dados",
+        "description": "Cada usuário só consulta o próprio cadastro: com outro id a resposta é 403, mesmo para ROOT/ADMIN (a listagem da empresa é GET /usuarios).",
+        "operationId": "buscar_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsuarioResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Usuários"
+        ],
+        "summary": "Desativar usuário",
+        "description": "Marca o usuário como inativo e remove do índice global. Não é possível desativar SUPER_ROOT.",
+        "operationId": "desativar_1",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         },
         "security": [
@@ -2743,7 +2820,7 @@
         ],
         "summary": "Buscar lançamento por ID",
         "description": "Retorna o lançamento completo com todas as parcelas e seus pagamentos. Retorna 403 se o lançamento não pertencer ao usuário autenticado.",
-        "operationId": "buscar_1",
+        "operationId": "buscar_2",
         "parameters": [
           {
             "name": "id",
@@ -3251,37 +3328,6 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
-      }
-    },
-    "/usuarios/{id}": {
-      "delete": {
-        "tags": [
-          "Usuários"
-        ],
-        "summary": "Desativar usuário",
-        "description": "Marca o usuário como inativo e remove do índice global. Não é possível desativar SUPER_ROOT.",
-        "operationId": "desativar_1",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
           }
         },
         "security": [

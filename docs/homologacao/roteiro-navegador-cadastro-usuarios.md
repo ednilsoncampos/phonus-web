@@ -129,6 +129,54 @@ Executado no Chrome (Playwright) contra o backend local, sem `curl`; o token de 
 | Minha conta: cortesia (ROOT e OPERADOR), FREE, assinatura mensal e anual | ok |
 | Troca de senha (senha atual errada; B → C; senha antiga 401) | ok |
 
-Não executado: 422 de CNPJ e de termos e 404 de termos com respostas reais do backend (o formulário já bloqueia CNPJ
-inválido; o 422 real exigiria e-mail ainda não cadastrado e dados forjados), validados só por simulação; reenvio de convite
-com troca de token (exige esperar o cooldown de 2 min); escopo financeiro (passo 6 do cenário 28).
+### Segunda rodada — pendências fechadas (base zerada de novo)
+
+| Etapa | Resultado |
+|---|---|
+| 422 REAL de termos desatualizados (nova versão vigente criada no banco com a tela aberta) | ok: status 422, mensagem exibida, `/termos/atual` recarregado, aceite desmarcado, nenhuma conta criada |
+| 404 REAL sem termo ativo (termos desativados no banco) | ok: status 404, mensagem exibida |
+| Cadastro real do ROOT com os termos 2.0 e ativação | ok |
+| Reenvio de convite dentro de 2 min | ok: backend ignora (token inalterado); web com botão em cooldown de 120 s |
+| Reenvio de convite depois do cooldown | **token novo gerado e o antigo deixa de valer (400)**, mas ver achado abaixo |
+| Financeiro: lançamentos de ADMIN (R$ 50), OPERADOR (R$ 20) e ROOT (R$ 10) | ok (201) |
+| ROOT e ADMIN veem os 3 lançamentos; OPERADOR vê só o próprio | ok |
+| OPERADOR abre o lançamento do ADMIN | ok: backend 403; tela mostra "Não foi possível carregar o lançamento" e aviso "Acesso negado a este recurso" |
+| Saldo de caixa do ROOT | ok: R$ 80,00 (soma da empresa) |
+
+**Achado do backend (reenvio de convite):** o token gerado pelo reenvio para um usuário `CONVIDADO` vem com
+`precisa_definir_senha = false` e validade de 1 hora (o do convite original: `true` e 24 horas). Abrir esse link
+ativa a conta **direto, sem o formulário de definir senha**, e o usuário fica `ATIVO` com uma senha que ninguém
+conhece (só recuperável por "esqueci a senha"). Contraria a regra informada de que o convite vale 24 h e define senha.
+A reportar ao backend.
+
+**Pré-requisitos do financeiro pelo web:** o wizard de lançamento exige produto em cada item; o produto exige
+categoria e estoque mínimo maior que zero; sem estoque o POST dá 422 "Estoque insuficiente". Criar categoria,
+produto e uma entrada de estoque (Estoque > Ajuste) antes.
+
+**Estado deixado na base:** termos versão 2.0 vigente (a 1.0 inativa); Suporte Operador ativo sem senha conhecida;
+categoria "Geral", "Produto Teste" (estoque 100 menos as vendas) e 3 lançamentos. Tudo some no próximo reset.
+
+### Validação de documento: web × backend (testada com `curl`, autorizado pelo usuário só para esta checagem)
+
+Requisições a `POST /auth/registro` com o e-mail do ROOT ainda não cadastrado, em ordem tal que só o último caso cria conta.
+
+| Documento enviado | Web | Backend |
+|---|---|---|
+| CNPJ `11111111111111` e `00000000000000` (dígitos iguais) | recusa | 422 "CNPJ inválido" |
+| CPF `11111111111` (dígitos iguais) | recusa | 422 "CPF inválido" |
+| CNPJ e CPF com dígito verificador errado | recusa | 422 "CNPJ/CPF inválido" |
+| CNPJ com 13 e 15 dígitos; CPF com 10 e 12 | recusa | 422 |
+| CPF válido enviado como CNPJ; CNPJ válido enviado como CPF | valida conforme o tipo escolhido (não envia cruzado) | 422 |
+| Documento com letras (`…9A`, `…-9X`) | só aceita dígitos e `. - /` | 422 |
+| Documento vazio | obrigatório | 400 "documento: Documento é obrigatório" |
+| CPF válido só com dígitos (`52998224725`) | aceita | **201** (ROOT criado) |
+| CNPJ válido só com dígitos | aceita (cadastro real feito pelo web) | 201 |
+
+**Conclusão:** as regras concordam em todos os casos testados; o web envia só dígitos e o backend aceita. Divergência
+menor e inofensiva: o web barra antes de enviar, então o 422 de documento do backend só aparece fora da tela.
+
+### Divergência de produto: itens do lançamento (detalhes em `docs/funcionalidades-cadastro-usuarios.md`, seção 8.4)
+
+O backend trata **itens como opcionais** (lançamento de serviço, despesa, receita avulsa ou venda pelo total não têm
+produto; estoque só é mexido quando há itens). O wizard do web **exige produto em cada item** (passo 1), o que impede
+registrar esses lançamentos pela tela. Decisão de produto pendente: permitir lançamento sem itens no web.

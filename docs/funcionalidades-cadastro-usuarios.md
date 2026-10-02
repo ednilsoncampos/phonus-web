@@ -154,6 +154,24 @@ Conferido e sem divergência: campos do cadastro e do convite; limites (200/150/
 - **Entitlement de terceiros:** `GET /usuarios/{outroId}/entitlement` dá 403 para qualquer papel; por isso não aparece no detalhe do usuário.
 - **`/auth/ativar`:** não é chamado pelo web (ativação via link do e-mail no backend).
 
+### 8.4 Pendência de produto: lançamento sem itens (decisão em aberto)
+
+Fora do escopo de cadastro e usuários, mas descoberta nos testes de escopo financeiro.
+
+- **Backend:** `itens` é opcional em `LancamentoRequest` (padrão: lista vazia). `CriarLancamentoUseCase` só processa itens
+  se a lista não estiver vazia. O lançamento é o "fato econômico" (valor total, descrição, forma de pagamento); parcelas,
+  pagamentos e caixa não dependem de produto. O estoque só é movimentado quando há itens (venda baixa, compra repõe),
+  e é daí que vem o 422 "Estoque insuficiente".
+- **Casos reais sem item:** serviço de autônomo, despesas (aluguel, luz, imposto, salário), receitas avulsas (sinal,
+  adiantamento) e venda pelo total do dia. A entrada principal do produto é por voz ("recebi 300 do João"), sem produto.
+- **Web hoje:** o wizard de `/lancamentos/novo` (`lancamento-form.component.ts`, método `avancar()`) exige ao menos um
+  item com produto no passo 1 ("Adicione pelo menos um produto."). Para testar foi preciso criar categoria, produto
+  (estoque mínimo maior que zero) e dar entrada de estoque. Pela tela não dá para registrar serviço, despesa nem receita avulsa.
+- **Mudança proposta (não implementada):** tornar o passo 1 opcional (permitir avançar sem itens, mantendo produto,
+  quantidade e desconto quando houver); enviar `itens` vazio ou omitido; deixar o valor total sempre editável; conferir
+  como a lista e o detalhe do lançamento tratam um lançamento sem itens; atualizar testes do formulário e validar no navegador.
+- **A decidir:** se o passo "Itens" some do wizard ou vira opcional; e se o valor total continua preenchido a partir dos itens quando existirem.
+
 ## 9. Resumo de endpoints usados
 
 | Endpoint | Uso |
