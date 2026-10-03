@@ -29,7 +29,9 @@
 
       <ng-container matColumnDef="nome">
         <th mat-header-cell *matHeaderCellDef>Nome</th>
-        <td mat-cell *matCellDef="let u">{{ u.nome }}</td>
+        <td mat-cell *matCellDef="let u">
+          <a [routerLink]="['/usuarios', u.id]" class="link-usuario">{{ u.nome }}</a>
+        </td>
       </ng-container>
 
       <ng-container matColumnDef="email">

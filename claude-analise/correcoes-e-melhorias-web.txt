@@ -1,55 +1,10 @@
+Leia este documento  docs/integracao-web-recibo.md para adicionar a funcionalidade de compartilhar recibo.
 
-O que o web precisa fazer igual ao mobile
-- Payload: o formato é o do CriarUsuarioRequestDto. Os campos obrigatórios são nomeEmpresa, tipoDocumento (CNPJ ou CPF), documento (só dígitos), nome, email, senha e termosId. cidade e estado são opcionais.
-- Termos de uso: antes de enviar, o web chama GET /termos/atual (público), mostra o texto e manda o termosId da versão vigente. Se a versão não for a vigente, a API rejeita.
-- Ativação por e-mail: o cadastro cria a empresa e o usuário ROOT com ativo=false e envia um e-mail de ativação. O login só funciona depois do clique em GET /auth/ativar?token=.... O web precisa ter uma tela de "verifique seu e-mail", e a página de ativação tem de abrir no navegador (o link do e-mail pode estar apontando para um deep link do app, então vale conferir).
-- Erros: e-mail duplicado retorna 409, dados inválidos retornam 400. Pelo fluxo de negócio, o documento também deve ser único por empresa, mas o swagger só documenta o 409 de e-mail. Vale checar como o backend responde a CNPJ/CPF duplicado.
+Para o web e o app, o essencial é:
+- Baixar: GET /lancamentos/{id}/recibo?formato=pdf|png devolve o arquivo (binário, não JSON). Tem que ser fetch com o token e blob. Um <a href> não leva o Authorization.
+- Botão de recibo: só em lançamentos de venda. Compra devolve 422.
+- Compartilhar: navigator.share com o arquivo, ou baixar como alternativa. A API só entrega o arquivo; o compartilhamento é do cliente.
+- Limite: 30 recibos por minuto por usuário (erro 429, com Retry-After). Baixe uma vez e reutilize o arquivo.
+- Empresa: GET /empresa e PUT /empresa; o PUT é só do ROOT, e a tela de edição deve aparecer só se permissoes tiver EMPRESA_GERENCIAR.
 
-Pontos de atenção
-1. CORS: o backend só aceita as origens listadas em CORS_ALLOWED_ORIGINS, que por padrão é http://localhost:3000. É preciso incluir a origem do web em dev, staging e prod, senão o browser bloqueia a chamada. O mobile não passa por CORS, por isso nunca apareceu.
-2. Dois cadastros diferentes: /auth/registro cria uma empresa nova com um ROOT. O convite de OPERADOR ou ADMIN é outro fluxo, e o plano web já o trata como gestão de usuários. O web não deve misturar os dois.
-3. Fora do plano atual: docs/backend/plano-implementacao-web.md descreve o web como administrativo (cadastros, usuários, termos) e não lista a tela de auto-cadastro de empresa. Ela seria um módulo novo.
-4. Segurança: o endpoint é público e cria schema no banco. Como o web fica exposto na internet, vale ter captcha ou rate limit no cadastro. Confirme se o backend já tem rate limit.
-5. Validação: o web deve validar CPF/CNPJ (dígitos verificadores) e a força da senha antes de enviar, como o mobile faz.
-
-Alguns detalhes uteis:
- Além da tela de registro, estes itens do fluxo também podem ir para o web:
-
-1. Ativação da conta
-- GET /auth/ativar?token=... é o link do e-mail. O token é um UUID e vale só 3 minutos (plano-desenvolvimento.md).
-- O login fica bloqueado até a ativação. O mobile responde 403 na conta não ativada, e só quando a senha está certa (docs/melhorias-mobile.md).
-- O web precisa de uma página que receba esse link e mostre sucesso, token expirado ou já usado.
-- Como o token expira em 3 minutos, o botão "Reenviar e-mail de ativação" (POST /auth/reenviar-ativacao) é essencial. O mobile já tem esse botão no RegisterViewModel.
-- Esse endpoint responde sempre a mesma mensagem, para não revelar se o e-mail existe. A doc sugere desabilitar o botão com contagem regressiva de 2 minutos.
-
-2. Recuperação de senha
-- POST /auth/esqueceu-senha e POST /auth/reset-password.
-- Hoje o reset abre num formulário HTML servido pelo backend (GET /auth/reset-password). Se o web tiver a própria página, o link do e-mail precisa apontar para ela. Isso é uma decisão de backend.
-
-3. Termos de uso no cadastro
-- O web busca GET /termos/atual, mostra o texto e exige o checkbox de aceite.
-- O termosId vai no payload e o aceite é gravado junto com a conta.
-- Se o usuário já tem conta e a versão dos termos mudou, existem GET /termos/aceite/status e POST /termos/aceite para reaceitar. O web precisa dessa tela também.
-
-4. Regras de validação (copiar do mobile)
-- Senha: de 8 a 72 caracteres, com letra e número, e diferente do e-mail. Confirmação de senha no cliente.
-- Trocar tipoDocumento limpa o campo documento.
-- Nome da empresa, documento, nome, e-mail e senha são obrigatórios. Cidade e estado são opcionais e vão como null quando vazios.
-- Documento só com dígitos.
-
-5. O que o cadastro cria no backend
-- Uma empresa (com schema próprio no banco) e um usuário ROOT inativo. O documento é único por empresa e o e-mail é único no sistema todo.
-- A criação roda em uma transação. Se falhar, o schema é apagado.
-- O web deve tratar 409 (e-mail ou documento duplicado) e mensagens de falha genéricas.
-
-6. Período de cortesia
-- Depois do cadastro, a conta ganha 21 dias de acesso PREMIUM. O web pode mostrar isso na tela de boas-vindas ou de assinatura (diasCortesiaRestantes em /usuarios/{id}/entitlement).
-
-7. Primeiro acesso depois de ativar
-- O ROOT recém-criado entra, chama /auth/me e usa permissoes[].
-- Um fluxo de "primeiros passos" pode levar direto a convidar usuários e criar categorias e produtos, que já estão no plano web.
-
-Pontos que precisam de decisão (backend)
-- Para onde o link de ativação e o de reset devem apontar quando o cadastro for feito pelo web.
-- A origem do web em CORS_ALLOWED_ORIGINS.
-- Rate limit ou captcha no /auth/registro, que é público e cria schema.
+Monte um plano para eu aprovar.

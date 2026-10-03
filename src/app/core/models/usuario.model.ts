@@ -11,8 +11,8 @@ export type Permissao =
   | 'USUARIOS_GERENCIAR'
   | 'USUARIOS_ALTERAR_PAPEL'
   | 'TERMOS_GERENCIAR'
-  | 'CONTA_PROPRIA'
-  | 'ASSINATURA_ENTITLEMENT_QUALQUER';
+  | 'EMPRESA_GERENCIAR'
+  | 'CONTA_PROPRIA';
 
 export interface Usuario {
   id: string;
@@ -21,8 +21,6 @@ export interface Usuario {
   papel: Papel;
   status: StatusUsuario;
   permissoes?: Permissao[];
-  cidade?: string;
-  estado?: string;
   createdAt?: string;
 }
 
@@ -33,14 +31,24 @@ export interface ConvidarUsuarioRequest {
 }
 
 export interface AlterarPapelRequest {
-  papel: Papel;
+  papel: 'ADMIN' | 'OPERADOR';
+}
+
+export interface PlanoResumido {
+  planoId: string;
+  googleProductId: string;
+  nome: string;
+  periodoCobranca: 'MONTHLY' | 'YEARLY';
+  /** Em centavos. */
+  preco: number;
+  moeda: string;
 }
 
 export interface EntitlementResponse {
   usuarioId: string;
   isPremium: boolean;
   tier: 'FREE' | 'PREMIUM';
-  planoAtual: { id: string; nome: string } | null;
+  planoAtual: PlanoResumido | null;
   expiraEm: string | null;
   diasCortesiaRestantes: number;
 }

@@ -24,6 +24,10 @@
   </button>
 
   <mat-menu #userMenu="matMenu">
+    <a mat-menu-item routerLink="/minha-conta">
+      <mat-icon aria-hidden="true">manage_accounts</mat-icon>
+      Minha conta
+    </a>
     <button mat-menu-item (click)="abrirAlterarSenha()">
       <mat-icon aria-hidden="true">lock_reset</mat-icon>
       Alterar senha

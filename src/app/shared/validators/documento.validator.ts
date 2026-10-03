@@ -35,6 +35,18 @@ export function cnpjValido(valor: string): boolean {
 }
 
 /**
+ * Validador de controle para documentos opcionais (cliente, fornecedor): infere CPF (11 dígitos)
+ * ou CNPJ (14) pelo tamanho e confere os dígitos verificadores. Vazio é válido.
+ */
+export function cpfCnpjValido(control: AbstractControl): ValidationErrors | null {
+  const digitos = apenasDigitos(control.value as string | null);
+  if (!digitos) return null;
+  const valido =
+    digitos.length === 11 ? cpfValido(digitos) : digitos.length === 14 ? cnpjValido(digitos) : false;
+  return valido ? null : { documentoInvalido: true };
+}
+
+/**
  * Validador de grupo: valida `documento` conforme o `tipoDocumento` do mesmo grupo.
  * O erro `documentoInvalido` é aplicado ao controle `documento`, sem afetar o grupo.
  */

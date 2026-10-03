@@ -27,7 +27,10 @@
     <form [formGroup]="form" (ngSubmit)="salvar()">
 
       @if (passo() === 1) {
-        <p class="section-label">Itens do lançamento</p>
+        <p class="section-label">Itens do lançamento (opcional)</p>
+        <p class="item-ref">
+          Informe produtos para movimentar o estoque. Para serviços, despesas ou receitas avulsas, vá direto em Próximo.
+        </p>
 
         <div class="itens-scroll">
           @for (item of itemGroups(); track $index; let i = $index) {
@@ -50,7 +53,7 @@
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Desconto (R$)</mat-label>
+                <mat-label>Desconto por unidade (R$)</mat-label>
                 <span matTextPrefix class="price-prefix">R$&nbsp;</span>
                 <input matInput type="number" min="0" step="0.01" formControlName="desconto" />
               </mat-form-field>
@@ -120,6 +123,17 @@
 
           <app-date-field label="Data" [required]="true" formControlName="dataLancamento" />
         </div>
+
+        <mat-form-field appearance="outline" style="width:100%;margin-bottom:12px">
+          <mat-label>Descrição</mat-label>
+          <input matInput maxlength="300" formControlName="descricao" />
+          @if (itemGroups().length > 0) {
+            <mat-hint>Em branco, usa os nomes dos produtos</mat-hint>
+          }
+          @if (form.controls.descricao.invalid && form.controls.descricao.touched) {
+            <mat-error>Informe a descrição do lançamento</mat-error>
+          }
+        </mat-form-field>
 
         @if (mostrarCliente()) {
           <mat-form-field appearance="outline" style="width:100%">

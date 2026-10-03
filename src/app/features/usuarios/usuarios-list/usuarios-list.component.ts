@@ -7,6 +7,7 @@ import {
   OnInit,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -38,6 +39,7 @@ const PAPEL_CONFIG: Record<Papel, { label: string; css: string }> = {
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     PageHeaderComponent,
+    RouterLink,
     MatTableModule,
     MatButtonModule,
     MatIconModule,
@@ -126,9 +128,13 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     if (usuario.papel === 'SUPER_ROOT') return false;
     if (usuario.id === this.authService.currentUser()?.id) return false;
 
+    // O backend só permite agir sobre papel inferior ao de quem age.
     const meuPapel = this.authService.papel();
     if (meuPapel === 'ADMIN') return usuario.papel === 'OPERADOR';
-    return meuPapel === 'ROOT' || meuPapel === 'SUPER_ROOT';
+    if (meuPapel === 'ROOT' || meuPapel === 'SUPER_ROOT') {
+      return usuario.papel === 'ADMIN' || usuario.papel === 'OPERADOR';
+    }
+    return false;
   }
 
   podeDesativar(usuario: Usuario): boolean {
@@ -190,6 +196,12 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
     });
   }
 
+  private mostrarErro(err: { error?: { message?: string } } | null, padrao: string): void {
+    this.snackBar.open(err?.error?.message ?? padrao, 'Fechar', {
+      duration: 7000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-error'],
+    });
+  }
+
   confirmarDesativar(usuario: Usuario): void {
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
@@ -208,9 +220,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
             lista.map((u) => (u.id === usuario.id ? { ...u, status: 'INATIVO' } : u)),
           );
         },
-        error: () => {
-          // erro silencioso — o usuário pode tentar novamente via reload
-        },
+        error: (err) => this.mostrarErro(err, 'Não foi possível desativar este usuário.'),
       });
     });
   }
@@ -236,15 +246,7 @@ export class UsuariosListComponent implements OnInit, OnDestroy {
             duration: 6000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-success'],
           });
         },
-        error: (err) => {
-          if (err?.status === 422) {
-            this.snackBar.open(
-              err?.error?.message ?? 'Não foi possível reativar este usuário.',
-              'Fechar',
-              { duration: 7000, horizontalPosition: 'center', verticalPosition: 'top', panelClass: ['snack-error'] },
-            );
-          }
-        },
+        error: (err) => this.mostrarErro(err, 'Não foi possível reativar este usuário.'),
       });
     });
   }

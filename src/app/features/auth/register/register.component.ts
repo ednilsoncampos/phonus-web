@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { AuthService } from '../../../core/auth/auth.service';
+import { PhoneMaskDirective } from '../../../shared/directives/phone-mask.directive';
 import { Termos } from '../../../core/models/termos.model';
 import { TermosService } from '../../../core/services/termos.service';
 import {
@@ -21,6 +22,7 @@ import {
 import {
   senhaDiferenteDeEmailValidator,
   senhaForteValidator,
+  senhaMaxBytesValidator,
   senhasConferemValidator,
 } from '../../../shared/validators/senha.validator';
 
@@ -39,6 +41,7 @@ const SENHA_MAX = 72;
     MatIconModule,
     MatProgressSpinnerModule,
     MatRadioModule,
+    PhoneMaskDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './register.component.html',
@@ -67,6 +70,8 @@ export class RegisterComponent {
       nomeEmpresa: ['', [Validators.required, Validators.maxLength(200)]],
       tipoDocumento: ['CNPJ' as TipoDocumento, Validators.required],
       documento: ['', [Validators.required, Validators.pattern(/^[\d.\-/\s]+$/)]],
+      endereco: ['', Validators.maxLength(200)],
+      telefone: ['', Validators.maxLength(30)],
       nome: ['', [Validators.required, Validators.maxLength(150)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(150)]],
       senha: [
@@ -74,7 +79,7 @@ export class RegisterComponent {
         [
           Validators.required,
           Validators.minLength(SENHA_MIN),
-          Validators.maxLength(SENHA_MAX),
+          senhaMaxBytesValidator(SENHA_MAX),
           senhaForteValidator(),
           senhaDiferenteDeEmailValidator((): string | undefined => this.form?.controls.email.value?.trim()),
         ],
@@ -143,12 +148,19 @@ export class RegisterComponent {
         email,
         senha: v.senha!,
         termosId: termos.id,
+        ...(v.endereco?.trim() && { endereco: v.endereco.trim() }),
+        ...(v.telefone?.trim() && { telefone: v.telefone.trim() }),
       })
       .subscribe({
         next: () => this.router.navigate(['/verifique-email'], { state: { email } }),
         error: (err: HttpErrorResponse) => {
           this.isLoading.set(false);
           this.errorMessage.set(this.mensagemDeErro(err));
+          // Termos desatualizados: recarrega a versão vigente e exige novo aceite.
+          if (err.status === 422 && /termos/i.test(err.error?.message ?? '')) {
+            this.form.controls.aceite.setValue(false);
+            this.carregarTermos();
+          }
         },
       });
   }
@@ -161,6 +173,10 @@ export class RegisterComponent {
         return apiMessage ?? 'E-mail já cadastrado.';
       case 400:
         return apiMessage ?? 'Dados inválidos. Verifique as informações e tente novamente.';
+      case 404:
+        return apiMessage ?? 'Não há termos de uso ativos no momento. Tente novamente mais tarde.';
+      case 422:
+        return apiMessage ?? 'Não foi possível validar os dados informados.';
       case 429:
         return 'Muitas tentativas. Aguarde um instante e tente novamente.';
       default:

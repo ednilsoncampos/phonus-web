@@ -36,6 +36,8 @@ describe('RegisterComponent', () => {
       nomeEmpresa: '  Padaria do João ',
       tipoDocumento: 'CNPJ',
       documento: '11.222.333/0001-81',
+      endereco: '',
+      telefone: '',
       nome: 'João da Silva',
       email: 'joao@padaria.com.br',
       senha: 'senha1234',
@@ -157,6 +159,19 @@ describe('RegisterComponent', () => {
     expect(comp.form.controls.senha.hasError('senhaFraca')).toBe(true);
   });
 
+  it('envia endereço e telefone da empresa quando preenchidos', () => {
+    const { comp } = criar();
+    carregarTermos();
+    preencherValido(comp);
+    comp.form.patchValue({ endereco: ' Rua A, 10 ', telefone: '(11) 99999-0000' });
+
+    comp.submit();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/registro') && r.method === 'POST');
+    expect(req.request.body.endereco).toBe('Rua A, 10');
+    expect(req.request.body.telefone).toBe('(11) 99999-0000');
+  });
+
   it('envia POST /auth/registro com documento só em dígitos e termosId, e vai para verifique-email', () => {
     const { comp } = criar();
     carregarTermos();
@@ -212,5 +227,59 @@ describe('RegisterComponent', () => {
       .expectOne((r) => r.url.endsWith('/auth/registro'))
       .flush(null, { status: 500, statusText: 'Server Error' });
     expect(comp.errorMessage()).toBe('Não foi possível concluir o cadastro. Tente novamente.');
+  });
+
+  it('exibe a mensagem do backend em 422 (documento inválido) sem recarregar os termos', () => {
+    const { comp } = criar();
+    carregarTermos();
+    preencherValido(comp);
+
+    comp.submit();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/auth/registro'))
+      .flush({ message: 'CNPJ inválido' }, { status: 422, statusText: 'Unprocessable Entity' });
+
+    expect(comp.errorMessage()).toBe('CNPJ inválido');
+    expect(comp.form.controls.aceite.value).toBe(true);
+    httpMock.expectNone((r) => r.url.endsWith('/termos/atual'));
+  });
+
+  it('em 422 de termos desatualizados recarrega os termos e exige novo aceite', () => {
+    const { comp } = criar();
+    carregarTermos();
+    preencherValido(comp);
+
+    comp.submit();
+    httpMock.expectOne((r) => r.url.endsWith('/auth/registro')).flush(
+      { message: 'Os termos aceitos não correspondem à versão vigente. Recarregue os termos e aceite novamente.' },
+      { status: 422, statusText: 'Unprocessable Entity' },
+    );
+
+    expect(comp.errorMessage()).toContain('Recarregue os termos');
+    expect(comp.form.controls.aceite.value).toBe(false);
+    httpMock.expectOne((r) => r.url.endsWith('/termos/atual')).flush({ ...termosMock, id: 'termos-2' });
+    expect(comp.termos().id).toBe('termos-2');
+  });
+
+  it('mostra a mensagem do backend em 404 (nenhum termo ativo)', () => {
+    const { comp } = criar();
+    carregarTermos();
+    preencherValido(comp);
+
+    comp.submit();
+    httpMock
+      .expectOne((r) => r.url.endsWith('/auth/registro'))
+      .flush({ message: 'Nenhum termo de uso ativo encontrado' }, { status: 404, statusText: 'Not Found' });
+
+    expect(comp.errorMessage()).toBe('Nenhum termo de uso ativo encontrado');
+  });
+
+  it('limita a senha em 72 bytes: acentos contam como 2', () => {
+    const { comp } = criar();
+    carregarTermos();
+    comp.form.controls.senha.setValue('é1'.repeat(30)); // 60 caracteres, 90 bytes
+    expect(comp.form.controls.senha.hasError('maxbytes')).toBe(true);
+    comp.form.controls.senha.setValue('a1'.repeat(36)); // 72 bytes
+    expect(comp.form.controls.senha.hasError('maxbytes')).toBe(false);
   });
 });

@@ -1,0 +1,79 @@
+<app-page-header title="Minha conta" />
+
+@if (usuario(); as u) {
+  <section class="detail-card" aria-label="Dados da conta">
+    <div class="detail-grid">
+      <div class="detail-field">
+        <label>Nome</label>
+        <span>{{ u.nome }}</span>
+      </div>
+      <div class="detail-field">
+        <label>E-mail</label>
+        <span>{{ u.email }}</span>
+      </div>
+      <div class="detail-field">
+        <label>Papel</label>
+        <span>{{ papelLabel() }}</span>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <h2 class="assinatura-titulo">Assinatura</h2>
+
+    @if (carregando()) {
+      <div class="state-center" role="status" aria-label="Carregando assinatura">
+        <mat-spinner diameter="32" />
+        <span>Carregando...</span>
+      </div>
+    } @else if (erro()) {
+      <div class="state-center" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <span>{{ erro() }}</span>
+        <button mat-stroked-button (click)="carregar()">Tentar novamente</button>
+      </div>
+    } @else if (entitlement(); as e) {
+      <div class="assinatura" aria-live="polite">
+        @switch (situacao()) {
+          @case ('CORTESIA') {
+            <p class="assinatura-situacao">
+              <span class="badge badge--green">Premium</span>
+              Período de cortesia
+            </p>
+            <p>
+              {{ e.diasCortesiaRestantes }}
+              {{ e.diasCortesiaRestantes === 1 ? 'dia restante' : 'dias restantes' }}
+              @if (e.expiraEm) {
+                · válido até {{ e.expiraEm | date: 'dd/MM/yyyy' }}
+              }
+            </p>
+          }
+          @case ('ASSINATURA') {
+            <p class="assinatura-situacao">
+              <span class="badge badge--green">Premium</span>
+              @if (e.planoAtual; as plano) {
+                {{ plano.nome }}
+              }
+            </p>
+            @if (e.planoAtual; as plano) {
+              <p>
+                {{ periodoLabel() }} · {{ plano.preco | currencyBrl }}
+                @if (e.expiraEm) {
+                  · válido até {{ e.expiraEm | date: 'dd/MM/yyyy' }}
+                }
+              </p>
+            } @else if (e.expiraEm) {
+              <p>Válido até {{ e.expiraEm | date: 'dd/MM/yyyy' }}</p>
+            }
+          }
+          @default {
+            <p class="assinatura-situacao">
+              <span class="badge badge--yellow">Gratuito</span>
+              Plano gratuito
+            </p>
+          }
+        }
+      </div>
+    }
+  </section>
+}

@@ -14,6 +14,36 @@
     [title]="lancamento()!.descricao"
     [subtitle]="tipoLabel(lancamento()!.tipo)"
   >
+    @if (ehVenda()) {
+      <button
+        mat-stroked-button
+        type="button"
+        [matMenuTriggerFor]="menuRecibo"
+        [disabled]="reciboIndisponivel()"
+        [attr.aria-busy]="gerandoRecibo()"
+      >
+        <mat-icon aria-hidden="true">receipt</mat-icon>
+        @if (esperaRecibo() > 0) {
+          Aguarde {{ esperaRecibo() }}s
+        } @else {
+          Recibo
+        }
+      </button>
+      <mat-menu #menuRecibo="matMenu">
+        <button mat-menu-item type="button" (click)="baixarRecibo('pdf')">
+          <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+          <span>Baixar PDF</span>
+        </button>
+        <button mat-menu-item type="button" (click)="baixarRecibo('png')">
+          <mat-icon aria-hidden="true">image</mat-icon>
+          <span>Baixar imagem (PNG)</span>
+        </button>
+        <button mat-menu-item type="button" (click)="compartilharRecibo()">
+          <mat-icon aria-hidden="true">share</mat-icon>
+          <span>Compartilhar</span>
+        </button>
+      </mat-menu>
+    }
     <button mat-stroked-button (click)="voltar()">
       <mat-icon>arrow_back</mat-icon>
       Voltar
@@ -68,12 +98,12 @@
           <td mat-cell *matCellDef="let item">{{ item.valorUnitarioOriginal | currencyBrl }}</td>
         </ng-container>
         <ng-container matColumnDef="desconto">
-          <th mat-header-cell *matHeaderCellDef>Desconto</th>
+          <th mat-header-cell *matHeaderCellDef>Desconto/un.</th>
           <td mat-cell *matCellDef="let item">{{ item.desconto | currencyBrl }}</td>
         </ng-container>
         <ng-container matColumnDef="subtotal">
           <th mat-header-cell *matHeaderCellDef>Subtotal</th>
-          <td mat-cell *matCellDef="let item">{{ item.valorUnitario | currencyBrl }}</td>
+          <td mat-cell *matCellDef="let item">{{ item.subtotal | currencyBrl }}</td>
         </ng-container>
         <tr mat-header-row *matHeaderRowDef="colunasItens"></tr>
         <tr mat-row *matRowDef="let row; columns: colunasItens;"></tr>

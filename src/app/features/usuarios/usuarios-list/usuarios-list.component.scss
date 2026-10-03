@@ -2,3 +2,6 @@
 .col-acoes { width: 80px; text-align: right; }
 
 .status-convidado { color: #a16207; font-weight: 600; }
+
+.link-usuario { color: inherit; font-weight: 500; text-decoration: none; }
+.link-usuario:hover, .link-usuario:focus-visible { text-decoration: underline; }

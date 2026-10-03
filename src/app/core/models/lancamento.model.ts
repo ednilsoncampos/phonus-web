@@ -81,7 +81,7 @@ export interface CriarLancamentoRequest {
   categoriaId?: string;
   clienteId?: string;
   fornecedorId?: string;
-  itens: LancamentoItemRequest[];
+  itens?: LancamentoItemRequest[];
 }
 
 export interface ListarLancamentosParams {

@@ -13,5 +13,5 @@
 .col-data   { width: 110px; }
 .col-obs    { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.badge-entrada { color: var(--phonus-primary); font-weight: 600; }
-.badge-saida   { color: var(--phonus-error);   font-weight: 600; }
+.badge-entrada { color: var(--phonus-primary-text); font-weight: 600; }
+.badge-saida   { color: var(--phonus-error-text);   font-weight: 600; }

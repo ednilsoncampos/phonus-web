@@ -48,6 +48,17 @@
         }
       </mat-form-field>
 
+      <mat-form-field appearance="outline" class="register-field">
+        <mat-label>Endereço da empresa (opcional)</mat-label>
+        <input matInput formControlName="endereco" autocomplete="street-address" maxlength="200" />
+        <mat-hint>Aparece no cabeçalho do recibo</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="register-field">
+        <mat-label>Telefone da empresa (opcional)</mat-label>
+        <input matInput formControlName="telefone" phoneMask autocomplete="tel" inputmode="tel" />
+      </mat-form-field>
+
       <h2 class="register-section">Responsável</h2>
 
       <mat-form-field appearance="outline" class="register-field">
@@ -86,13 +97,13 @@
         >
           <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
         </button>
-        <mat-hint>{{ senhaMin }} a 72 caracteres, com letra e número</mat-hint>
+        <mat-hint>{{ senhaMin }} a 72 caracteres (acentos contam como 2), com letra e número</mat-hint>
         @if (form.controls.senha.hasError('required')) {
           <mat-error>Senha é obrigatória</mat-error>
         } @else if (form.controls.senha.hasError('minlength')) {
           <mat-error>A senha deve ter no mínimo {{ senhaMin }} caracteres</mat-error>
-        } @else if (form.controls.senha.hasError('maxlength')) {
-          <mat-error>A senha deve ter no máximo 72 caracteres</mat-error>
+        } @else if (form.controls.senha.hasError('maxbytes')) {
+          <mat-error>A senha deve ter no máximo 72 bytes (letras acentuadas contam como 2)</mat-error>
         } @else if (form.controls.senha.hasError('senhaFraca')) {
           <mat-error>A senha deve conter letra e número</mat-error>
         } @else if (form.controls.senha.hasError('senhaIgualEmail')) {
