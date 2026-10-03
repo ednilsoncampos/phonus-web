@@ -166,6 +166,20 @@ O backend trata `itens` como opcional (serviço, despesa, receita avulsa, venda 
 - Sem itens, o request omite `itens`. O valor total (passo 3) já era editável e obrigatório.
 - Lista e detalhe já tratavam lançamento sem itens.
 
+### 8.5 Ajustes posteriores (2026-10-02, após a homologação de vendas e lançamentos)
+
+- **Desconto por unidade:** o backend aplica o desconto do item por unidade (`valorUnitario = preço − desconto`). O campo
+  do wizard virou "Desconto por unidade (R$)" e o total sugerido é `(preço − desconto) × quantidade`.
+- **Total sugerido por tipo:** em saída (`SAIDA_CAIXA`) usa o custo do produto (`precoCusto ?? precoVenda`), como o corpo
+  enviado; em entrada, o preço de venda. É recalculado ao trocar o tipo (só quando há itens) e continua editável.
+- **Detalhe do lançamento:** o subtotal do item é `quantidade × valorUnitario` (já com desconto); a coluna de desconto é "Desconto/un.".
+- **Parcelas:** em forma a prazo, parcelas menores que 1 são barradas no web antes do envio.
+- **Documento de cliente e fornecedor:** passa a validar CPF (11 dígitos) ou CNPJ (14) com dígitos verificadores e rejeita
+  dígitos repetidos (`cpfCnpjValido`, em `shared/validators/documento.validator.ts`); o backend continua sendo a fonte da verdade.
+- **Contraste (WCAG AA):** texto secundário `#4b5563`; tokens `--phonus-primary-text` (`#0a7a45`) e `--phonus-error-text`
+  (`#b91c1c`) para texto verde e vermelho. O verde `#0d9f5a` segue nos fundos e botões.
+- **Pendente no backend:** `valorTotal` diferente da soma dos itens é aceito (só confere `> 0`); decisão de produto.
+
 ## 9. Resumo de endpoints usados
 
 | Endpoint | Uso |

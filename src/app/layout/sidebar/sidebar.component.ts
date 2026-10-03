@@ -28,6 +28,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Fornecedores', icon: 'local_shipping', route: '/fornecedores', permissao: 'CADASTROS_CONSULTAR' },
   { label: 'Cat. Lançamento', icon: 'label', route: '/categorias/lancamento', permissao: 'CADASTROS_CONSULTAR' },
   { label: 'Lançamentos', icon: 'receipt_long', route: '/lancamentos', permissao: 'FINANCEIRO_CONSULTAR' },
+  { label: 'Empresa', icon: 'business', route: '/empresa', permissao: 'EMPRESA_GERENCIAR' },
   { label: 'Termos', icon: 'gavel', route: '/termos', permissao: 'TERMOS_GERENCIAR' },
   { label: 'Relatórios', icon: 'bar_chart', route: '/relatorios/margem', permissao: 'ESTOQUE_GERENCIAR' },
 ];

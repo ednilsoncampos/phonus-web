@@ -11,6 +11,7 @@ export type Permissao =
   | 'USUARIOS_GERENCIAR'
   | 'USUARIOS_ALTERAR_PAPEL'
   | 'TERMOS_GERENCIAR'
+  | 'EMPRESA_GERENCIAR'
   | 'CONTA_PROPRIA';
 
 export interface Usuario {

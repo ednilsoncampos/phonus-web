@@ -1,22 +1,10 @@
-Monte um plano macro de cenarios de testes para eu aprovar
-que inclua vendas, entrada, saida, laçamentos e cadastros.
-Salve os cenarios na pasta docs/homologacao.
+Leia este documento  docs/integracao-web-recibo.md para adicionar a funcionalidade de compartilhar recibo.
 
-Veja abaixo o que cada perfil consegue fazer.
-┌───────────────────────────────────────────────────────────────┬──────┬───────┬──────────┐
-│                             Ação                              │ ROOT │ ADMIN │ OPERADOR │
-├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
-│ Registrar venda (POST /lancamentos, /lancamentos/interpretar) │ ✅   │ ✅    │ ✅       │
-├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
-│ Cadastrar ou editar produto                                   │ ✅   │ ✅    │ ❌       │
-├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
-│ Cadastrar ou editar fornecedor                                │ ✅   │ ✅    │ ❌       │
-├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
-│ Cadastrar ou editar cliente                                   │ ✅   │ ✅    │ ❌       │
-├───────────────────────────────────────────────────────────────┼──────┼───────┼──────────┤
-│ Consultar (GET) produtos, clientes e fornecedores             │ ✅   │ ✅    │ ✅       │
-└───────────────────────────────────────────────────────────────┴──────┴───────┴──────────┘
+Para o web e o app, o essencial é:
+- Baixar: GET /lancamentos/{id}/recibo?formato=pdf|png devolve o arquivo (binário, não JSON). Tem que ser fetch com o token e blob. Um <a href> não leva o Authorization.
+- Botão de recibo: só em lançamentos de venda. Compra devolve 422.
+- Compartilhar: navigator.share com o arquivo, ou baixar como alternativa. A API só entrega o arquivo; o compartilhamento é do cliente.
+- Limite: 30 recibos por minuto por usuário (erro 429, com Retry-After). Baixe uma vez e reutilize o arquivo.
+- Empresa: GET /empresa e PUT /empresa; o PUT é só do ROOT, e a tela de edição deve aparecer só se permissoes tiver EMPRESA_GERENCIAR.
 
-- Venda: os três papéis registram. O LancamentoController inteiro usa LANCAMENTOS_REGISTRAR. O OPERADOR só enxerga os lançamentos que ele mesmo fez, porque o escopo financeiro é restrito ao autor.
-- Cadastros: POST e PUT de produto, cliente e fornecedor exigem CADASTROS_GERENCIAR, que só ROOT e ADMIN têm. O mesmo vale para as categorias e para PATCH /produtos/{id}/desativar.
-- Consulta: o OPERADOR só lê esses cadastros, o que basta para escolher um produto ou cliente ao registrar uma venda.
+Monte um plano para eu aprovar.

@@ -8,15 +8,15 @@ export class ApiService {
   private readonly base = environment.apiUrl;
 
   get<T>(path: string, params?: Record<string, unknown>) {
-    let httpParams = new HttpParams();
-    if (params) {
-      Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          httpParams = httpParams.set(key, String(value));
-        }
-      });
-    }
-    return this.http.get<T>(`${this.base}${path}`, { params: httpParams });
+    return this.http.get<T>(`${this.base}${path}`, { params: this.toParams(params) });
+  }
+
+  getBlob(path: string, params?: Record<string, unknown>) {
+    return this.http.get(`${this.base}${path}`, {
+      params: this.toParams(params),
+      responseType: 'blob',
+      observe: 'response',
+    });
   }
 
   post<T>(path: string, body: unknown) {
@@ -33,5 +33,17 @@ export class ApiService {
 
   delete<T>(path: string) {
     return this.http.delete<T>(`${this.base}${path}`);
+  }
+
+  private toParams(params?: Record<string, unknown>): HttpParams {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, String(value));
+        }
+      });
+    }
+    return httpParams;
   }
 }

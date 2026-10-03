@@ -1,7 +1,9 @@
 # Plano macro de cenários de teste — vendas, entradas, saídas, lançamentos e cadastros
 
-**Status: proposta para aprovação.** Nenhum cenário foi executado. Depois de aprovado, cada bloco vira um roteiro
-passo a passo no mesmo formato de `roteiro-navegador-cadastro-usuarios.md` (execução pelo navegador, sem `curl`).
+**Status: aprovado e executado em 2026-10-02.** O resultado, os achados e as correções estão em
+`resultado-execucao-vendas-lancamentos-cadastros.md`. Os cenários abaixo permanecem como referência para reexecução
+(execução pelo navegador, sem `curl`, no mesmo estilo de `roteiro-navegador-cadastro-usuarios.md`). Na execução o G3
+usou um só OPERADOR (comparado ao ADMIN) e o D3 cobriu dinheiro e PIX.
 
 Origem: pedido em `claude-analise/correcoes-e-melhorias-web.txt` e rotas/menu do web (`app.routes.ts`,
 `sidebar.component.ts`). Complementa `funcionalidades-cadastro-usuarios.md` (usuários e autenticação já cobertos).

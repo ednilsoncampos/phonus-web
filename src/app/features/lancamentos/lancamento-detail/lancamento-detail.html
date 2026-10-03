@@ -14,6 +14,36 @@
     [title]="lancamento()!.descricao"
     [subtitle]="tipoLabel(lancamento()!.tipo)"
   >
+    @if (ehVenda()) {
+      <button
+        mat-stroked-button
+        type="button"
+        [matMenuTriggerFor]="menuRecibo"
+        [disabled]="reciboIndisponivel()"
+        [attr.aria-busy]="gerandoRecibo()"
+      >
+        <mat-icon aria-hidden="true">receipt</mat-icon>
+        @if (esperaRecibo() > 0) {
+          Aguarde {{ esperaRecibo() }}s
+        } @else {
+          Recibo
+        }
+      </button>
+      <mat-menu #menuRecibo="matMenu">
+        <button mat-menu-item type="button" (click)="baixarRecibo('pdf')">
+          <mat-icon aria-hidden="true">picture_as_pdf</mat-icon>
+          <span>Baixar PDF</span>
+        </button>
+        <button mat-menu-item type="button" (click)="baixarRecibo('png')">
+          <mat-icon aria-hidden="true">image</mat-icon>
+          <span>Baixar imagem (PNG)</span>
+        </button>
+        <button mat-menu-item type="button" (click)="compartilharRecibo()">
+          <mat-icon aria-hidden="true">share</mat-icon>
+          <span>Compartilhar</span>
+        </button>
+      </mat-menu>
+    }
     <button mat-stroked-button (click)="voltar()">
       <mat-icon>arrow_back</mat-icon>
       Voltar

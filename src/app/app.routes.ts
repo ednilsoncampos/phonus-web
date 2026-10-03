@@ -151,6 +151,13 @@ export const routes: Routes = [
           import('./features/conta/minha-conta/minha-conta').then((m) => m.MinhaConta),
       },
       {
+        path: 'empresa',
+        canActivate: [permissionGuard],
+        data: { permissao: 'EMPRESA_GERENCIAR' },
+        loadComponent: () =>
+          import('./features/empresa/empresa-form/empresa-form').then((m) => m.EmpresaForm),
+      },
+      {
         path: 'termos',
         canActivate: [permissionGuard],
         data: { permissao: 'TERMOS_GERENCIAR' },

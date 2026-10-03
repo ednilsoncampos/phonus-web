@@ -16,6 +16,8 @@ export interface RegistroRequest {
   email: string;
   senha: string;
   termosId: string;
+  endereco?: string;
+  telefone?: string;
 }
 
 export interface RefreshRequest {

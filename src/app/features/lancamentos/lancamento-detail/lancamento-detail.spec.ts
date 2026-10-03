@@ -3,6 +3,8 @@ import { provideRouter } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { ReciboService } from '../../../core/services/recibo.service';
 import { LancamentoDetail } from './lancamento-detail';
 import { LancamentoService } from '../../../core/services/lancamento.service';
 import { ProdutoService } from '../../../core/services/produto.service';
@@ -173,5 +175,36 @@ describe('LancamentoDetail', () => {
     comp.voltar();
 
     expect(router.navigate).toHaveBeenCalledWith(['/lancamentos']);
+  });
+
+  describe('recibo', () => {
+    it('mostra o botão só em venda', () => {
+      const fixture = TestBed.createComponent(LancamentoDetail);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.textContent).toContain('Recibo');
+
+      vi.spyOn(lancamentoService, 'buscar').mockReturnValue(of({ ...mockLancamento, tipo: 'SAIDA_CAIXA' }));
+      const compra = TestBed.createComponent(LancamentoDetail);
+      compra.detectChanges();
+      expect(compra.nativeElement.textContent).not.toContain('Recibo');
+    });
+
+    it('429 bloqueia o botão pelo Retry-After', () => {
+      vi.useFakeTimers();
+      const recibo = TestBed.inject(ReciboService);
+      const err = new HttpErrorResponse({ status: 429, headers: new HttpHeaders({ 'Retry-After': '5' }) });
+      vi.spyOn(recibo, 'baixar').mockReturnValue(throwError(() => err));
+      const fixture = TestBed.createComponent(LancamentoDetail);
+      fixture.detectChanges();
+      const comp = fixture.componentInstance;
+
+      comp.baixarRecibo('pdf');
+      expect(comp.esperaRecibo()).toBe(5);
+      expect(comp.reciboIndisponivel()).toBe(true);
+
+      vi.advanceTimersByTime(5000);
+      expect(comp.reciboIndisponivel()).toBe(false);
+      vi.useRealTimers();
+    });
   });
 });

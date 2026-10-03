@@ -36,6 +36,8 @@ describe('RegisterComponent', () => {
       nomeEmpresa: '  Padaria do João ',
       tipoDocumento: 'CNPJ',
       documento: '11.222.333/0001-81',
+      endereco: '',
+      telefone: '',
       nome: 'João da Silva',
       email: 'joao@padaria.com.br',
       senha: 'senha1234',
@@ -155,6 +157,19 @@ describe('RegisterComponent', () => {
     comp.form.controls.senha.setValue('somenteletras');
 
     expect(comp.form.controls.senha.hasError('senhaFraca')).toBe(true);
+  });
+
+  it('envia endereço e telefone da empresa quando preenchidos', () => {
+    const { comp } = criar();
+    carregarTermos();
+    preencherValido(comp);
+    comp.form.patchValue({ endereco: ' Rua A, 10 ', telefone: '(11) 99999-0000' });
+
+    comp.submit();
+
+    const req = httpMock.expectOne((r) => r.url.endsWith('/auth/registro') && r.method === 'POST');
+    expect(req.request.body.endereco).toBe('Rua A, 10');
+    expect(req.request.body.telefone).toBe('(11) 99999-0000');
   });
 
   it('envia POST /auth/registro com documento só em dígitos e termosId, e vai para verifique-email', () => {

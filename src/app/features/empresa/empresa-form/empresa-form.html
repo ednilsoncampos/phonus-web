@@ -1,0 +1,56 @@
+<app-page-header
+  title="Dados da empresa"
+  subtitle="Essas informações aparecem no cabeçalho dos recibos"
+/>
+
+@if (carregando()) {
+  <div class="state-center" role="status" aria-label="Carregando dados da empresa">
+    <mat-spinner diameter="48" />
+    <span>Carregando...</span>
+  </div>
+} @else if (erro()) {
+  <div class="state-center" role="alert">
+    <mat-icon aria-hidden="true">error_outline</mat-icon>
+    <span>{{ erro() }}</span>
+    <button mat-stroked-button type="button" (click)="carregar()">Tentar novamente</button>
+  </div>
+} @else if (empresa(); as e) {
+  <form class="detail-card empresa-form" [formGroup]="form" (ngSubmit)="salvar()" novalidate>
+    @if (!e.endereco && !e.telefone) {
+      <p class="empresa-aviso" role="note">
+        <mat-icon aria-hidden="true">info</mat-icon>
+        Preencha endereço e telefone para que apareçam no recibo.
+      </p>
+    }
+
+    <p class="empresa-doc"><strong>{{ e.tipoDocumento }}:</strong> {{ e.documento }}</p>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nome da empresa</mat-label>
+      <input matInput formControlName="nome" maxlength="150" autocomplete="organization" aria-required="true" />
+      @if (form.controls.nome.hasError('required')) {
+        <mat-error>Nome é obrigatório</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Endereço</mat-label>
+      <input matInput formControlName="endereco" maxlength="200" autocomplete="street-address" />
+      <mat-hint>Uma linha</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Telefone</mat-label>
+      <input matInput formControlName="telefone" phoneMask autocomplete="tel" inputmode="tel" />
+    </mat-form-field>
+
+    <div class="empresa-acoes">
+      <button mat-flat-button type="submit" [disabled]="salvando()">
+        @if (salvando()) {
+          <mat-spinner diameter="18" aria-label="Salvando" />
+        }
+        Salvar
+      </button>
+    </div>
+  </form>
+}

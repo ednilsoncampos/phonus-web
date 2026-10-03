@@ -48,6 +48,17 @@
         }
       </mat-form-field>
 
+      <mat-form-field appearance="outline" class="register-field">
+        <mat-label>Endereço da empresa (opcional)</mat-label>
+        <input matInput formControlName="endereco" autocomplete="street-address" maxlength="200" />
+        <mat-hint>Aparece no cabeçalho do recibo</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="register-field">
+        <mat-label>Telefone da empresa (opcional)</mat-label>
+        <input matInput formControlName="telefone" phoneMask autocomplete="tel" inputmode="tel" />
+      </mat-form-field>
+
       <h2 class="register-section">Responsável</h2>
 
       <mat-form-field appearance="outline" class="register-field">
